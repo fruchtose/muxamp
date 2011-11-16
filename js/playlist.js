@@ -17,12 +17,12 @@ function Playlist(soundManager) {
     }
     
     this.play = function() {
-        var nextTrack = this.currentTrack + 1 >= this.list.length ? 0 : this.currentTrack + 1;
+        var obj = this;
         this.soundManager.play(this.list[this.currentTrack].getID(), {
             onfinish: function() {
                 alert("Next track!");
-                this.currentTrack = nextTrack;
-                this.play();
+                obj.currentTrack = obj.currentTrack + 1 >= obj.list.length ? 0 : obj.currentTrack + 1;
+                obj.play();
             }
         });
     }
