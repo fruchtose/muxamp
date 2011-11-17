@@ -16,7 +16,7 @@ var SoundObject = new JS.Class({
 
 var SoundCloudObject = new JS.Class(SoundObject, {
     initialize: function(urlArg, consumerKeyArg, trackArg, soundManagerArg) {
-        var trackID = 'track_' + trackArg.id;
+        var trackID = 'soundcloud_' + trackArg.id;
         this.callSuper(urlArg, trackID, soundManagerArg);
         var apiURL = urlArg;
         (apiURL.toString().indexOf("secret_token") == -1) ? apiURL = apiURL + '?' : apiURL = apiURL + '&';

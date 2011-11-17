@@ -25,7 +25,7 @@
             <table id="list">
                 <tbody>
                 <tr>
-                    <td>Sup</td>
+                    <td>Link</td><td></td>
                 </tr>
                 </tbody>
             </table>
