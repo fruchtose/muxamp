@@ -6,7 +6,9 @@ function Playlist(soundManager) {
     this.addTrack = function(soundObject) {
         this.list[this.list.length] = soundObject;
         var obj = this;
-        $('#playlist table tbody:last').append('<tr id=' + soundObject.getID() + '><td>' + soundObject.artist + ' - ' + soundObject.soundName + '</td><td><a onclick="return false;" class="remove" href>Remove</a></td></tr>');
+        var extLink = '<a href="' + soundObject.permalink +'" target="_blank" class="external">' + soundObject.siteName + '</a>';
+        var appendedHTML = '<tr id=' + soundObject.getID() + '><td>' + soundObject.artist + ' - ' + soundObject.soundName + '</td><td><a onclick="return false;" class="remove" href>Remove</a></td><td>' + extLink +'</td></tr>';
+        $('#playlist table tbody:last').append(appendedHTML);
         $('#playlist table tbody tr:last').css('font-weight', 'normal');
         var rowDOM = '#playlist table tbody tr#' + soundObject.getID();
         var domName = '#playlist table tbody tr#' + soundObject.getID() + ' td a.remove';

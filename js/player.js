@@ -1,9 +1,11 @@
 var SoundObject = new JS.Class({
-    initialize: function(url, id, soundManager, artist, soundName) {
+    initialize: function(siteName, url, permalink, id, soundManager, artist, soundName) {
         this.id = id;
+        this.permalink = permalink != "" ? permalink : "";
         this.url = url;
         this.soundManager = soundManager;
         this.artist = artist != "" ? artist : "";
+        this.siteName = siteName != "" ? siteName : "";
         this.soundName = soundName != "" ? soundName : "";
     },
     
@@ -27,7 +29,7 @@ var SoundObject = new JS.Class({
 var SoundCloudObject = new JS.Class(SoundObject, {
     initialize: function(url, consumerKey, track, soundManager) {
         var trackID = 'soundcloud_' + track.id;
-        this.callSuper(url, trackID, soundManager, track.user.username, track.title);
+        this.callSuper("SoundCloud", url, track.permalink_url, trackID, soundManager, track.user.username, track.title);
         var apiURL = url;
         (apiURL.toString().indexOf("secret_token") == -1) ? apiURL = apiURL + '?' : apiURL = apiURL + '&';
         apiURL = apiURL + 'consumer_key=' + consumerKey;
