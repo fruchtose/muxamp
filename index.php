@@ -32,7 +32,7 @@
                 </div>
                 <div id="adder">
                     <input type="text" id="adder-link" />
-                    <a href onclick="return false;" id="adder-button">Add Music Source</a>
+                    <a href onclick="return false;" id="adder-button">Add Media Source</a>
                 </div>
                 <div id="playlist">
                     <table id="list">
