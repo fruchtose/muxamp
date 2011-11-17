@@ -11,22 +11,27 @@
         <script src="js/playlist.js" type="text/javascript"></script>
         <script src="js/router.js" type="text/javascript"></script>
         <script src="js/ui.js" type="text/javascript"></script>
+        <style type="text/css">
+            html {font-family: Verdana, Tahoma, Helvetica, Arial;
+                  font-size: 13px;}
+            table tbody tr.playing td {font-weight: bold;}
+            table tbody tr.playing td a.remove {font-weight: normal;}
+        </style>
     </head>
     <body>
         <div id ="player">
-            <span id ="play">Play</span>
-            <span id ="stop">Stop</span>
+            <a href onclick="return false;" id="previous">Previous</a>
+            <a href onclick="return false;" id ="play">Play</a>
+            <a href onclick="return false;" id="next">Next</a>
+            <a href onclick="return false;" id ="stop">Stop</a>
         </div>
         <div id="adder">
             <input type="text" id="adder-link" />
-            <button type="button" id="adder-button">Add Track</button>
+            <button type="button" id="adder-button">Add Music Source</button>
         </div>
         <div id="playlist">
             <table id="list">
                 <tbody>
-                <tr>
-                    <td>Link</td><td></td>
-                </tr>
                 </tbody>
             </table>
         </div>
