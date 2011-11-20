@@ -140,22 +140,34 @@ function Playlist(soundManager) {
             listNumbers[track] = track;
         }
         var newList = [];
+        var newCurrentTrack = 0;
         while (listNumbers.length > 0) {
             var nextTrack = listNumbers[Math.floor(Math.random()*listNumbers.length)];
             listNumbers.splice(listNumbers.indexOf(nextTrack), 1);
             newList[newList.length] = this.list[nextTrack];
+            if (nextTrack == this.currentTrack) {
+                newCurrentTrack = newList.length - 1;
+            }
         }
-        
+        var wasPlaying = this.isPlaying();
+        this.currentTrack = newCurrentTrack;
+        this.list = newList;
         var playlist = this;
         $(this.playlistDOM.allRowsInTable).attr("id", function(index) {
             return newList[index].id;
         }).each(function(index) {
+            if (index != newCurrentTrack) {
+                $(this).removeClass('playing');
+            }
+            else  if (wasPlaying) {
+                $(this).addClass('playing');
+            }
             $(this).html(playlist._getDOMTableCellsForSoundObject(newList[index]));
         });
         /*.each(function() {
             playlist.removeTrack(playlist.list[0].id);
         });*/
-        this.list = newList;
+        
         /*for (index in this.list){
             this._addPlaylistDOMRow(this.list[index]);
         }*/
