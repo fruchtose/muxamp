@@ -1,21 +1,49 @@
+var PlaylistDOMInformation = function() {
+    this.parentTable = "#playlist table tbody";
+    
+    this.lastElementOfParent = this.parentTable + ":last";
+    
+    this.lastRowInParent = this.parentTable + " tr:last";
+    
+    this.allRowsInTable = this.parentTable + " tr";
+    
+    this.getRowForID = function(id) {
+        return this.parentTable + " tr#" + id;
+    };
+    
+    this.getRemovalHyperlinkForID =  function(id) {
+        return this.getRowForID(id) + " td a.remove";
+    };
+};
+
 function Playlist(soundManager) {
     this.currentTrack = 0;
     this.list = [];
+    this.playlistDOM = new PlaylistDOMInformation();
     this.soundManager = soundManager;
+    
+    this._addPlaylistDOMRow = function(soundObject) {
+        var obj = this;
+        var appendedHTML = this._getDOMRowForSoundObject(soundObject);
+        $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
+        $(this.playlistDOM.lastRowInParent).css('font-weight', 'normal');
+        $(this.playlistDOM.getRemovalHyperlinkForID()).live('click', function() {
+            obj.removeTrack(soundObject.id);
+        });
+    }
+    
+    this._getDOMRowForSoundObject = function(soundObject) {
+        return '<tr id=' + soundObject.getID() + '>' + this._getDOMTableCellsForSoundObject(soundObject) + '</tr>';
+    }
+    
+    this._getDOMTableCellsForSoundObject = function(soundObject) {
+        var extLink = '<a href="' + soundObject.permalink +'" target="_blank" class="external">' + soundObject.siteName + '</a>';
+        return '<td>' + soundObject.artist + ' - ' + soundObject.soundName + '</td><td><a onclick="return false;" class="remove" href>Remove</a></td><td>' + extLink +'</td>';
+    }
     
     this.addTrack = function(soundObject) {
         this.list[this.list.length] = soundObject;
-        var obj = this;
-        var extLink = '<a href="' + soundObject.permalink +'" target="_blank" class="external">' + soundObject.siteName + '</a>';
-        var appendedHTML = '<tr id=' + soundObject.getID() + '><td>' + soundObject.artist + ' - ' + soundObject.soundName + '</td><td><a onclick="return false;" class="remove" href>Remove</a></td><td>' + extLink +'</td></tr>';
-        $('#playlist table tbody:last').append(appendedHTML);
-        $('#playlist table tbody tr:last').css('font-weight', 'normal');
-        var rowDOM = '#playlist table tbody tr#' + soundObject.getID();
-        var domName = '#playlist table tbody tr#' + soundObject.getID() + ' td a.remove';
-        $(domName).live('click', function() {
-            obj.removeTrack(soundObject.getID());
-            $(rowDOM).remove();
-        });
+        this._addPlaylistDOMRow(soundObject);
     };
     
     this.hasNext = function() {
@@ -60,7 +88,7 @@ function Playlist(soundManager) {
                 }
             });
             $('#play').text('Pause');
-            var rowDOM = '#playlist table tbody tr#' + this.list[this.currentTrack].getID();
+            var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
             $(rowDOM).addClass('playing');
         }
     }
@@ -98,8 +126,48 @@ function Playlist(soundManager) {
                     $('#play').text('Pause');
                 }
             }
-            
+            var rowDOM = this.playlistDOM.getRowForID(track_id);
+            $(rowDOM).remove();
         }
+    }
+    
+    this.shuffle = function() {
+        if (this.isEmpty()) {
+            return;
+        }
+        var listNumbers = [];
+        for (track in this.list) {
+            listNumbers[track] = track;
+        }
+        var newList = [];
+        while (listNumbers.length > 0) {
+            var nextTrack = listNumbers[Math.floor(Math.random()*listNumbers.length)];
+            listNumbers.splice(listNumbers.indexOf(nextTrack), 1);
+            newList[newList.length] = this.list[nextTrack];
+        }
+        
+        var playlist = this;
+        $(this.playlistDOM.allRowsInTable).attr("id", function(index) {
+            return newList[index].id;
+        }).each(function(index) {
+            $(this).html(playlist._getDOMTableCellsForSoundObject(newList[index]));
+        });
+        /*.each(function() {
+            playlist.removeTrack(playlist.list[0].id);
+        });*/
+        this.list = newList;
+        /*for (index in this.list){
+            this._addPlaylistDOMRow(this.list[index]);
+        }*/
+    }
+    
+    this.stop = function () {
+        for (track in this.list) {
+            this.list[track].getSound().stop();
+        }
+        var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
+        $(rowDOM).removeClass('playing');
+        $('#play').text('Play');
     }
     
     this.togglePause = function() {
@@ -110,15 +178,6 @@ function Playlist(soundManager) {
         else {
             $('#play').text('Pause');
         }
-    }
-    
-    this.stop = function () {
-        for (track in this.list) {
-            this.list[track].getSound().stop();
-        }
-        var rowDOM = '#playlist table tbody tr#' + this.list[this.currentTrack].getID();
-        $(rowDOM).removeClass('playing');
-        $('#play').text('Play');
     }
 }
 var playlist = new Playlist(soundManager);

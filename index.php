@@ -29,6 +29,7 @@
                     <a href onclick="return false;" id ="play">Play</a>
                     <a href onclick="return false;" id="next">Next</a>
                     <a href onclick="return false;" id ="stop">Stop</a>
+                    <a href onclick="return false;" id="shuffle">Shuffle</a>
                 </div>
                 <div id="adder">
                     <input type="text" id="adder-link" />

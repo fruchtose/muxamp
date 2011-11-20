@@ -19,6 +19,10 @@ $('#stop').live('click', function() {
     playlist.stop();
 });
 
+$('#shuffle').live('click', function() {
+    playlist.shuffle();
+});
+
 $('#adder-button').live('click', function(){
     var value = $('#adder-link').val();
     router.addTracks(value);
