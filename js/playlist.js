@@ -8,7 +8,7 @@ var PlaylistDOMInformation = function() {
     this.allRowsInTable = this.parentTable + " tr";
     
     this.getRowForID = function(id) {
-        return this.parentTable + " tr#" + id;
+        return this.parentTable + " tr." + id;
     };
     
     this.getRemovalHyperlinkForID =  function(id) {
@@ -26,14 +26,13 @@ function Playlist(soundManager) {
         var obj = this;
         var appendedHTML = this._getDOMRowForSoundObject(soundObject);
         $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
-        $(this.playlistDOM.lastRowInParent).css('font-weight', 'normal');
         $(this.playlistDOM.getRemovalHyperlinkForID()).live('click', function() {
             obj.removeTrack(soundObject.id);
         });
     }
     
     this._getDOMRowForSoundObject = function(soundObject) {
-        return '<tr id=' + soundObject.getID() + '>' + this._getDOMTableCellsForSoundObject(soundObject) + '</tr>';
+        return '<tr class=' + soundObject.getID() + '>' + this._getDOMTableCellsForSoundObject(soundObject) + '</tr>';
     }
     
     this._getDOMTableCellsForSoundObject = function(soundObject) {
@@ -153,13 +152,10 @@ function Playlist(soundManager) {
         this.currentTrack = newCurrentTrack;
         this.list = newList;
         var playlist = this;
-        $(this.playlistDOM.allRowsInTable).attr("id", function(index) {
+        $(this.playlistDOM.allRowsInTable).attr("class", function(index) {
             return newList[index].id;
         }).each(function(index) {
-            if (index != newCurrentTrack) {
-                $(this).removeClass('playing');
-            }
-            else  if (wasPlaying) {
+            if (index == newCurrentTrack && wasPlaying) {
                 $(this).addClass('playing');
             }
             $(this).html(playlist._getDOMTableCellsForSoundObject(newList[index]));
