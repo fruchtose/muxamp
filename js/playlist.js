@@ -40,6 +40,8 @@ function Playlist(soundManager) {
         return '<td>' + soundObject.artist + ' - ' + soundObject.soundName + '</td><td><a onclick="return false;" class="remove" href>Remove</a></td><td>' + extLink +'</td>';
     }
     
+    this._started = false;
+    
     this.addTrack = function(soundObject) {
         this.list[this.list.length] = soundObject;
         this._addPlaylistDOMRow(soundObject);
@@ -86,6 +88,7 @@ function Playlist(soundManager) {
                     obj.nextTrack(true);
                 }
             });
+            this._started = true;
             $('#play').text('Pause');
             var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
             $(rowDOM).addClass('playing');
@@ -149,7 +152,9 @@ function Playlist(soundManager) {
             }
         }
         var wasPlaying = this.isPlaying();
-        this.currentTrack = newCurrentTrack;
+        if (this._started == true) {
+            this.currentTrack = newCurrentTrack;
+        }
         this.list = newList;
         var playlist = this;
         $(this.playlistDOM.allRowsInTable).attr("class", function(index) {

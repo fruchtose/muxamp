@@ -45,6 +45,25 @@ var SoundCloudObject = new JS.Class(SoundObject, {
         return this.sound;
     }
 });
+
+var BandcampObject = new JS.Class(SoundObject, {
+    initialize: function(linkURL, consumerKey, track, artistName, soundManager) {
+        var trackID = 'bandcamp_' + track.track_id;
+        this.callSuper("Bandcamp", track.streaming_url, linkURL, trackID, soundManager, artistName, track.title);
+        var apiURL = track.streaming_url;
+        apiURL = apiURL + '&api_key=' + consumerKey;
+        this.url = apiURL;
+        this.sound = soundManager.createSound({
+            id: trackID,
+            url: this.url
+        });
+        this.isPaused = false;
+    },
+   
+    getSound: function() {
+        return this.sound;
+    }
+});
 /*var SoundObject = function(url, soundManager, player) {
     this.url = url != "" ? url : "";
     

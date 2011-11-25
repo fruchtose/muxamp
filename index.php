@@ -22,12 +22,36 @@
                 top: 0;
                 width: 75%;
             }
-            #controls {
+            #player-wrapper {
+            }
+            #player {
                 background-color: #fff;
-                display: inline-block;
-                position: fixed;
+                display: block;
+                float: left;
+                height: 40px;
+                line-height: 40px;
+                margin: 0 auto;
+                /*position: fixed;*/
                 top: 0;
+                vertical-align: baseline;
+                width: 800px;
                 z-index: 10;
+            }
+            #controls {
+                float: left;
+                display: inline-block;
+            }
+            #timebar {
+                height: 10px;
+                margin-left: 210px;
+                position: relative;
+                width: 200px;
+            }
+            #timebar-meter-unfilled {
+                background-color: #000;
+                height: 10px;
+                margin-top: 15px;
+                width: 100%;
             }
             #content {
                 top: 40px;
@@ -42,12 +66,23 @@
     </head>
     <body>
         <div id="wrapper">
-            <div id="controls">
-                <a href onclick="return false;" id="previous">Previous</a>
-                <a href onclick="return false;" id ="play">Play</a>
-                <a href onclick="return false;" id="next">Next</a>
-                <a href onclick="return false;" id ="stop">Stop</a>
-                <a href onclick="return false;" id="shuffle">Shuffle</a>
+            <div id="player-wrapper">
+                <div id="player">
+                    <div id ="controls">
+                        <a href onclick="return false;" id="previous">Previous</a>
+                        <a href onclick="return false;" id ="play">Play</a>
+                        <a href onclick="return false;" id="next">Next</a>
+                        <a href onclick="return false;" id ="stop">Stop</a>
+                        <a href onclick="return false;" id="shuffle">Shuffle</a>
+                    </div>
+                    <div id="timebar">
+                        <div id="timebar-meter-unfilled">
+                            <div id="timebar-meter-filled">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="content">
                 <div id="adder">
