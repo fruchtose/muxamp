@@ -26,7 +26,7 @@ function Playlist(soundManager) {
         var obj = this;
         var appendedHTML = this._getDOMRowForSoundObject(soundObject);
         $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
-        $(this.playlistDOM.getRemovalHyperlinkForID()).live('click', function() {
+        $(this.playlistDOM.getRemovalHyperlinkForID(soundObject.id)).live('click', function() {
             obj.removeTrack(soundObject.id);
         });
     }
