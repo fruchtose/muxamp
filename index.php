@@ -18,6 +18,16 @@
             body {
                 margin-left: 0;
             }
+            li {
+                display: list-item;
+                margin: 0px;
+                white-space: nowrap;
+            }
+            ol, ul {
+                list-style: none;
+                margin: 0px;
+                padding: 0px;
+            }
             #wrapper {
                 top: 0;
                 width: 75%;
@@ -31,7 +41,7 @@
                 height: 40px;
                 line-height: 40px;
                 margin: 0 auto;
-                /*position: fixed;*/
+                position: fixed;
                 top: 0;
                 vertical-align: baseline;
                 width: 800px;
@@ -60,18 +70,34 @@
             #adder {
                 z-index: -1;
             }
-            table tbody tr a {
-                font-weight: bold;
+            #tracks li .desc {
+                display: block;
+                padding-right: 200px;
+                position: relative;
             }
-            table tbody tr.playing {
+            #tracks li div.right {
+                display: block;
+                overflow: hidden;
+                position: absolute;
+                right: 0px;
+                text-align: right;
+                width: 200px;
+            }
+            #tracks a {
+                font-weight: bold;
+                padding-left: 1em;
+                padding-right: 0;
+                text-decoration: none;
+            }
+            #tracks li.playing {
                 background-color: #333;
                 color: #ddd;
             }
-            table tbody tr.playing a {
+            #tracks li.playing a {
                 color: #eeeecc;
                 text-decoration: none;
             }
-            table tbody tr.playing a:hover {text-decoration: underline; }
+            #tracks li.playing a:hover {text-decoration: underline; }
         </style>
     </head>
     <body>
@@ -100,10 +126,8 @@
                     <a href onclick="return false;" id="adder-button">Add Media Source</a>
                 </div>
                 <div id="playlist">
-                    <table id="list">
-                        <tbody>
-                        </tbody>
-                    </table>
+                    <ol id="tracks">
+                    </ol>
                 </div>
             </div>
         </div>

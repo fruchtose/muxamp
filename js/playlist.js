@@ -1,18 +1,18 @@
 var PlaylistDOMInformation = function() {
-    this.parentTable = "#playlist table tbody";
+    this.parentTable = "ol#tracks";
     
     this.lastElementOfParent = this.parentTable + ":last";
     
-    this.lastRowInParent = this.parentTable + " tr:last";
+    this.lastRowInParent = this.parentTable + " li:last";
     
-    this.allRowsInTable = this.parentTable + " tr";
+    this.allRowsInTable = this.parentTable + " li";
     
     this.getRowForID = function(id) {
-        return this.parentTable + " tr." + id;
+        return this.parentTable + " li." + id;
     };
     
     this.getRemovalHyperlinkForID =  function(id) {
-        return this.getRowForID(id) + " td a.remove";
+        return this.getRowForID(id) + " li a.remove";
     };
 };
 
@@ -32,12 +32,13 @@ function Playlist(soundManager) {
     }
     
     this._getDOMRowForSoundObject = function(soundObject) {
-        return '<tr class=' + soundObject.getID() + '>' + this._getDOMTableCellsForSoundObject(soundObject) + '</tr>';
+        return '<li class=' + soundObject.getID() + '>' + this._getDOMTableCellsForSoundObject(soundObject) + '</li>';
     }
     
     this._getDOMTableCellsForSoundObject = function(soundObject) {
         var extLink = '<a href="' + soundObject.permalink +'" target="_blank" class="external">' + soundObject.siteName + '</a>';
-        return '<td>' + soundObject.artist + ' - ' + soundObject.soundName + '</td><td><a onclick="return false;" class="remove" href>Remove</a></td><td>' + extLink +'</td>';
+        var links = '<div class="right"><a onclick="return false;" class="remove" href>Remove</a>' + extLink + '</div>';
+        return links + '<span class="desc">' +soundObject.artist + ' - ' + soundObject.soundName + '</span>';
     }
     
     this._started = false;
