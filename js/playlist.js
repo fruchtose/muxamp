@@ -38,7 +38,7 @@ function Playlist(soundManager) {
     this._getDOMTableCellsForSoundObject = function(soundObject) {
         var extLink = '<a href="' + soundObject.permalink +'" target="_blank" class="external">' + soundObject.siteName + '</a>';
         var links = '<div class="right"><a onclick="return false;" class="remove" href>Remove</a>' + extLink + '</div>';
-        return links + '<span class="desc">' +soundObject.artist + ' - ' + soundObject.soundName + '</span>';
+        return links + '<div class="desc">' +soundObject.artist + ' - ' + soundObject.soundName + '</span>';
     }
     
     this._started = false;
@@ -87,6 +87,12 @@ function Playlist(soundManager) {
             this.soundManager.play(this.list[this.currentTrack].getID(), {
                 onfinish: function() {
                     obj.nextTrack(true);
+                },
+                onload: function(success) {
+                    alert(success);
+                    if (!success) {
+                            obj.nextTrack(true);
+                        }
                 }
             });
             this._started = true;

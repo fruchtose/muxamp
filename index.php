@@ -19,9 +19,8 @@
                 margin-left: 0;
             }
             li {
-                display: list-item;
                 margin: 0px;
-                white-space: nowrap;
+                white-space: pre-line;
             }
             ol, ul {
                 list-style: none;
@@ -71,17 +70,14 @@
                 z-index: -1;
             }
             #tracks li .desc {
-                display: block;
-                padding-right: 200px;
-                position: relative;
+                padding-right: 171px;
             }
             #tracks li div.right {
-                display: block;
-                overflow: hidden;
                 position: absolute;
                 right: 0px;
                 text-align: right;
-                width: 200px;
+                width: 171px;
+                z-index: 9;
             }
             #tracks a {
                 font-weight: bold;

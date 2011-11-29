@@ -1,18 +1,24 @@
-function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumerKey) {
+function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumerKey, youtubeKey) {
     this.soundManager = (typeof soundManager === 'object') ? soundManager : null;
     this.soundcloudConsumerKey = soundcloudConsumerKey != "" ? soundcloudConsumerKey : "";
     this.bandcampConsumerKey = bandcampConsumerKey != "" ? bandcampConsumerKey : "";
     this.playlist = playlist != null ? playlist : new Playlist();
+    this.youtubeKey = youtubeKey != null ? youtubeKey : "";
     
     this.addTracks = function(url) {
         url = jQuery.trim(url.toString());
-        if (url.match(/https?:\/\/(www\.)?soundcloud\.com\/[0-9A-Za-z][0-9A-Za-z_-]*\/(sets\/)?[0-9A-Za-z][0-9A-Za-z_-]*/)) {
-            this.getSoundCloudTracks(url);
-        }
-        else if (url.match(/(http:\/\/)?[0-9A-Za-z][0-9A-Za-z_-]*\.bandcamp\.com\/track\/*/) || 
-            url.match(/(http:\/\/)?[0-9A-Za-z][0-9A-Za-z_-]*\.bandcamp\.com\/album\/*/)) {
-            this.getBandcampTracks(url);
-        }
+        var router = this;
+        this.verifyURL(url, function(success) {
+            if (success == true) {
+                if (url.match(/https?:\/\/(www\.)?soundcloud\.com\/[0-9A-Za-z][0-9A-Za-z_-]*\/(sets\/)?[0-9A-Za-z][0-9A-Za-z_-]*/)) {
+                    router.getSoundCloudTracks(url);
+                }
+                else if (url.match(/(http:\/\/)?[0-9A-Za-z][0-9A-Za-z_-]*\.bandcamp\.com\/track\/*/) || 
+                    url.match(/(http:\/\/)?[0-9A-Za-z][0-9A-Za-z_-]*\.bandcamp\.com\/album\/*/)) {
+                    router.getBandcampTracks(url);
+                }
+            }
+        });
     };
     
     this.getBandcampTracks = function(url) {
@@ -53,19 +59,24 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     else if (data.album_id != undefined) {
                         var albumRequest = 'http://api.bandcamp.com/api/album/2/info?key=' + consumerKey + '&album_id=' + albumID + '&callback=?';
                         $.getJSON(albumRequest, function (albumdata) {
-                           if (albumdata.tracks != undefined) {
-                               $.each(albumdata.tracks, function (index, track) {
-                                   var linkURL = bandcampArtistURL + track.url;
-                                   var trackObject = new BandcampObject(linkURL, consumerKey, track, artist, soundManager);
-                                   playlist.addTrack(trackObject);
-                               });
-                           } 
+                            if (albumdata.tracks != undefined) {
+                                $.each(albumdata.tracks, function (index, track) {
+                                    var linkURL = bandcampArtistURL + track.url;
+                                    var trackObject = new BandcampObject(linkURL, consumerKey, track, artist, soundManager);
+                                    playlist.addTrack(trackObject);
+                                });
+                            } 
                         });
                     }
                 }
             });
         });
     };
+    
+    this.getMP3Track = function (url) {
+        var trackObject = new SoundObject("URL", url, url, url, soundManager, "Track", url);
+        this.playlist.addTrack(trackObject);
+    }
     
     this.getSoundCloudTracks = function(url) {
         var resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
@@ -88,5 +99,9 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
             }
         });
     };
+    
+    this.verifyURL = function(url, callback) {
+        callback(/^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url));
+    }
 }
-var router = new Router(playlist, soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "apthroskulagakvaeniighentr");
+var router = new Router(playlist, soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "apthroskulagakvaeniighentr", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");
