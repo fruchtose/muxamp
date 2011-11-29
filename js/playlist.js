@@ -90,6 +90,7 @@ function Playlist(soundManager) {
             });
             this._started = true;
             $('#play').text('Pause');
+            $('.playing').removeClass('playing');
             var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
             $(rowDOM).addClass('playing');
         }
@@ -178,8 +179,6 @@ function Playlist(soundManager) {
         for (track in this.list) {
             this.list[track].getSound().stop();
         }
-        var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
-        $(rowDOM).removeClass('playing');
         $('#play').text('Play');
     }
     

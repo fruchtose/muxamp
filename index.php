@@ -48,7 +48,7 @@
                 width: 200px;
             }
             #timebar-meter-unfilled {
-                background-color: #000;
+                /*background-color: #000;*/
                 height: 10px;
                 margin-top: 15px;
                 width: 100%;
@@ -60,8 +60,18 @@
             #adder {
                 z-index: -1;
             }
-            table tbody tr.playing td {font-weight: bold;}
-            table tbody tr.playing td a {font-weight: normal;}
+            table tbody tr a {
+                font-weight: bold;
+            }
+            table tbody tr.playing {
+                background-color: #333;
+                color: #ddd;
+            }
+            table tbody tr.playing a {
+                color: #eeeecc;
+                text-decoration: none;
+            }
+            table tbody tr.playing a:hover {text-decoration: underline; }
         </style>
     </head>
     <body>
