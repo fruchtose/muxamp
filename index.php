@@ -4,6 +4,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title></title>
         <script src="js/jquery-1.7.js" type="text/javascript"></script>
+        <script src="js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
+        <script src="js/jquery.layout-latest.js" type="text/javascript"></script>
         <script src="js/soundmanager2.js" type="text/javascript"></script>
         <script src="js/jsclass.js" type="text/javascript"></script>
         <script src="js/config.js" type="text/javascript"></script>
@@ -29,26 +31,21 @@
             }
             #wrapper {
                 top: 0;
-                width: 75%;
             }
             #player-wrapper {
+                line-height: 40px;
             }
             #player {
                 background-color: #fff;
                 display: block;
                 float: left;
                 height: 40px;
-                line-height: 40px;
                 margin: 0 auto;
-                position: fixed;
-                top: 0;
+                margin-right: 1em;
+                /*position: fixed;
+                top: 0;*/
                 vertical-align: baseline;
-                width: 800px;
                 z-index: 10;
-            }
-            #controls {
-                float: left;
-                display: inline-block;
             }
             #timebar {
                 height: 10px;
@@ -62,12 +59,8 @@
                 margin-top: 15px;
                 width: 100%;
             }
-            #content {
-                top: 40px;
-                position: relative;
-            }
-            #adder {
-                z-index: -1;
+            #main {
+                overflow: auto;
             }
             #tracks li .desc {
                 padding-right: 171px;
@@ -94,6 +87,10 @@
                 text-decoration: none;
             }
             #tracks li.playing a:hover {text-decoration: underline; }
+            #footer {
+                line-height: 20px;
+                text-align: center;
+            }
         </style>
     </head>
     <body>
@@ -107,24 +104,31 @@
                         <a href onclick="return false;" id ="stop">Stop</a>
                         <a href onclick="return false;" id="shuffle">Shuffle</a>
                     </div>
-                    <div id="timebar">
+                    <!--<div id="timebar">
                         <div id="timebar-meter-unfilled">
                             <div id="timebar-meter-filled">
 
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
-            </div>
-            <div id="content">
                 <div id="adder">
                     <input type="text" id="adder-link" />
                     <a href onclick="return false;" id="adder-button">Add Media Source</a>
                 </div>
-                <div id="playlist">
+            </div>
+            <div id="main">
+                <div class="content">
                     <ol id="tracks">
                     </ol>
+
                 </div>
+            </div>
+            <div id="right-side">
+
+            </div>
+            <div id="footer">
+                by Robert Fruchtman
             </div>
         </div>
     </body>

@@ -1,3 +1,25 @@
+var body;
+var bodyLayoutOptions = {
+        center: {
+            paneSelector: "#main"
+            
+        },
+        north: {
+            paneSelector: "#player-wrapper",
+            size: 40
+        },
+        south: {
+            paneSelector: "#footer",
+            size: 20
+        }
+    };
+
+$(document).ready(function() {
+    body = $('body').layout(bodyLayoutOptions);
+});
+
+
+
 $('#previous').live('click', function() {
     playlist.previousTrack();
 });

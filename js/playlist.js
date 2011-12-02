@@ -12,7 +12,8 @@ var PlaylistDOMInformation = function() {
     };
     
     this.getRemovalHyperlinkForID =  function(id) {
-        return this.getRowForID(id) + " li a.remove";
+        var selector = this.getRowForID(id) + " a.remove";
+        return selector;
     };
 };
 
@@ -26,8 +27,9 @@ function Playlist(soundManager) {
         var obj = this;
         var appendedHTML = this._getDOMRowForSoundObject(soundObject);
         $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
-        $(this.playlistDOM.getRemovalHyperlinkForID(soundObject.id)).live('click', function() {
-            obj.removeTrack(soundObject.id);
+        var id = soundObject.id;
+        $(this.playlistDOM.getRemovalHyperlinkForID(id)).live('click', function() {
+            obj.removeTrack(id);
         });
     }
     
@@ -89,7 +91,6 @@ function Playlist(soundManager) {
                     obj.nextTrack(true);
                 },
                 onload: function(success) {
-                    alert(success);
                     if (!success) {
                             obj.nextTrack(true);
                         }
