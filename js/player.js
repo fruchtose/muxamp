@@ -1,5 +1,6 @@
 var SoundObject = new JS.Class({
-    initialize: function(siteName, url, permalink, id, soundManager, artist, soundName) {
+    initialize: function(siteName, url, permalink, clazz, id, soundManager, artist, soundName) {
+        this.clazz = clazz;
         this.id = id;
         this.permalink = permalink != "" ? permalink : "";
         this.url = url;
@@ -27,15 +28,15 @@ var SoundObject = new JS.Class({
 });
 
 var SoundCloudObject = new JS.Class(SoundObject, {
-    initialize: function(url, consumerKey, track, soundManager) {
-        var trackID = 'soundcloud_' + track.id;
-        this.callSuper("SoundCloud", url, track.permalink_url, trackID, soundManager, track.user.username, track.title);
+    initialize: function(id, url, consumerKey, track, soundManager) {
+        var trackClass = 'soundcloud_' + track.id;
+        this.callSuper("SoundCloud", url, track.permalink_url, trackClass, id, soundManager, track.user.username, track.title);
         var apiURL = url;
         (apiURL.toString().indexOf("secret_token") == -1) ? apiURL = apiURL + '?' : apiURL = apiURL + '&';
         apiURL = apiURL + 'consumer_key=' + consumerKey;
         this.url = apiURL;
         this.sound = soundManager.createSound({
-            id: trackID,
+            id: id,
             url: this.url				
         });
         this.isPaused = false;
@@ -47,14 +48,14 @@ var SoundCloudObject = new JS.Class(SoundObject, {
 });
 
 var BandcampObject = new JS.Class(SoundObject, {
-    initialize: function(linkURL, consumerKey, track, artistName, soundManager) {
-        var trackID = 'bandcamp_' + track.track_id;
-        this.callSuper("Bandcamp", track.streaming_url, linkURL, trackID, soundManager, artistName, track.title);
+    initialize: function(id, linkURL, consumerKey, track, artistName, soundManager) {
+        var trackClass = 'bandcamp_' + track.track_id;
+        this.callSuper("Bandcamp", track.streaming_url, linkURL, trackClass, id, soundManager, artistName, track.title);
         var apiURL = track.streaming_url;
         apiURL = apiURL + '&api_key=' + consumerKey;
         this.url = apiURL;
         this.sound = soundManager.createSound({
-            id: trackID,
+            id: id,
             url: this.url
         });
         this.isPaused = false;

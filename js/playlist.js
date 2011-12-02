@@ -20,8 +20,12 @@ var PlaylistDOMInformation = function() {
 function Playlist(soundManager) {
     this.currentTrack = 0;
     this.list = [];
+    this.nextNewID = 0;
+    this.newTrackIDs = [];
     this.playlistDOM = new PlaylistDOMInformation();
     this.soundManager = soundManager;
+    this.tracksByClass = new Object();
+    this.tracksByID = new Object();
     
     this._addPlaylistDOMRow = function(soundObject) {
         var obj = this;
@@ -34,7 +38,7 @@ function Playlist(soundManager) {
     }
     
     this._getDOMRowForSoundObject = function(soundObject) {
-        return '<li class=' + soundObject.getID() + '>' + this._getDOMTableCellsForSoundObject(soundObject) + '</li>';
+        return '<li class=' + soundObject.id + '>' + this._getDOMTableCellsForSoundObject(soundObject) + '</li>';
     }
     
     this._getDOMTableCellsForSoundObject = function(soundObject) {
@@ -49,6 +53,21 @@ function Playlist(soundManager) {
         this.list[this.list.length] = soundObject;
         this._addPlaylistDOMRow(soundObject);
     };
+    
+    this.allocateNewIDs = function(count) {
+        var firstNewID = this.nextNewID;
+        this.nextNewID += count;
+        var trackIDsLength = this.newTrackIDs.length;
+        for (i = 0; i < count; i++) {
+            this.newTrackIDs[trackIDsLength + i] = firstNewID + i;
+        }
+    }
+    
+    this.getNewTrackID = function() {
+        var newID = this.newTrackIDs.splice(0, 1);
+        newID = $.isArray(newID) ? newID[0] : newID;
+        return newID;
+    }
     
     this.hasNext = function() {
         return !this.isEmpty() && this.list.length > this.currentTrack + 1;
@@ -86,7 +105,7 @@ function Playlist(soundManager) {
     this.play = function() {
         if (!this.isEmpty()) {
             var obj = this;
-            this.soundManager.play(this.list[this.currentTrack].getID(), {
+            this.soundManager.play(this.list[this.currentTrack].id, {
                 onfinish: function() {
                     obj.nextTrack(true);
                 },
@@ -116,7 +135,7 @@ function Playlist(soundManager) {
     this.removeTrack = function(track_id) {
         var pos = -1;
         for (track in this.list) {
-            if (this.list[track].getID() == track_id) {
+            if (this.list[track].id == track_id) {
                 pos = track;
                 break;
             }
