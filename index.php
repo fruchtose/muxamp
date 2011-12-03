@@ -118,11 +118,8 @@
                 </div>
             </div>
             <div id="main">
-                <div class="content">
-                    <ol id="tracks">
-                    </ol>
-
-                </div>
+                <ol id="tracks">
+                </ol>
             </div>
             <div id="right-side">
 

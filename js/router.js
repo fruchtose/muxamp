@@ -70,7 +70,6 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                                 router.allocateNewTracks(albumdata.tracks.length);
                                 $.each(albumdata.tracks, function (index, track) {
                                     var id = router.getNewTrackID();
-                                    alert(id);
                                     var linkURL = bandcampArtistURL + track.url;
                                     var trackObject = new BandcampObject(id, linkURL, consumerKey, track, artist, soundManager);
                                     playlist.addTrack(trackObject);

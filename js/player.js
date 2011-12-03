@@ -1,7 +1,7 @@
 var SoundObject = new JS.Class({
-    initialize: function(siteName, url, permalink, clazz, id, soundManager, artist, soundName) {
-        this.clazz = clazz;
+    initialize: function(siteName, url, permalink, id, soundManager, artist, soundName, seconds) {
         this.id = id;
+        this.duration = seconds; /* Number of seconds */
         this.permalink = permalink != "" ? permalink : "";
         this.url = url;
         this.soundManager = soundManager;
@@ -12,6 +12,30 @@ var SoundObject = new JS.Class({
     
     getArtist: function() {
         return this.artist;
+    },
+    
+    getDurationString: function() {
+        var str = "";
+        var secondsLeft = this.duration;
+        var hours = Math.floor(secondsLeft / 3600);
+        if (hours >= 1) {
+            secondsLeft -= hours * 3600;
+        }
+        var minutes = Math.floor(secondsLeft / 60);
+        if (minutes >= 1) {
+            secondsLeft -= (minutes * 60);
+        }
+        var seconds = Math.floor(secondsLeft);
+        str = (hours >= 1) ? (hours.toString() + ":") : "";
+        if (minutes < 10) {
+            str += "0";
+        }
+        str += minutes.toString() + ":";
+        if (seconds < 10) {
+            str += "0";
+        }
+        str += seconds.toString();
+        return str;
     },
     
     getSound: function() {
@@ -29,8 +53,7 @@ var SoundObject = new JS.Class({
 
 var SoundCloudObject = new JS.Class(SoundObject, {
     initialize: function(id, url, consumerKey, track, soundManager) {
-        var trackClass = 'soundcloud_' + track.id;
-        this.callSuper("SoundCloud", url, track.permalink_url, trackClass, id, soundManager, track.user.username, track.title);
+        this.callSuper("SoundCloud", url, track.permalink_url, id, soundManager, track.user.username, track.title, track.duration / 1000);
         var apiURL = url;
         (apiURL.toString().indexOf("secret_token") == -1) ? apiURL = apiURL + '?' : apiURL = apiURL + '&';
         apiURL = apiURL + 'consumer_key=' + consumerKey;
@@ -49,8 +72,7 @@ var SoundCloudObject = new JS.Class(SoundObject, {
 
 var BandcampObject = new JS.Class(SoundObject, {
     initialize: function(id, linkURL, consumerKey, track, artistName, soundManager) {
-        var trackClass = 'bandcamp_' + track.track_id;
-        this.callSuper("Bandcamp", track.streaming_url, linkURL, trackClass, id, soundManager, artistName, track.title);
+        this.callSuper("Bandcamp", track.streaming_url, linkURL, id, soundManager, artistName, track.title, track.duration);
         var apiURL = track.streaming_url;
         apiURL = apiURL + '&api_key=' + consumerKey;
         this.url = apiURL;

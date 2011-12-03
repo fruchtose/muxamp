@@ -44,7 +44,7 @@ function Playlist(soundManager) {
     this._getDOMTableCellsForSoundObject = function(soundObject) {
         var extLink = '<a href="' + soundObject.permalink +'" target="_blank" class="external">' + soundObject.siteName + '</a>';
         var links = '<div class="right"><a onclick="return false;" class="remove" href>Remove</a>' + extLink + '</div>';
-        return links + '<div class="desc">' +soundObject.artist + ' - ' + soundObject.soundName + '</span>';
+        return links + '<div class="desc">' +soundObject.artist + ' - ' + soundObject.soundName + ' ' + '[' + soundObject.getDurationString() + ']' + '</span>';
     }
     
     this._started = false;
@@ -65,7 +65,7 @@ function Playlist(soundManager) {
     
     this.getNewTrackID = function() {
         var newID = this.newTrackIDs.splice(0, 1);
-        newID = $.isArray(newID) ? newID[0] : newID;
+        newID = ($.isArray(newID) ? newID[0] : newID).toString();
         return newID;
     }
     
