@@ -33,31 +33,40 @@
                 top: 0;
             }
             #player-wrapper {
-                line-height: 40px;
-            }
-            #player {
                 background-color: #fff;
-                display: block;
-                float: left;
+                clear: both;
                 height: 40px;
-                margin: 0 auto;
-                margin-right: 1em;
-                /*position: fixed;
-                top: 0;*/
+                line-height: 40px;
                 vertical-align: baseline;
+                width: 100%;
                 z-index: 10;
             }
-            #timebar {
-                height: 10px;
-                margin-left: 210px;
-                position: relative;
-                width: 200px;
+            #controls {
+                float: left;
+                /*position: fixed;
+                top: 0;*/
             }
-            #timebar-meter-unfilled {
-                /*background-color: #000;*/
-                height: 10px;
-                margin-top: 15px;
-                width: 100%;
+            #timebar {
+                float: left;
+                height: 40px;
+            }
+            #timebar-outer {
+                border: 1px solid #333;
+                float: left;
+                height: 20px;
+                margin-top: 9px;
+                overflow: hidden;
+                width: 350px;
+            }
+            #timebar-inner {
+                background-color: #3d3;
+                height: 20px;
+                min-width: 0px;
+                width: 0;
+            }
+            #time-elapsed {
+                float: left;
+                height: 50px;
             }
             #main {
                 overflow: auto;
@@ -104,14 +113,14 @@
                         <a href onclick="return false;" id ="stop">Stop</a>
                         <a href onclick="return false;" id="shuffle">Shuffle</a>
                     </div>
-                    <!--<div id="timebar">
-                        <div id="timebar-meter-unfilled">
-                            <div id="timebar-meter-filled">
-
-                            </div>
+                    <div id="timebar">
+                        <div id="timebar-outer">
+                            <div id="timebar-inner"></div>
                         </div>
-                    </div> -->
+                        <div id="time-elapsed">0:00</div>
+                    </div>
                 </div>
+
                 <div id="adder">
                     <input type="text" id="adder-link" />
                     <a href onclick="return false;" id="adder-button">Add Media Source</a>

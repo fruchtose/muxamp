@@ -14,30 +14,6 @@ var SoundObject = new JS.Class({
         return this.artist;
     },
     
-    getDurationString: function() {
-        var str = "";
-        var secondsLeft = this.duration;
-        var hours = Math.floor(secondsLeft / 3600);
-        if (hours >= 1) {
-            secondsLeft -= hours * 3600;
-        }
-        var minutes = Math.floor(secondsLeft / 60);
-        if (minutes >= 1) {
-            secondsLeft -= (minutes * 60);
-        }
-        var seconds = Math.floor(secondsLeft);
-        str = (hours >= 1) ? (hours.toString() + ":") : "";
-        if (minutes < 10) {
-            str += "0";
-        }
-        str += minutes.toString() + ":";
-        if (seconds < 10) {
-            str += "0";
-        }
-        str += seconds.toString();
-        return str;
-    },
-    
     getSound: function() {
         return 'I don\'t have a sound!';
     },

@@ -44,7 +44,7 @@ function Playlist(soundManager) {
     this._getDOMTableCellsForSoundObject = function(soundObject) {
         var extLink = '<a href="' + soundObject.permalink +'" target="_blank" class="external">' + soundObject.siteName + '</a>';
         var links = '<div class="right"><a onclick="return false;" class="remove" href>Remove</a>' + extLink + '</div>';
-        return links + '<div class="desc">' +soundObject.artist + ' - ' + soundObject.soundName + ' ' + '[' + soundObject.getDurationString() + ']' + '</span>';
+        return links + '<div class="desc">' +soundObject.artist + ' - ' + soundObject.soundName + ' ' + '[' + secondsToString(soundObject.duration) + ']' + '</span>';
     }
     
     this._started = false;
@@ -104,15 +104,22 @@ function Playlist(soundManager) {
     
     this.play = function() {
         if (!this.isEmpty()) {
-            var obj = this;
-            this.soundManager.play(this.list[this.currentTrack].id, {
+            var playlist = this;
+            var object = this.list[this.currentTrack].id;
+            this.soundManager.play(object, {
                 onfinish: function() {
-                    obj.nextTrack(true);
+                    playlist.nextTrack(true);
                 },
                 onload: function(success) {
                     if (!success) {
-                            obj.nextTrack(true);
+                            playlist.nextTrack(true);
                         }
+                },
+                whileplaying: function() {
+                    var position = this.position, seconds = position/ 1000;
+                    timeElapsed.text(secondsToString(seconds));
+                    var percent = Math.min(100 * (position / this.duration), 100);
+                    updateTimebar(percent);
                 }
             });
             this._started = true;
@@ -142,6 +149,7 @@ function Playlist(soundManager) {
         }
         if (pos >= 0) {
             var wasPlaying = this.isPlaying() && pos == this.currentTrack;
+            this.stop();
             if (!this.hasNext()) {
                 this.currentTrack = 0;
             }
@@ -158,6 +166,13 @@ function Playlist(soundManager) {
             }
             var rowDOM = this.playlistDOM.getRowForID(track_id);
             $(rowDOM).remove();
+        }
+    }
+    
+    this.seek = function(decimalPercent) {
+        if (!this.isEmpty()) {
+            var sound = this.list[this.currentTrack].sound;
+            sound.setPosition(Math.floor(decimalPercent * sound.duration));
         }
     }
     
@@ -206,6 +221,8 @@ function Playlist(soundManager) {
         for (track in this.list) {
             this.list[track].getSound().stop();
         }
+        timebar.width(0);
+        $('#time-elapsed').text('0:00');
         $('#play').text('Play');
     }
     
