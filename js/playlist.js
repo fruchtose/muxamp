@@ -52,10 +52,11 @@ function Playlist(soundManager) {
     
     this.addTrack = function(soundObject) {
         var index = this.list.length;
+        var trackNumber = index++;
         this.list[index] = soundObject;
         this.totalDuration += soundObject.duration;
-        this._addPlaylistDOMRow(soundObject, index + 1);
-        $('#track-count').text(index.toString());
+        this._addPlaylistDOMRow(soundObject, trackNumber);
+        $('#track-count').text(trackNumber.toString());
         $('#playlist-duration').text(secondsToString(this.totalDuration));
     };
     
