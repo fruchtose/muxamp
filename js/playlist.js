@@ -24,6 +24,7 @@ function Playlist(soundManager) {
     this.newTrackIDs = [];
     this.playlistDOM = new PlaylistDOMInformation();
     this.soundManager = soundManager;
+    this.totalDuration = 0; // Duration in seconds
     this.tracksByClass = new Object();
     this.tracksByID = new Object();
     
@@ -51,7 +52,10 @@ function Playlist(soundManager) {
     
     this.addTrack = function(soundObject) {
         this.list[this.list.length] = soundObject;
+        this.totalDuration += soundObject.duration;
         this._addPlaylistDOMRow(soundObject);
+        $('#track-count').text(this.list.length.toString());
+        $('#playlist-duration').text(secondsToString(this.totalDuration));
     };
     
     this.allocateNewIDs = function(count) {
@@ -153,8 +157,10 @@ function Playlist(soundManager) {
             if (!this.hasNext()) {
                 this.currentTrack = 0;
             }
+            var trackDuration = this.list[pos].duration;
             this.list[pos].getSound().destruct();
             this.list.splice(pos, 1);
+            this.totalDuration -= trackDuration;
             if (this.isEmpty()) {
                 $('#play').text('Play');
             }
@@ -166,6 +172,8 @@ function Playlist(soundManager) {
             }
             var rowDOM = this.playlistDOM.getRowForID(track_id);
             $(rowDOM).remove();
+            $('#track-count').text(this.list.length.toString());
+            $('#playlist-duration').text(secondsToString(this.totalDuration));
         }
     }
     

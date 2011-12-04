@@ -5,17 +5,47 @@ var bodyLayoutOptions = {
             
     },
     north: {
+        closable: false,
         paneSelector: "#player-wrapper",
-        size: 40
+        resizable: false,
+        size: 60,
+        slidable: false
     },
     south: {
+        closable: false,
         paneSelector: "#footer",
-        size: 20
+        resizable: false,
+        size: 20,
+        slidable: false
+    }
+};
+
+var header;
+var headerLayoutOptions = {
+    center: {
+        paneSelector: "#timebar",
+        minSize: 400
+    },
+    defaults: {
+        closable: false,
+        resizable: false,
+        slidable: false
+    },
+    east: {
+        minSize: 300,
+        paneSelector: "#adder",
+        size: 300
+    },
+    west: {
+        minSize: 300,
+        paneSelector: "#controls",
+        size: 300
     }
 };
 
 $(document).ready(function() {
     body = $('body').layout(bodyLayoutOptions);
+    header = $('#player-wrapper').layout(headerLayoutOptions);
 });
 
 $('#previous').live('click', function() {
@@ -69,14 +99,21 @@ $(function() {
 $(document).ready(function() {
     var timebarOuter = $("#timebar-outer");
     timebarOuter.click(function(e) {
-        var fraction = (e.pageX - this.offsetLeft) / timebarOuter.width();
+        var fraction = (e.pageX - timebarOuter.offset().left) / timebarOuter.width();
        playlist.seek(fraction.toFixed(4)); 
     });
 });
 
 var secondsToString = function(duration) {
         var str = "";
-        var secondsLeft = duration;
+        // The duration can be a decimal, but we want it to be an integer so the user 
+        // doesn't end up seeing the a track is 4:20 when the track is actually 260.75 seconds long.
+        // This would mean that adding this track to the playlist twice would cause the 
+        // total duration to be 8:41 (260.75 + 260.75 = 521.5 seconds). To prevent this from happening, 
+        // we round up. The track of 260.75 seconds is now reported to be 4:21, and 
+        // the adding this track twice to the playlist would make the total duration 
+        // to be 8:42, which the user would expect intuitively.
+        var secondsLeft = Math.ceil(duration);
         var hours = Math.floor(secondsLeft / 3600);
         if (hours >= 1) {
             secondsLeft -= hours * 3600;
