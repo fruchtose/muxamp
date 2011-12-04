@@ -28,9 +28,9 @@ function Playlist(soundManager) {
     this.tracksByClass = new Object();
     this.tracksByID = new Object();
     
-    this._addPlaylistDOMRow = function(soundObject) {
+    this._addPlaylistDOMRow = function(soundObject, index) {
         var obj = this;
-        var appendedHTML = this._getDOMRowForSoundObject(soundObject);
+        var appendedHTML = this._getDOMRowForSoundObject(soundObject, index);
         $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
         var id = soundObject.id;
         $(this.playlistDOM.getRemovalHyperlinkForID(id)).live('click', function() {
@@ -38,23 +38,24 @@ function Playlist(soundManager) {
         });
     }
     
-    this._getDOMRowForSoundObject = function(soundObject) {
-        return '<li class=' + soundObject.id + '>' + this._getDOMTableCellsForSoundObject(soundObject) + '</li>';
+    this._getDOMRowForSoundObject = function(soundObject, index) {
+        return '<li class=' + soundObject.id + '>' + this._getDOMTableCellsForSoundObject(soundObject, index) + '</li>';
     }
     
-    this._getDOMTableCellsForSoundObject = function(soundObject) {
+    this._getDOMTableCellsForSoundObject = function(soundObject, index) {
         var extLink = '<a href="' + soundObject.permalink +'" target="_blank" class="external">' + soundObject.siteName + '</a>';
         var links = '<div class="right"><a onclick="return false;" class="remove" href>Remove</a>' + extLink + '</div>';
-        return links + '<div class="desc">' +soundObject.artist + ' - ' + soundObject.soundName + ' ' + '[' + secondsToString(soundObject.duration) + ']' + '</span>';
+        return links + '<div class="desc">' + index + ". " +soundObject.artist + ' - ' + soundObject.soundName + ' ' + '[' + secondsToString(soundObject.duration) + ']' + '</span>';
     }
     
     this._started = false;
     
     this.addTrack = function(soundObject) {
-        this.list[this.list.length] = soundObject;
+        var index = this.list.length;
+        this.list[index] = soundObject;
         this.totalDuration += soundObject.duration;
-        this._addPlaylistDOMRow(soundObject);
-        $('#track-count').text(this.list.length.toString());
+        this._addPlaylistDOMRow(soundObject, index + 1);
+        $('#track-count').text(index.toString());
         $('#playlist-duration').text(secondsToString(this.totalDuration));
     };
     
@@ -214,7 +215,7 @@ function Playlist(soundManager) {
             if (index == newCurrentTrack && wasPlaying) {
                 $(this).addClass('playing');
             }
-            $(this).html(playlist._getDOMTableCellsForSoundObject(newList[index]));
+            $(this).html(playlist._getDOMTableCellsForSoundObject(newList[index], index + 1));
         });
         /*.each(function() {
             playlist.removeTrack(playlist.list[0].id);
