@@ -6,7 +6,6 @@
         <script src="js/jquery-1.7.js" type="text/javascript"></script>
         <script src="js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
         <script src="js/jquery.layout-latest.js" type="text/javascript"></script>
-        <script src="js/datatables/js/jquery.dataTables.min.js" type="text/javascript"></script>
         <script src="js/soundmanager2.js" type="text/javascript"></script>
         <script src="js/jsclass.js" type="text/javascript"></script>
         <script src="js/config.js" type="text/javascript"></script>
@@ -154,18 +153,8 @@
                 </div>
             </div>
             <div id="main">
-                <table id="tracks">
-                    <thead>
-                        <tr>
-                            <th>Number</th>
-                            <th>Artist</th>
-                            <th>Track</th>
-                            <th>Duration</th>
-                            <th>Remove</th>
-                            <th>Link</th>
-                        </tr>
-                    <tbody></tbody>
-                </table>
+                <ol id="tracks">
+                </ol>
             </div>
             <div id="right-side">
 

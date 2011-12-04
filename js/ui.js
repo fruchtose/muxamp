@@ -43,21 +43,9 @@ var headerLayoutOptions = {
     }
 };
 
-var tracksTableOptions = {
-    "bFilter": false,
-    "bInfo": false,
-    "bPaginate": false,
-    "bSort": false,
-    "oLanguage": {
-        "sZeroRecords": "Tracks will show up here!"
-    },
-    "sDOM": 't'
-};
-
 $(document).ready(function() {
     body = $('body').layout(bodyLayoutOptions);
     header = $('#player-wrapper').layout(headerLayoutOptions);
-    $('table#tracks').dataTable(tracksTableOptions);
 });
 
 $('#previous').live('click', function() {
