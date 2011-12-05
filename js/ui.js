@@ -6,7 +6,7 @@ var bodyLayoutOptions = {
     },
     north: {
         closable: false,
-        paneSelector: "#player-wrapper",
+        paneSelector: "#player-header",
         resizable: false,
         size: 60,
         slidable: false
@@ -20,32 +20,8 @@ var bodyLayoutOptions = {
     }
 };
 
-var header;
-var headerLayoutOptions = {
-    center: {
-        paneSelector: "#timebar",
-        minSize: 400
-    },
-    defaults: {
-        closable: false,
-        resizable: false,
-        slidable: false
-    },
-    east: {
-        minSize: 300,
-        paneSelector: "#adder",
-        size: 300
-    },
-    west: {
-        minSize: 300,
-        paneSelector: "#controls",
-        size: 300
-    }
-};
-
 $(document).ready(function() {
     body = $('body').layout(bodyLayoutOptions);
-    header = $('#player-wrapper').layout(headerLayoutOptions);
 });
 
 $('#previous').live('click', function() {
