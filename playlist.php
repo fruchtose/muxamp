@@ -37,13 +37,9 @@
             #wrapper {
                 top: 0;
             }
-            #player-row-1 {
+            .player-row {
                 height: 30px;
                 line-height: 30px;
-            }
-            #player-row-2 {
-                height: 40px;
-                line-height: 40px;
             }
             #controls {
                 float: left;
@@ -64,7 +60,7 @@
                 float: left;
                 height: 20px;
                 margin-left: 1em;
-                margin-top: 9px;
+                margin-top: 4px;
                 overflow: hidden;
                 width: 350px;
             }
@@ -124,7 +120,7 @@
     <body>
         <div id="wrapper">
             <div id="player-header">
-                <div id="player-row-1">
+                <div id="player-row-1" class="player-row">
                     <div id="playlist-info">
                         <div id="track-count-wrapper">
                             Tracks: <span id="track-count">0</span>
@@ -138,7 +134,7 @@
                         <a href onclick="return false;" id="adder-button">Add Media Source</a>
                     </div>
                 </div>
-                <div id="player-row-2">
+                <div id="player-row-2" class="player-row">
                     <div id ="controls">
                         <a href onclick="return false;" id="previous">Previous</a>
                         <a href onclick="return false;" id ="play">Play</a>
