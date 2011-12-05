@@ -28,34 +28,34 @@ function Playlist(soundManager) {
     this.tracksByClass = new Object();
     this.tracksByID = new Object();
     
-    this._addPlaylistDOMRow = function(soundObject, index) {
+    this._addPlaylistDOMRow = function(mediaObject, index) {
         var obj = this;
-        var appendedHTML = this._getDOMRowForSoundObject(soundObject, index);
+        var appendedHTML = this._getDOMRowForMediaObject(mediaObject, index);
         $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
-        var id = soundObject.id;
+        var id = mediaObject.id;
         $(this.playlistDOM.getRemovalHyperlinkForID(id)).live('click', function() {
             obj.removeTrack(id);
         });
     }
     
-    this._getDOMRowForSoundObject = function(soundObject, index) {
-        return '<li class=' + soundObject.id + '>' + this._getDOMTableCellsForSoundObject(soundObject, index) + '</li>';
+    this._getDOMRowForMediaObject = function(mediaObject, index) {
+        return '<li class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</li>';
     }
     
-    this._getDOMTableCellsForSoundObject = function(soundObject, index) {
-        var extLink = '<a href="' + soundObject.permalink +'" target="_blank" class="external">' + soundObject.siteName + '</a>';
+    this._getDOMTableCellsForMediaObject = function(mediaObject, index) {
+        var extLink = '<a href="' + mediaObject.permalink +'" target="_blank" class="external">' + mediaObject.siteName + '</a>';
         var links = '<div class="right"><a onclick="return false;" class="remove" href>Remove</a>' + extLink + '</div>';
-        return links + '<div class="desc">' + index + ". " +soundObject.artist + ' - ' + soundObject.soundName + ' ' + '[' + secondsToString(soundObject.duration) + ']' + '</span>';
+        return links + '<div class="desc">' + index + ". " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     }
     
     this._started = false;
     
-    this.addTrack = function(soundObject) {
+    this.addTrack = function(mediaObject) {
         var index = this.list.length;
         var trackNumber = index + 1;
-        this.list[index] = soundObject;
-        this.totalDuration += soundObject.duration;
-        this._addPlaylistDOMRow(soundObject, trackNumber);
+        this.list[index] = mediaObject;
+        this.totalDuration += mediaObject.getDuration();
+        this._addPlaylistDOMRow(mediaObject, trackNumber);
         $('#track-count').text(trackNumber.toString());
         $('#playlist-duration').text(secondsToString(this.totalDuration));
     };
@@ -64,6 +64,7 @@ function Playlist(soundManager) {
         var firstNewID = this.nextNewID;
         this.nextNewID += count;
         var trackIDsLength = this.newTrackIDs.length;
+        var i = 0;
         for (i = 0; i < count; i++) {
             this.newTrackIDs[trackIDsLength + i] = firstNewID + i;
         }
@@ -88,13 +89,13 @@ function Playlist(soundManager) {
     }
     
     this.isPaused = function() {
-        return this.list[this.currentTrack].getSound().paused;
+        return this.list[this.currentTrack].isPaused();
     }
     
     this.isPlaying = function() {
         var status = false;
         if (!this.isEmpty()) {
-            status = this.list[this.currentTrack].getSound().playState == 1;
+            status = this.list[this.currentTrack].isPlaying();
         }
         return status;
     }
@@ -111,8 +112,8 @@ function Playlist(soundManager) {
     this.play = function() {
         if (!this.isEmpty()) {
             var playlist = this;
-            var object = this.list[this.currentTrack].id;
-            this.soundManager.play(object, {
+            var media = this.list[this.currentTrack];
+            media.play({
                 onfinish: function() {
                     playlist.nextTrack(true);
                 },
@@ -159,8 +160,8 @@ function Playlist(soundManager) {
             if (!this.hasNext()) {
                 this.currentTrack = 0;
             }
-            var trackDuration = this.list[pos].duration;
-            this.list[pos].getSound().destruct();
+            var trackDuration = this.list[pos].getDuration();
+            this.list[pos].destruct();
             this.list.splice(pos, 1);
             this.totalDuration -= trackDuration;
             if (this.isEmpty()) {
@@ -181,8 +182,8 @@ function Playlist(soundManager) {
     
     this.seek = function(decimalPercent) {
         if (!this.isEmpty()) {
-            var sound = this.list[this.currentTrack].sound;
-            sound.setPosition(Math.floor(decimalPercent * sound.duration));
+            var track = this.list[this.currentTrack];
+            track.seek(decimalPercent);
         }
     }
     
@@ -216,7 +217,7 @@ function Playlist(soundManager) {
             if (index == newCurrentTrack && wasPlaying) {
                 $(this).addClass('playing');
             }
-            $(this).html(playlist._getDOMTableCellsForSoundObject(newList[index], index + 1));
+            $(this).html(playlist._getDOMTableCellsForMediaObject(newList[index], index + 1));
         });
         /*.each(function() {
             playlist.removeTrack(playlist.list[0].id);
@@ -229,7 +230,7 @@ function Playlist(soundManager) {
     
     this.stop = function () {
         for (track in this.list) {
-            this.list[track].getSound().stop();
+            this.list[track].stop();
         }
         timebar.width(0);
         $('#time-elapsed').text('0:00');
@@ -237,7 +238,7 @@ function Playlist(soundManager) {
     }
     
     this.togglePause = function() {
-        this.list[this.currentTrack].getSound().togglePause();
+        this.list[this.currentTrack].togglePause();
         if (this.isPaused()) {
             $('#play').text('Resume');
         }
