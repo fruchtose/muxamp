@@ -42,10 +42,26 @@
                 height: 30px;
                 line-height: 30px;
             }
+            #playlist-info {
+                float: left;
+                min-width: 200px;
+                width: 266px;
+            }
+            #track-count-wrapper {
+                float: left;
+                margin-right: 1em;
+            }
+            #playlist-duration-wrapper {
+                float: left;
+            }
+            #adder {
+                float: left;
+                width: 350px;
+                z-index: 10;
+            }
             #controls {
                 float: left;
                 min-width: 225px;
-                padding-right: 400px;
                 z-index: 12;
             }
             #timebar {
@@ -70,22 +86,6 @@
                 height: 20px;
                 min-width: 0px;
                 width: 0;
-            }
-            #playlist-info {
-                float: left;
-                min-width: 200px;
-                padding-right: 300px;
-            }
-            #track-count-wrapper {
-                float: left;
-                margin-right: 1em;
-            }
-            #playlist-duration-wrapper {
-                float: left;
-            }
-            #adder {
-                width: 300px;
-                z-index: 10;
             }
             #main {
                 min-width: 400px;
@@ -131,8 +131,8 @@
                             Duration: <span id="playlist-duration">0:00</span>
                         </div>
                     </div>
-                    <div id="adder" class="right">
-                        <input type="text" id="adder-link" />
+                    <div id="adder">
+                        <input type="text" id="adder-link" size="30"/>
                         <a href onclick="return false;" id="adder-button">Add Media Source</a>
                     </div>
                 </div>
@@ -144,7 +144,7 @@
                         <a href onclick="return false;" id ="stop">Stop</a>
                         <a href onclick="return false;" id="shuffle">Shuffle</a>
                     </div>
-                    <div id="timebar" class="right">
+                    <div id="timebar">
                         <div id="time-elapsed">0:00</div>
                         <div id="timebar-outer">
                             <div id="timebar-inner"></div>

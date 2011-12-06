@@ -12,20 +12,32 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
     this.addTracks = function(url) {
         url = jQuery.trim(url.toString());
         var router = this;
+        
+        var failure = function() {
+            alert("Unable to add track from specified URL " + url);
+        };
+        var bandcampOrFailure = function() {
+            router.resolveBandcampTracks(url, failure);
+        };
+        
         this.verifyURL(url, function(success) {
             if (success == true) {
-                // First, try to get SoundCloud tracks
-                // IF that fails, go to Bandcamp
-                router.resolveSoundCloud(url, function() {
-                    router.getBandcampTracks(url, function() {
-                        alert("Unable to add track from specified URL " + url);
-                    });
-                });
+                // First, try to get SoundCloud tracks;
+                // all SoundCloud URLs are guaranteed to have soundcloud.com in the URL, so 
+                // we only resolve a SoundCloud link if the address is present.
+                // If that fails, go to Bandcamp.
+                if (url.indexOf("soundcloud.com/") >= 0)
+                {
+                    router.resolveSoundCloud(url, bandcampOrFailure);
+                }
+                else {
+                    bandcampOrFailure();
+                }
             }
         });
     };
     
-    this.getBandcampTracks = function(url, failure) {
+    this.resolveBandcampTracks = function(url, failure) {
         url = encodeURIComponent(url);
         var urlRequest = 'http://api.bandcamp.com/api/url/1/info?key=' + this.bandcampConsumerKey + '&url=' + url + '&callback=?';
         var consumerKey = this.bandcampConsumerKey;
