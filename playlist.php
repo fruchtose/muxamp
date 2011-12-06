@@ -4,6 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title></title>
         <script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
+        <script src="js/jquery.jsonp-2.1.4.min.js"></script>
         <script src="js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
         <script src="js/jquery.layout-latest.min.js" type="text/javascript"></script>
         <script src="js/soundmanager2-nodebug-jsmin.js" type="text/javascript"></script>
@@ -87,6 +88,7 @@
                 z-index: 10;
             }
             #main {
+                min-width: 400px;
                 overflow: auto;
             }
             #tracks li .desc {

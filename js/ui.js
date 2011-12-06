@@ -1,15 +1,24 @@
 var body;
 var bodyLayoutOptions = {
     center: {
+        minSize: 400,
         paneSelector: "#main"
-            
+    },
+    east: {
+        closable: true,
+        initClosed: true,
+        paneSelector: "#right-side",
+        resizable: false,
+        slidable: false,
+        spacing_closed: 0
     },
     north: {
         closable: false,
         paneSelector: "#player-header",
         resizable: false,
         size: 60,
-        slidable: false
+        slidable: false,
+        spacing_open: 0
     },
     south: {
         closable: false,
