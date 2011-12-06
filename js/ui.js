@@ -7,7 +7,7 @@ var bodyLayoutOptions = {
     east: {
         closable: true,
         minSize: 400,
-        initClosed: false,
+        initClosed: true,
         paneSelector: "#right-side",
         resizable: false,
         size: 400,
