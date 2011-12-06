@@ -30,8 +30,13 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                 {
                     router.resolveSoundCloud(url, bandcampOrFailure);
                 }
-                else if (/youtube\.com\/watch\?v=[A-za-z0-9]{11}/.test(url)) {
-                    router.resolveYouTube(url);
+                else if (/youtube\.com\/watch\?v=[\w\-]+/.test(url)) {
+                    var beginningURL = "youtube.com/watch?v=";
+                    var beginningURLLoc = url.indexOf(beginningURL);
+                    var beginningURLLength = beginningURL.length;
+                    var idSubstring = url.substring(beginningURLLoc + beginningURLLength);
+                    var match = idSubstring.match(/[\w\-]+/);
+                    router.resolveYouTube(match[0]);
                 }
                 else {
                     bandcampOrFailure();
@@ -149,14 +154,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         });
     };
     
-    this.resolveYouTube = function(url) {
+    this.resolveYouTube = function(youtubeID) {
         var playlist = this.playlist;
-        
-        var watchString = 'youtube.com/watch?v=';
-        var watchStringLength = watchString.length;
-        var watchStringIndex = url.indexOf(watchString);
-        var idLocation = watchStringIndex + watchStringLength;
-        var youtubeID = url.substr(idLocation, 11);
         var youtubeAPI = 'http://gdata.youtube.com/feeds/api/videos?v=2&alt=jsonc';
         $.get(youtubeAPI,{'q':youtubeID},function(response){
             var data = response.data;

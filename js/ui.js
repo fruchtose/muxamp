@@ -12,7 +12,8 @@ var bodyLayoutOptions = {
         resizable: false,
         size: 400,
         slidable: false,
-        spacing_closed: 0
+        spacing_closed: 0,
+        spacing_open: 0
     },
     north: {
         closable: false,

@@ -144,11 +144,12 @@ function Playlist(soundManager) {
                 if (media.siteName == 'YouTube') {
                     media.play({
                         autoPlay: true,
-                        initialVideo: media.id,
+                        initialVideo: media.youtubeID,
                         loadSWFObject: false,
                         width: 400,
                         height: 255,
                         onPlayerEnded: function() {
+                            media.stop();
                             playlist.nextTrack(true);
                         },
                         onErrorNotEmbeddable: function() {

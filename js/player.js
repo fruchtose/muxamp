@@ -82,12 +82,14 @@ var YouTubeObject = new JS.Class(VideoObject, {
     initialize: function(id, youtubeID, uploader, title, duration) {
         var permalink = 'http://www.youtube.com/watch?v=' + youtubeID;
         this.callSuper("YouTube", permalink, permalink, id, uploader, title, duration);
+        this.youtubeID = youtubeID;
     },
    
     destruct: function() {
         if ($('#right-side').width() > 10) {
             body.close('east');
             $('#video').tubeplayer('destruct');
+            $("#video").replaceWith('<div id="video"></id>');
         }
     },
    
@@ -121,7 +123,6 @@ var YouTubeObject = new JS.Class(VideoObject, {
         if ($('.flashContainer').length == 0) {
             body.open('east');
         }
-        var track = this;
         $(document).ready(function() {
             if (options) {
                 $("#video").tubeplayer(options);
