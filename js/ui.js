@@ -6,9 +6,11 @@ var bodyLayoutOptions = {
     },
     east: {
         closable: true,
-        initClosed: true,
+        minSize: 400,
+        initClosed: false,
         paneSelector: "#right-side",
         resizable: false,
+        size: 400,
         slidable: false,
         spacing_closed: 0
     },

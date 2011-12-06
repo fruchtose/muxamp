@@ -157,7 +157,7 @@
                 </ol>
             </div>
             <div id="right-side">
-
+                <div id="video"></div>
             </div>
             <div id="footer">Site by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a></div>
         </div>
