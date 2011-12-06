@@ -15,8 +15,8 @@ var SoundObject = new JS.Class(MediaObject, {
         this.soundManager = (soundManager != undefined && soundManager != null) ? soundManager : null;
         this.duration = duration;
         this.sound = soundManager.createSound({
-           id: id,
-           url: url
+            id: id,
+            url: url
         });
         this.callSuper(siteName, url, permalink, id, artist, soundName, "audio");
     },
@@ -30,7 +30,7 @@ var SoundObject = new JS.Class(MediaObject, {
     },
     
     isPaused: function() {
-      return this.sound.paused;  
+        return this.sound.paused;  
     },
     
     isPlaying: function() {
@@ -68,5 +68,85 @@ var BandcampObject = new JS.Class(SoundObject, {
         var apiURL = track.streaming_url;
         apiURL = apiURL + '&api_key=' + consumerKey;
         this.callSuper("Bandcamp", apiURL, linkURL, id, soundManager, artistName, track.title, track.duration);
+    }
+});
+
+var VideoObject = new JS.Class(MediaObject, {
+    initialize: function(siteName, url, permalink, id, artist, videoName, duration) {
+        this.callSuper(siteName, url, permalink, id, artist, videoName, "video");
+        this.duration = duration;
+    }
+});
+
+var YouTubeObject = new JS.Class(VideoObject, {
+    initialize: function(id, youtubeID, uploader, title, duration) {
+        var permalink = 'http://www.youtube.com/watch?v=' + youtubeID;
+        this.callSuper("YouTube", permalink, permalink, id, uploader, title, duration);
+    },
+   
+    destruct: function() {
+        if ($('#right-side').width() > 10) {
+            body.close('east');
+            $('#video').tubeplayer('destruct');
+        }
+    },
+   
+    getDuration: function() {
+        return this.duration;
+    },
+   
+    isPaused: function() {
+        var paused;
+        try {
+            paused = $('#video').tubeplayer('isPaused');
+        }
+        catch(e) {
+            paused = false;
+        }
+        return paused;
+    },
+   
+    isPlaying: function() {
+        var playing;
+        try {
+            playing = $('#video').tubeplayer('isPlaying');
+        }
+        catch(e) {
+            playing = false;
+        }
+        return playing;
+    },
+   
+    play: function(options) {
+        if ($('.flashContainer').length == 0) {
+            body.open('east');
+        }
+        var track = this;
+        $(document).ready(function() {
+            if (options) {
+                $("#video").tubeplayer(options);
+            }
+            else {
+                $("#video").tubeplayer();
+            }
+        });
+    },
+   
+    stop: function() {
+        $(document).ready(function() {
+            $('#video').tubeplayer('stop');
+        });
+    },
+   
+    togglePause: function() {
+        var track = this;
+        $(document).ready(function() {
+            if (track.isPlaying()) {
+                $('#video').tubeplayer('pause');
+            }
+            else if (track.isPaused()) {
+                $('#video').tubeplayer('play');
+            }
+        });
     }
 });

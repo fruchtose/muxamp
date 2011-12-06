@@ -89,13 +89,18 @@ function Playlist(soundManager) {
     }
     
     this.isPaused = function() {
-        return this.list[this.currentTrack].isPaused();
+        var status = false;
+        if (!this.isEmpty()) {
+            status = this.list[this.currentTrack].isPaused();
+        }
+        return status;
     }
     
+    // Function is asynchronous, because the response can be depending on the media
     this.isPlaying = function() {
         var status = false;
         if (!this.isEmpty()) {
-            status = this.list[this.currentTrack].isPlaying();
+            status = this.list[this.currentTrack].isPlaying() || this.list[this.currentTrack].isPaused();
         }
         return status;
     }
@@ -103,6 +108,10 @@ function Playlist(soundManager) {
     this.nextTrack = function(autostart) {
         var wasPlaying = this.isPlaying();
         this.stop();
+        var media = this.list[this.currentTrack];
+        if (media.type == "video") {
+            media.destruct();
+        }
         this.currentTrack = this.currentTrack + 1 >= this.list.length ? 0 : this.currentTrack + 1;
         if (wasPlaying || autostart) {
             this.play();
@@ -113,22 +122,47 @@ function Playlist(soundManager) {
         if (!this.isEmpty()) {
             var playlist = this;
             var media = this.list[this.currentTrack];
-            media.play({
-                onfinish: function() {
-                    playlist.nextTrack(true);
-                },
-                onload: function(success) {
-                    if (!success) {
+            if (media.type == 'audio') {
+                media.play({
+                    onfinish: function() {
+                        playlist.nextTrack(true);
+                    },
+                    onload: function(success) {
+                        if (!success) {
                             playlist.nextTrack(true);
                         }
-                },
-                whileplaying: function() {
-                    var position = this.position, seconds = position/ 1000;
-                    timeElapsed.text(secondsToString(seconds));
-                    var percent = Math.min(100 * (position / this.duration), 100);
-                    updateTimebar(percent);
+                    },
+                    whileplaying: function() {
+                        var position = this.position, seconds = position/ 1000;
+                        timeElapsed.text(secondsToString(seconds));
+                        var percent = Math.min(100 * (position / this.duration), 100);
+                        updateTimebar(percent);
+                    }
+                });
+            }
+            else if (media.type == 'video') {
+                if (media.siteName == 'YouTube') {
+                    media.play({
+                        autoPlay: true,
+                        initialVideo: media.id,
+                        loadSWFObject: false,
+                        width: 400,
+                        height: 255,
+                        onPlayerEnded: function() {
+                            playlist.nextTrack(true);
+                        },
+                        onErrorNotEmbeddable: function() {
+                            playlist.nextTrack(true);
+                        },
+                        onErrorNotFound: function() {
+                            playlist.nextTrack(true);
+                        },
+                        onErrorInvalidParameter: function() {
+                            playlist.nextTrack(true);
+                        }
+                    });
                 }
-            });
+            }
             this._started = true;
             $('#play').text('Pause');
             $('.playing').removeClass('playing');
@@ -140,6 +174,10 @@ function Playlist(soundManager) {
     this.previousTrack = function(autostart) {
         var wasPlaying = this.isPlaying();
         this.stop();
+        var media = this.list[this.currentTrack];
+        if (media.type == "video") {
+            media.destruct();
+        }
         this.currentTrack = this.currentTrack - 1 >= 0 ? this.currentTrack - 1 : (this.isEmpty() ? 0 : this.list.length - 1);
         if (wasPlaying || autostart) {
             this.play();
@@ -156,7 +194,9 @@ function Playlist(soundManager) {
         }
         if (pos >= 0) {
             var wasPlaying = this.isPlaying() && pos == this.currentTrack;
-            this.stop();
+            if (wasPlaying){
+                this.stop();
+            }
             if (!this.hasNext()) {
                 this.currentTrack = 0;
             }
@@ -219,11 +259,11 @@ function Playlist(soundManager) {
             }
             $(this).html(playlist._getDOMTableCellsForMediaObject(newList[index], index + 1));
         });
-        /*.each(function() {
+    /*.each(function() {
             playlist.removeTrack(playlist.list[0].id);
         });*/
         
-        /*for (index in this.list){
+    /*for (index in this.list){
             this._addPlaylistDOMRow(this.list[index]);
         }*/
     }
@@ -238,13 +278,13 @@ function Playlist(soundManager) {
     }
     
     this.togglePause = function() {
-        this.list[this.currentTrack].togglePause();
         if (this.isPaused()) {
-            $('#play').text('Resume');
-        }
-        else {
             $('#play').text('Pause');
         }
+        else {
+            $('#play').text('Resume');
+        }
+        this.list[this.currentTrack].togglePause();
     }
 }
 var playlist = new Playlist(soundManager);

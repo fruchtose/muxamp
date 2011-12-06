@@ -21,7 +21,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         };
         
         this.verifyURL(url, function(success) {
-            if (success == true) {
+            if (success) {
                 // First, try to get SoundCloud tracks;
                 // all SoundCloud URLs are guaranteed to have soundcloud.com in the URL, so 
                 // we only resolve a SoundCloud link if the address is present.
@@ -29,6 +29,9 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                 if (url.indexOf("soundcloud.com/") >= 0)
                 {
                     router.resolveSoundCloud(url, bandcampOrFailure);
+                }
+                else if (/youtube\.com\/watch\?v=[A-za-z0-9]{11}/.test(url)) {
+                    router.resolveYouTube(url);
                 }
                 else {
                     bandcampOrFailure();
@@ -46,17 +49,17 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         var router = this;
         $.getJSON(urlRequest, function(data) {
             var artist = undefined;
-            var band_id = undefined;
+            var bandId = data.band_id;
             if (data.artist != undefined) {
                 //Artist name specified in JSON, so use it
                 artist = data.artist;
             }
             //Let's verify the artist's ID and get their bandcamp subdomain
-            var bandNameRequest = 'http://api.bandcamp.com/api/band/3/info?key=' + consumerKey + '&band_id=' + data.band_id + '&callback=?';
+            var bandNameRequest = 'http://api.bandcamp.com/api/band/3/info?key=' + consumerKey + '&band_id=' + bandId + '&callback=?';
             var trackID = data.track_id;
             var albumID = data.album_id;
             // Don't attempt to get anymore info if the album isn't there
-            if (albumID != undefined)
+            if (bandId != undefined && (trackID != undefined || albumID != undefined))
             {
                 $.getJSON(bandNameRequest, function (namedata) {
                     //Set artist name if it was specified in the JSON
@@ -145,6 +148,25 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
             timeout: 30000
         });
     };
+    
+    this.resolveYouTube = function(url) {
+        var playlist = this.playlist;
+        
+        var watchString = 'youtube.com/watch?v=';
+        var watchStringLength = watchString.length;
+        var watchStringIndex = url.indexOf(watchString);
+        var idLocation = watchStringIndex + watchStringLength;
+        var youtubeID = url.substr(idLocation, 11);
+        var youtubeAPI = 'http://gdata.youtube.com/feeds/api/videos?v=2&alt=jsonc';
+        $.get(youtubeAPI,{'q':youtubeID},function(response){
+            var data = response.data;
+            var video = data.items[0];
+            router.allocateNewTracks(1);
+            var id = router.getNewTrackID();
+            var track = new YouTubeObject(id, youtubeID, video.uploader, video.title, video.duration);
+            playlist.addTrack(track);
+        },'jsonp');
+    }
     
     this.verifyURL = function(url, callback) {
         callback(/^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url));
