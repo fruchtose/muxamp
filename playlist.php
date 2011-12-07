@@ -41,6 +41,9 @@
             #wrapper {
                 top: 0;
             }
+            #rows {
+                float: left;
+            }
             .player-row {
                 height: 30px;
                 line-height: 30px;
@@ -87,8 +90,34 @@
             #timebar-inner {
                 background-color: #3d3;
                 height: 20px;
-                min-width: 0px;
+                min-width: 0;
                 width: 0;
+            }
+            #volume {
+                float: left;
+                margin-left: 2em;
+            }
+            #volume-outer {
+                background-color: #d33;
+                border: 1px solid #333;
+                float: left;
+                height: 50px;
+                margin-top: 5px;
+                overflow: hidden;
+                width: 20px;
+            }
+            #volume-inner {
+                background-color: #fff;
+                bottom: 0;
+                height: 50%;
+                min-height: 0;
+                width: 20px;
+            }
+            #volume-amount {
+                float: left;
+                line-height: 60px;
+                margin-left: 1em;
+                vertical-align: middle;
             }
             #main {
                 min-width: 400px;
@@ -138,34 +167,42 @@
     <body>
         <div id="wrapper">
             <div id="player-header">
-                <div id="player-row-1" class="player-row">
-                    <div id="playlist-info">
-                        <div id="track-count-wrapper">
-                            Tracks: <span id="track-count">0</span>
+                <div id="rows">
+                    <div id="player-row-1" class="player-row">
+                        <div id="playlist-info">
+                            <div id="track-count-wrapper">
+                                Tracks: <span id="track-count">0</span>
+                            </div>
+                            <div id="playlist-duration-wrapper">
+                                Duration: <span id="playlist-duration">0:00</span>
+                            </div>
                         </div>
-                        <div id="playlist-duration-wrapper">
-                            Duration: <span id="playlist-duration">0:00</span>
+                        <div id="adder">
+                            <input type="text" id="adder-link" size="30"/>
+                            <a href onclick="return false;" id="adder-button">Add Media Source</a>
                         </div>
                     </div>
-                    <div id="adder">
-                        <input type="text" id="adder-link" size="30"/>
-                        <a href onclick="return false;" id="adder-button">Add Media Source</a>
+                    <div id="player-row-2" class="player-row">
+                        <div id ="controls">
+                            <a href onclick="return false;" id="previous">Previous</a>
+                            <a href onclick="return false;" id="play">Play</a>
+                            <a href onclick="return false;" id="next">Next</a>
+                            <a href onclick="return false;" id="stop">Stop</a>
+                            <a href onclick="return false;" id="shuffle">Shuffle</a>
+                        </div>
+                        <div id="timebar">
+                            <div id="time-elapsed">0:00</div>
+                            <div id="timebar-outer">
+                                <div id="timebar-inner"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="player-row-2" class="player-row">
-                    <div id ="controls">
-                        <a href onclick="return false;" id="previous">Previous</a>
-                        <a href onclick="return false;" id="play">Play</a>
-                        <a href onclick="return false;" id="next">Next</a>
-                        <a href onclick="return false;" id="stop">Stop</a>
-                        <a href onclick="return false;" id="shuffle">Shuffle</a>
+                <div id="volume">
+                    <div id="volume-outer">
+                        <div id="volume-inner"></div>
                     </div>
-                    <div id="timebar">
-                        <div id="time-elapsed">0:00</div>
-                        <div id="timebar-outer">
-                            <div id="timebar-inner"></div>
-                        </div>
-                    </div>
+                    <div id="volume-amount">50% Volume</div>
                 </div>
             </div>
             <div id="main">

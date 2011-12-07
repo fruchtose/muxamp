@@ -19,6 +19,7 @@ var PlaylistDOMInformation = function() {
 
 function Playlist(soundManager) {
     this.currentTrack = 0;
+    this.currentVolumePercent = 50; // Start at 50% so users can increase/decrease volume if they want to
     this.list = [];
     this.nextNewID = 0;
     this.newTrackIDs = [];
@@ -76,6 +77,10 @@ function Playlist(soundManager) {
         return newID;
     }
     
+    this.getVolume = function() {
+        return this.currentVolumePercent;
+    }
+    
     this.hasNext = function() {
         return !this.isEmpty() && this.list.length > this.currentTrack + 1;
     }
@@ -124,6 +129,7 @@ function Playlist(soundManager) {
             var media = this.list[this.currentTrack];
             if (media.type == 'audio') {
                 media.play({
+                    volume: playlist.currentVolumePercent,
                     onfinish: function() {
                         playlist.nextTrack(true);
                     },
@@ -134,21 +140,40 @@ function Playlist(soundManager) {
                     },
                     whileplaying: function() {
                         var position = this.position, seconds = position/ 1000;
-                        timeElapsed.text(secondsToString(seconds));
                         var percent = Math.min(100 * (position / this.duration), 100);
+                        timeElapsed.text(secondsToString(seconds));
                         updateTimebar(percent);
                     }
                 });
             }
             else if (media.type == 'video') {
                 if (media.siteName == 'YouTube') {
+                    var clearMediaInterval = function() {
+                        if (media.interval != undefined) {
+                            window.clearInterval(media.interval);
+                        }
+                    };
                     media.play({
+                        showControls: false,
                         autoPlay: true,
                         initialVideo: media.youtubeID,
                         loadSWFObject: false,
                         width: 400,
                         height: 255,
+                        onStop: clearMediaInterval,
+                        onPlayerBuffering: clearMediaInterval,
+                        onPlayerPaused: clearMediaInterval,
+                        onPlayerPlaying: function() {
+                            playlist.setVolume(playlist.currentVolumePercent);
+                            media.interval = window.setInterval(function() {
+                                var data = $("#video").tubeplayer('data');
+                                var percent =  (data.currentTime / data.duration) * 100;
+                                timeElapsed.text(secondsToString(data.currentTime));
+                                updateTimebar(percent);
+                            }, 334);
+                        },
                         onPlayerEnded: function() {
+                            clearMediaInterval();
                             media.stop();
                             playlist.nextTrack(true);
                         },
@@ -226,6 +251,26 @@ function Playlist(soundManager) {
             var track = this.list[this.currentTrack];
             track.seek(decimalPercent);
         }
+    }
+    
+    this.setVolume = function(intPercent) {
+        intPercent = Math.round(intPercent);
+        this.currentVolumePercent = intPercent;
+        if (this.isPlaying() || this.isPaused()) {
+            var media = this.list[this.currentTrack];
+            if (media.type == 'audio') {
+                soundManager.setVolume(media.id, intPercent);
+            }
+            else if (media.type == 'video') {
+                if (media.siteName == 'YouTube') {
+                    $('#video').tubeplayer('volume', intPercent);
+                }
+            }
+        }
+        //Update volume bar
+        var volumeBarHeight = 100 - intPercent;
+        $("#volume-inner").height(volumeBarHeight.toString() + "%");
+        $("#volume-amount").text(intPercent + "% Volume");
     }
     
     this.shuffle = function() {

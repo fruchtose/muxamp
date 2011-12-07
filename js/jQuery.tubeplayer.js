@@ -676,11 +676,13 @@
 		}),
                 
                 isPaused: buildFN(function(evt,param,p){
-                    return p.ytplayer.getPlayerState() == 2;
+                    var playerState = p.ytplayer.getPlayerState();
+                    return playerState == 2;
                 }),
                 
                 isPlaying: buildFN(function(evt,param,p){
-                    return p.ytplayer.getPlayerState() == 1;
+                    var playerState = p.ytplayer.getPlayerState();
+                    return playerState == 1;
                 }),
 		
 		volume: buildFN(function(evt,param,p){

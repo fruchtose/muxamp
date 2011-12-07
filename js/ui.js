@@ -67,6 +67,17 @@ $('#adder-button').live('click', function(){
     $('#adder-link').val("");
 });
 
+$(document).ready(function() {
+   var volumeOuter = $("#volume-outer");
+   volumeOuter.click(function(e) {
+       var volumePossible = volumeOuter.height();
+       var reverseVolume = e.pageY - volumeOuter.offset().top;
+       var amount =  Math.max(0, volumeOuter.height() - reverseVolume);
+       var percent = (amount / volumePossible) * 100;
+       playlist.setVolume(percent);
+   });
+});
+
 var timebar, timebarLastUpdated = new Date(), timebarNowUpdated, timeElapsed;
 var updateTimebar = function(percentage) {
     if (percentage >= 0 && percentage <= 100) {

@@ -132,6 +132,18 @@ var YouTubeObject = new JS.Class(VideoObject, {
             }
         });
     },
+    
+    seek: function(decimalPercent) {
+        var duration = this.duration;
+        try {
+            // Use floor function in case rounding would otherwise result in 
+            // a value of 101% of the total time
+            $("#video").tubeplayer('seek', Math.floor(decimalPercent * duration));
+        }
+        catch(e) {
+            // Eh, don't try anything if seeking isn't possible'
+        }
+    },
    
     stop: function() {
         $(document).ready(function() {
