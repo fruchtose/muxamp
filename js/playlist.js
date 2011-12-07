@@ -161,6 +161,9 @@ function Playlist(soundManager) {
                         width: 400,
                         height: 255,
                         onStop: clearMediaInterval,
+                        onPlayerCued: function() {
+                            playlist.setVolume(playlist.currentVolumePercent);
+                        },
                         onPlayerBuffering: clearMediaInterval,
                         onPlayerPaused: clearMediaInterval,
                         onPlayerPlaying: function() {
