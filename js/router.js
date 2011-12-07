@@ -156,15 +156,18 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
     
     this.resolveYouTube = function(youtubeID) {
         var playlist = this.playlist;
-        var youtubeAPI = 'http://gdata.youtube.com/feeds/api/videos?v=2&alt=jsonc';
-        $.get(youtubeAPI,{'q':youtubeID},function(response){
-            var data = response.data;
-            var video = data.items[0];
+        var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json';
+        $.getJSON(youtubeAPI, function(response) {
+            var entry = response.entry;
+            var authorObj = entry.author[0];
+            var author = authorObj.name.$t;
+            var title = entry.title.$t;
+            var duration = entry.media$group.yt$duration.seconds;
             router.allocateNewTracks(1);
             var id = router.getNewTrackID();
-            var track = new YouTubeObject(id, youtubeID, video.uploader, video.title, video.duration);
+            var track = new YouTubeObject(id, youtubeID, author, title, duration);
             playlist.addTrack(track);
-        },'jsonp');
+        });
     }
     
     this.verifyURL = function(url, callback) {
