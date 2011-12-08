@@ -68,14 +68,21 @@ $('#adder-button').live('click', function(){
 });
 
 $(document).ready(function() {
-   var volumeOuter = $("#volume-outer");
-   volumeOuter.click(function(e) {
-       var volumePossible = volumeOuter.height();
-       var reverseVolume = e.pageY - volumeOuter.offset().top;
-       var amount =  Math.max(0, volumeOuter.height() - reverseVolume);
-       var percent = (amount / volumePossible) * 100;
-       playlist.setVolume(percent);
-   });
+    var volumeOuter = $("#volume-outer");
+    var adjustVolume = function(x, y, params) {
+        var volumePossible = volumeOuter.height();
+        var amount =  Math.max(0, volumeOuter.height() - y);
+        var percent = (amount / volumePossible) * 100;
+        playlist.setVolume(percent);
+    };
+    volumeOuter.draginside({
+        snapAtDistance: 2,
+        snapDimensions: 'y',
+        snapPoints: [['any', 0], ['any', 'height()']],
+        onMouseDown: adjustVolume,
+        onMouseMove: adjustVolume,
+        onMouseUp: adjustVolume
+    });
 });
 
 var timebar, timebarLastUpdated = new Date(), timebarNowUpdated, timeElapsed;

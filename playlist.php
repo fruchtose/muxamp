@@ -9,6 +9,7 @@
         <script src="js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
         <script src="js/jquery.layout-latest.min.js" type="text/javascript"></script>
         <script src="js/jQuery.tubeplayer.js" type="text/javascript"></script>
+        <script src="js/jquery.draginside.js" type="text/javascript"></script>
         <script src="js/soundmanager2-nodebug-jsmin.js" type="text/javascript"></script>
         <script src="js/jsclass.js" type="text/javascript"></script>
         <script src="js/config.js" type="text/javascript"></script>
@@ -16,7 +17,6 @@
         <script src="js/playlist.js" type="text/javascript"></script>
         <script src="js/router.js" type="text/javascript"></script>
         <script src="js/ui.js" type="text/javascript"></script>
-        <script src="js/youtube.js" type="text/javascript"></script>
         <style type="text/css">
             html {font-family: Verdana, Tahoma, Helvetica, Arial;
                   font-size: 13px;
@@ -98,12 +98,15 @@
                 margin-left: 2em;
             }
             #volume-outer {
+                -khtml-user-select: none;
+                -moz-user-select: none;
                 background-color: #d33;
                 border: 1px solid #333;
                 float: left;
                 height: 50px;
                 margin-top: 5px;
                 overflow: hidden;
+                user-select: none;
                 width: 20px;
             }
             #volume-inner {
