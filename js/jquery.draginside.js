@@ -119,9 +119,9 @@
                     var $this = $(this);
                     
                     $this.bind('mousedown.' + settings.namespace, function(event) {
-                        internal_methods.mousedown(event.clientX - this.offsetLeft, event.clientY - this.offsetTop, this, settings.onMouseDownParams);
+                        internal_methods.mousedown(event.pageX - $this.offset().left, event.pageY - $this.offset().top, this, settings.onMouseDownParams);
                     }).bind('mouseup.' + settings.namespace, function(event) {
-                        internal_methods.mouseup(event.clientX - this.offsetLeft, event.clientY - this.offsetTop, this, settings.onMouseUpParams);
+                        internal_methods.mouseup(event.pageX - $this.offset().left, event.pageY - $this.offset().top, this, settings.onMouseUpParams);
                     });
                     
                     return $this;
