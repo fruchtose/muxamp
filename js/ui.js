@@ -69,7 +69,7 @@ $('#adder-button').live('click', function(){
 
 $(document).ready(function() {
     var volumeOuter = $("#volume-outer");
-    var adjustVolume = function(x, y, params) {
+    var adjustVolume = function(x, y) {
         var volumePossible = volumeOuter.height();
         var amount =  Math.max(0, volumeOuter.height() - y);
         var percent = (amount / volumePossible) * 100;
@@ -104,9 +104,16 @@ $(function() {
 
 $(document).ready(function() {
     var timebarOuter = $("#timebar-outer");
-    timebarOuter.click(function(e) {
-        var fraction = (e.pageX - timebarOuter.offset().left) / timebarOuter.width();
+    var timebarSeek = function(x) {
+        var fraction = (x/timebarOuter.width());
         playlist.seek(fraction.toFixed(4)); 
+    };
+    timebarOuter.draginside({
+        snapAtDistance: 2,
+        snapDimensions: 'x',
+        snapPoints: [[0, 'any'], ['width()', 'any']],
+        onMouseDown: timebarSeek,
+        onMouseMove: timebarSeek
     });
 });
 
