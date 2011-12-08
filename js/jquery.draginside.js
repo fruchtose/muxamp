@@ -30,6 +30,7 @@
                 var internal_methods = {
                     doSnap: function (x, y, element) {
                         var checkX, checkY;
+                        var xArrLoc = 0, yArrLoc = 1;
                         if (typeof settings.snapDimensions == 'string') {
                             checkX = settings.snapDimensions == 'x';
                             checkY = settings.snapDimensions == 'y';
@@ -44,20 +45,20 @@
                         var newX = x, newY = y;
                         for (var i in settings.snapPoints) {
                             var point = settings.snapPoints[i];
-                            var xAny = point[0] == 'any', yAny = point[1] == 'any';
+                            var xAny = point[xArrLoc] == 'any', yAny = point[yArrLoc] == 'any';
                             snapX = !checkX, snapY = !checkY;
                             if ((snapX || xAny) && (snapY || yAny)) {
                                 break;
                             }
                             if (checkX && !xAny) {
-                                var xPoint = typeof point[0] == 'string' ? eval('$(element).' + point[0]) : point[0];
+                                var xPoint = typeof point[xArrLoc] == 'string' ? eval('$(element).' + point[xArrLoc]) : point[xArrLoc];
                                 if (Math.abs(xPoint - x) <= distance) {
                                     snapX = true;
                                     newX = xPoint;
                                 }
                             }
                             if (checkY && !yAny) {
-                                var yPoint = typeof point[1] == 'string' ? eval('$(element).' + point[1]) : point[1];
+                                var yPoint = typeof point[yArrLoc] == 'string' ? eval('$(element).' + point[yArrLoc]) : point[yArrLoc];
                                 if (Math.abs(yPoint - y) <= distance) {
                                     snapY = true;
                                     newY = yPoint;
