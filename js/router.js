@@ -30,7 +30,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                 {
                     router.resolveSoundCloud(url, bandcampOrFailure);
                 }
-                else if (/youtube\.com\/watch\?v=[\w\-]+/.test(url)) {
+                else if (/youtube\.com\/watch\\?/.test(url) && /v=[\w\-]+/.test(url)) {
                     router.resolveYouTube(url, failure);
                 }
                 else {
