@@ -27,7 +27,7 @@ var bodyLayoutOptions = {
         closable: false,
         paneSelector: "#footer",
         resizable: false,
-        size: 20,
+        size: "auto",
         slidable: false
     }
 };
