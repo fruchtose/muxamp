@@ -51,7 +51,7 @@ $(document).ready(function() {
     for (var param in urlParams) {
         var keyValuePair = urlParams[param];
         switch(keyValuePair.key.toString().toLowerCase()) {
-            case 'youtube':
+            case 'youtubevid':
                 if (keyValuePair.value) {
                     router.processYouTubeVideoID(keyValuePair.value);
                 }
