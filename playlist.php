@@ -1,3 +1,5 @@
+<?php require_once 'slogans.php'; ?>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -151,7 +153,12 @@
             #tracks li.playing a:hover {text-decoration: underline; }
             #footer {
                 line-height: 20px;
+                min-height: 20px;
                 text-align: center;
+            }
+            span.slogan {
+                font-style: italic;
+                z-index: inherit; 
             }
         </style>
         <script type="text/javascript">
@@ -216,7 +223,14 @@
             <div id="right-side">
                 <div id="video"></div>
             </div>
-            <div id="footer">Site by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a></div>
+            <div id="footer">Powered by <a href="http://www.bandcamp.com">Bandcamp</a>, <a href="http://www.soundcloud.com">SoundCloud</a>, and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
+                <?php
+                $slogan = get_random_slogan();
+
+                if ($slogan !== false)
+                    echo '<span class="slogan">' . $slogan . '</span>';
+                ?>
+            </div>
         </div>
     </body>
 </html>
