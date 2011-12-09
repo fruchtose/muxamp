@@ -17,6 +17,7 @@
         <script src="js/playlist.js" type="text/javascript"></script>
         <script src="js/router.js" type="text/javascript"></script>
         <script src="js/ui.js" type="text/javascript"></script>
+        <script src="js/input.js" type="text/javascript"></script>
         <style type="text/css">
             html {font-family: Verdana, Tahoma, Helvetica, Arial;
                   font-size: 13px;
