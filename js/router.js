@@ -31,17 +31,33 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     router.resolveSoundCloud(url, bandcampOrFailure);
                 }
                 else if (/youtube\.com\/watch\?v=[\w\-]+/.test(url)) {
-                    var beginningURL = "youtube.com/watch?v=";
-                    var beginningURLLoc = url.indexOf(beginningURL);
-                    var beginningURLLength = beginningURL.length;
-                    var idSubstring = url.substring(beginningURLLoc + beginningURLLength);
-                    var match = idSubstring.match(/[\w\-]+/);
-                    router.resolveYouTube(match[0]);
+                    router.resolveYouTube(url, failure);
                 }
                 else {
                     bandcampOrFailure();
                 }
             }
+        });
+    };
+    
+    this.getNewTrackID = function() {
+        return this.playlist.getNewTrackID();
+    };
+    
+    this.processYouTubeVideoID = function(youtubeID, failure) {
+        var playlist = this.playlist;
+        var router = this;
+        var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json';
+        $.getJSON(youtubeAPI, function(response) {
+            var entry = response.entry;
+            var authorObj = entry.author[0];
+            var author = authorObj.name.$t;
+            var title = entry.title.$t;
+            var duration = parseInt(entry.media$group.yt$duration.seconds);
+            router.allocateNewTracks(1);
+            var id = router.getNewTrackID();
+            var track = new YouTubeObject(id, youtubeID, author, title, duration);
+            playlist.addTrack(track);
         });
     };
     
@@ -116,10 +132,6 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         });
     };
     
-    this.getNewTrackID = function() {
-        return this.playlist.getNewTrackID();
-    }
-    
     this.resolveSoundCloud = function(url, failure) {
         var router = this;
         var consumerKey = router.soundcloudConsumerKey;
@@ -129,7 +141,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
             url: resolveURL,
             error: failure,
             success: function(data, textStatus) {
-                if (textStatus === "success") {
+                if (textStatus == "success") {
                     if (data.streamable === true) {
                         //Tracks have stream URL
                         if (data.stream_url != undefined) {
@@ -154,25 +166,24 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         });
     };
     
-    this.resolveYouTube = function(youtubeID) {
-        var playlist = this.playlist;
-        var router = this;
-        var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json';
-        $.getJSON(youtubeAPI, function(response) {
-            var entry = response.entry;
-            var authorObj = entry.author[0];
-            var author = authorObj.name.$t;
-            var title = entry.title.$t;
-            var duration = parseInt(entry.media$group.yt$duration.seconds);
-            router.allocateNewTracks(1);
-            var id = router.getNewTrackID();
-            var track = new YouTubeObject(id, youtubeID, author, title, duration);
-            playlist.addTrack(track);
-        });
+    this.resolveYouTube = function(url, failure) {
+        var beginningURL = "v=";
+        var beginningURLLoc = url.indexOf(beginningURL);
+        var beginningURLLength = beginningURL.length;
+        var idSubstring = url.substring(beginningURLLoc + beginningURLLength);
+        var match = idSubstring.match(/[\w\-]+/);
+        var canBeSearched = false;
+        if (match) {
+            canBeSearched = true;
+            var youtubeID = match[0];
+            this.processYouTubeVideoID(youtubeID);
+        }
+        else failure();
+        return canBeSearched;
     }
     
-    this.verifyURL = function(url, callback) {
-        callback(/^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url));
-    };
+this.verifyURL = function(url, callback) {
+    callback(/^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url));
+};
 }
 var router = new Router(playlist, soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "apthroskulagakvaeniighentr", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");
