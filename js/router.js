@@ -2,11 +2,11 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
     this.soundManager = (typeof soundManager === 'object') ? soundManager : null;
     this.soundcloudConsumerKey = soundcloudConsumerKey != "" ? soundcloudConsumerKey : "";
     this.bandcampConsumerKey = bandcampConsumerKey != "" ? bandcampConsumerKey : "";
-    this.playlist = playlist != null ? playlist : new Playlist();
+    this.playlistObject = playlist != null ? playlist : new Playlist();
     this.youtubeKey = youtubeKey != null ? youtubeKey : "";
     
     this.allocateNewTracks = function(count) {
-        this.playlist.allocateNewIDs(count);
+        this.playlistObject.allocateNewIDs(count);
     };
     
     this.addTracks = function(url) {
@@ -41,34 +41,268 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
     };
     
     this.getNewTrackID = function() {
-        return this.playlist.getNewTrackID();
+        return this.playlistObject.getNewTrackID();
     };
     
-    this.processYouTubeVideoID = function(youtubeID, failure) {
-        var playlist = this.playlist;
+    this.processBandcampArtist = function(id, queue, failure, callback) {
+        var consumerKey = this.bandcampConsumerKey;
+        var bandNameRequest = 'http://api.bandcamp.com/api/band/3/info?key=' + consumerKey + '&band_id=' + id + '&callback=?';
+        var options = {
+            url: bandNameRequest,
+            dataType: 'jsonp',
+            timeout: 10000,
+            error: function() {
+                failure();
+            },
+            success: function(namedata) {
+                if (!namedata.error){
+                    var name = namedata.name;
+                    var url = namedata.url;
+                    callback(name, url);
+                }
+                else failure();
+            }
+        };
+        if (queue) {
+            $.ajaxq(queue, options);
+        }
+        else {
+            $.ajax(options);
+        }
+    };
+    
+    this.processBandcampAlbum = function(albumID, queue, failure) {
+        var consumerKey = this.bandcampConsumerKey;
+        var router = this;
+        var albumRequest = 'http://api.bandcamp.com/api/album/2/info?key=' + consumerKey + '&album_id=' + albumID + '&callback=?';
+        var options = {
+            url: albumRequest,
+            error: function() {
+                failure();
+            },
+            dataType: 'jsonp',
+            timeout: 10000,
+            success: function(albumdata) {
+                if (!albumdata.error && albumdata.tracks) {
+                    var artist = albumdata.artist ? albumdata.artist : undefined;
+                    var bandID = albumdata.band_id;
+                    router.processBandcampArtist(bandID, queue, failure, function(name, url) {
+                        if (!artist) {
+                            artist = name;
+                        }
+                        router.allocateNewTracks(albumdata.tracks.length);
+                        $.each(albumdata.tracks, function (index, track) {
+                            var id = router.getNewTrackID();
+                            var linkURL = url + track.url;
+                            var trackObject = new BandcampObject(id, linkURL, consumerKey, track, artist, soundManager);
+                            router.playlistObject.addTrack(trackObject);
+                        });
+                    });
+                }
+                else failure();
+            }
+        };
+        if (queue) {
+            $.ajaxq(queue, options);
+        }
+        else {
+            $.ajax(options);
+        }
+    };
+    
+    this.processBandcampTrack = function(trackID, queue, failure) {
+        var consumerKey = this.bandcampConsumerKey;
+        var router = this;
+        var trackRequest = 'http://api.bandcamp.com/api/track/1/info?key=' + consumerKey + '&track_id=' + trackID + '&callback=?';
+        var options = {
+            url: trackRequest,
+            error: function() {
+                failure();
+            },
+            dataType: 'jsonp',
+            timeout: 10000,
+            success: function(trackdata) {
+                if (!trackdata.error) {
+                    var bandID = trackdata.band_id;
+                    var artist = trackdata.artist ? trackdata.artist : undefined;
+                    router.processBandcampArtist(bandID, queue, failure, function(name, url) {
+                        if (!artist) {
+                            artist = name;
+                        }
+                        var linkURL = url + trackdata.url;
+                        router.allocateNewTracks(1);
+                        var id = router.getNewTrackID();
+                        var trackObject = new BandcampObject(id, linkURL, consumerKey, trackdata, artist, soundManager);
+                        router.playlistObject.addTrack(trackObject);
+                    });
+                        
+                }
+                else failure();
+            }
+        };
+        if (queue) {
+            $.ajaxq(queue, options);
+        }
+        else {
+            $.ajax(options);
+        }
+    };
+    
+    this.processSoundCloudPlaylist = function(input, queue, failure) {
+        var consumerKey = this.soundcloudConsumerKey;
+        var router = this;
+        var addPlaylistData = function(data) {
+            if (data.streamable === true) {
+                //Tracks have stream URL
+                if (data.tracks && data.tracks.length > 0) {
+                    $.each(data.tracks, function(index, track) {
+                        router.processSoundCloudTrack(track, queue, failure);
+                    });
+                }
+                else failure();
+            }
+        };
+        // If a data object is not provided, the data is fetched using the id
+        if (typeof input == 'string') {
+            var resolveURL = 'http://api.soundcloud.com/playlists/' + input + ".json?consumer_key=" + consumerKey + '&callback=?';
+            var options = {
+                url: resolveURL,
+                error: function() {
+                    failure();
+                },
+                dataType: 'jsonp',
+                success: function(data, textStatus) {
+                    if (textStatus == "success") {
+                        addPlaylistData(data);
+                    }
+                    else failure();
+                },
+                timeout: 10000
+            };
+            if (queue) {
+                $.ajaxq(queue, options);
+            }
+            else {
+                $.ajax(options);
+            }
+        }
+        // If a data object is provided, the track data is fetched from it
+        else addPlaylistData(input);
+    }
+    
+    this.processSoundCloudTrack = function(input, queue, failure) {
+        var consumerKey = this.soundcloudConsumerKey;
+        var router = this;
+        var success = false;
+        var addTrackData = function(data) {
+            if (data.streamable === true) {
+                //Tracks have stream URL
+                if (data.stream_url) {
+                    router.allocateNewTracks(1);
+                    var id = router.getNewTrackID();
+                    var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, soundManager);
+                    router.playlistObject.addTrack(trackObject);
+                    success = true;
+                }
+                else failure();
+            }
+        };
+        // If a data object is not provided, the data is fetched using the id
+        if (typeof input == 'string') {
+            var resolveURL = 'http://api.soundcloud.com/tracks/' + input + ".json?consumer_key=" + consumerKey + '&callback=?';
+            var options = {
+                url: resolveURL,
+                dataType: 'jsonp',
+                error: function() {
+                    failure();
+                },
+                success: function(data, textStatus) {
+                    if (textStatus == "success") {
+                        addTrackData(data);
+                    }
+                    else failure();
+                    console.log("finished inside soundcloud " + new Date().toString());
+                },
+                timeout: 10000
+            };
+            if (queue) {
+                $.ajaxq(queue, options);
+            }
+            else {
+                $.ajax(options);
+            }
+        }
+        // If a data object is provided, the track data is fetched from it
+        else addTrackData(input);
+        return success;
+    };
+    
+    this.processYouTubeVideoID = function(youtubeID, queue, failure) {
         var router = this;
         var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json';
-        $.getJSON(youtubeAPI, function(response) {
-            var entry = response.entry;
-            var authorObj = entry.author[0];
-            var author = authorObj.name.$t;
-            var title = entry.title.$t;
-            var duration = parseInt(entry.media$group.yt$duration.seconds);
-            router.allocateNewTracks(1);
-            var id = router.getNewTrackID();
-            var track = new YouTubeObject(id, youtubeID, author, title, duration);
-            playlist.addTrack(track);
-        });
+        var success = false;
+        var options = {
+            url: youtubeAPI,
+            dataType: 'jsonp',
+            timeout: 10000,
+            success: function(response) {
+                var entry = response.entry;
+                var authorObj = entry.author[0];
+                var author = authorObj.name.$t;
+                var title = entry.title.$t;
+                var duration = parseInt(entry.media$group.yt$duration.seconds);
+                router.allocateNewTracks(1);
+                var id = router.getNewTrackID();
+                var track = new YouTubeObject(id, youtubeID, author, title, duration);
+                router.playlistObject.addTrack(track);
+                success = true;
+                console.log("finished inside youtube " + new Date().toString());
+            },
+            error: function() {
+                failure();
+            }
+        };
+        if (queue) {
+            $.ajaxq(queue, options);
+        }
+        else {
+            $.ajax(options);
+        }
+        return success;
     };
     
     this.resolveBandcampTracks = function(url, failure) {
         url = encodeURIComponent(url);
         var urlRequest = 'http://api.bandcamp.com/api/url/1/info?key=' + this.bandcampConsumerKey + '&url=' + url + '&callback=?';
         var consumerKey = this.bandcampConsumerKey;
-        var playlist = this.playlist;
+        var playlist = this.playlistObject;
         var bandcampArtistURL = undefined;
         var router = this;
-        $.getJSON(urlRequest, function(data) {
+        $.ajax({
+            url: urlRequest,
+            dataType: 'jsonp',
+            timeout: 10000,
+            error: function() {
+                failure()
+            },
+            success: function(data) {
+                if (!data.error) {
+                    var trackID = data.track_id;
+                    var albumID = data.album_id;
+                    if (trackID) {
+                        router.processBandcampTrack(trackID, false, failure);
+                    }
+                    else if (albumID) {
+                        router.processBandcampAlbum(albumID, false, failure);
+                    }
+                    else {
+                        failure();
+                    }
+                }
+                else failure();
+            }
+        });
+    /*$.getJSON(urlRequest, function(data) {
             var artist = undefined;
             var bandId = data.band_id;
             if (data.artist != undefined) {
@@ -129,40 +363,32 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
             else {
                 failure();
             }
-        });
+        });*/
     };
     
     this.resolveSoundCloud = function(url, failure) {
         var router = this;
         var consumerKey = router.soundcloudConsumerKey;
         var resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
-        $.jsonp(
-        {
+        $.ajax({
             url: resolveURL,
-            error: failure,
+            error: function(){
+                failure();
+            },
+            timeout: 10000,
+            dataType: 'jsonp',
             success: function(data, textStatus) {
                 if (textStatus == "success") {
                     if (data.streamable === true) {
                         //Tracks have stream URL
-                        if (data.stream_url != undefined) {
-                            router.allocateNewTracks(1);
-                            var id = router.getNewTrackID();
-                            var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, soundManager);
-                            playlist.addTrack(trackObject);
+                        if (data.stream_url) {
+                            router.processSoundCloudTrack(data, false, failure);
                         }
-                        else if (data.tracks != undefined && data.tracks.length > 0) {
-                            router.allocateNewTracks(data.tracks.length);
-                            $.each(data.tracks, function(index, track) {
-                                var id = router.getNewTrackID();
-                                var trackObject = new SoundCloudObject(id, track.stream_url, consumerKey, track, soundManager);
-                                playlist.addTrack(trackObject);
-                            });
-                        }
+                        else router.processSoundCloudPlaylist(data, false, failure);
                     }
                 }
                 else failure();
-            },
-            timeout: 30000
+            }
         });
     };
     
@@ -176,14 +402,14 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         if (match) {
             canBeSearched = true;
             var youtubeID = match[0];
-            this.processYouTubeVideoID(youtubeID);
+            this.processYouTubeVideoID(youtubeID, false, failure);
         }
         else failure();
         return canBeSearched;
     }
     
-this.verifyURL = function(url, callback) {
-    callback(/^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url));
-};
+    this.verifyURL = function(url, callback) {
+        callback(/^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url));
+    };
 }
 var router = new Router(playlist, soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "apthroskulagakvaeniighentr", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");

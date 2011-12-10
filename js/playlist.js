@@ -28,6 +28,9 @@ function Playlist(soundManager) {
     this.totalDuration = 0; // Duration in seconds
     this.tracksByClass = new Object();
     this.tracksByID = new Object();
+    this.settings = {
+        updateURLOnAdd: true
+    };
     
     this._addPlaylistDOMRow = function(mediaObject, index) {
         var obj = this;
@@ -59,6 +62,19 @@ function Playlist(soundManager) {
         this._addPlaylistDOMRow(mediaObject, trackNumber);
         $('#track-count').text(trackNumber.toString());
         $('#playlist-duration').text(secondsToString(this.totalDuration));
+        if (this.settings.updateURLOnAdd) {
+            switch(mediaObject.siteName.toLowerCase()) {
+                case 'youtube':
+                    window.location.hash = addHashParam('ytv', mediaObject.siteMediaID);
+                    break;
+                case 'soundcloud':
+                    window.location.href = addHashParam('sct', mediaObject.siteMediaID);
+                    break;
+                case 'bandcamp':
+                    window.location.hash = addHashParam('bct', mediaObject.siteMediaID);
+                    break;
+            }
+        }
     };
     
     this.allocateNewIDs = function(count) {
@@ -337,6 +353,12 @@ function Playlist(soundManager) {
             $('#play').text('Resume');
         }
         this.list[this.currentTrack].togglePause();
+    }
+    
+    this.updateSettings = function(options) {
+        if (options) {
+            this.settings = $.extend({}, this.settings, options);
+        }
     }
 }
 var playlist = new Playlist(soundManager);

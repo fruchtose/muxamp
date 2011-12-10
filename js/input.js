@@ -1,7 +1,7 @@
-// Original code by "Andy E" of Stack Overflow
+// Original code by Andy E of Stack Overflow
 // http://stackoverflow.com/a/7676115/959934
 // Modified by me to allow multiple values to be associated with a single key
-var getURLParams = function(useOrderedList) {
+function getURLParams(useOrderedList) {
     var urlParams = {};
     var orderedList = [];
     var e,
@@ -17,7 +17,10 @@ var getURLParams = function(useOrderedList) {
             return spaced;
         }
     },
-    q = window.location.search.substring(1);
+    q = window.location.hash;
+    if (q.charAt(0) == '#') {
+        q = q.substring(1);
+    }
 
     while (e = r.exec(q)) {
         var key = d(e[1]);
@@ -41,21 +44,65 @@ var getURLParams = function(useOrderedList) {
     if (useOrderedList) {
         return orderedList;
     }
-     else {
-         return urlParams;
-     }
+    else {
+        return urlParams;
+    }
 };
+
+function addHashParam(key, value) {
+    var currentHash = window.location.hash;
+    if (!currentHash.length) {
+        return key + "=" + value;
+    }
+    else return currentHash + "&" + key + "=" + value;
+}
 
 $(document).ready(function() {
     var urlParams = getURLParams(true);
-    for (var param in urlParams) {
-        var keyValuePair = urlParams[param];
-        switch(keyValuePair.key.toString().toLowerCase()) {
-            case 'youtubevid':
-                if (keyValuePair.value) {
-                    router.processYouTubeVideoID(keyValuePair.value);
+    $.ajaxSetup({
+        async: false
+    });
+    if (urlParams) {
+        soundManager.onready(function(status) {
+            $.blockUI();
+            router.playlistObject.updateSettings({updateURLOnAdd: false});
+            for (var param in urlParams) {
+                var keyValuePair = urlParams[param];
+                switch(keyValuePair.key.toString().toLowerCase()) {
+                    case 'ytv':
+                        if (keyValuePair.value) {
+                            router.processYouTubeVideoID(keyValuePair.value, 'pageload');
+                        }
+                        break;
+                    case 'sct':
+                        if (keyValuePair.value) {
+                            router.processSoundCloudTrack(keyValuePair.value, 'pageload');
+                        }
+                        break;
+                    case 'scp':
+                        if (keyValuePair.value) {
+                            router.processSoundCloudPlaylist(keyValuePair.value, 'pageload');
+                        }
+                        break;
+                    case 'bct':
+                        if (keyValuePair.value) {
+                            router.processBandcampTrack(keyValuePair.value, 'pageload');
+                        }
+                        break;
+                    case 'bca':
+                        if (keyValuePair.value) {
+                            router.processBandcampAlbum(keyValuePair.value, 'pageload');
+                        }
+                        break;
                 }
-                break;
-        }
+            }
+            var interval = window.setInterval(function() {
+                if (!document.ajaxq.q['pageload'].length) {
+                    window.clearInterval(interval);
+                    router.playlistObject.updateSettings({updateURLOnAdd: true});
+                    $.unblockUI();
+                }
+            }, 100);
+        });
     }
 });
