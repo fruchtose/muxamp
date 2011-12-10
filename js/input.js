@@ -64,45 +64,52 @@ $(document).ready(function() {
     });
     if (urlParams) {
         soundManager.onready(function(status) {
-            $.blockUI();
-            router.playlistObject.updateSettings({updateURLOnAdd: false});
-            for (var param in urlParams) {
-                var keyValuePair = urlParams[param];
-                switch(keyValuePair.key.toString().toLowerCase()) {
-                    case 'ytv':
-                        if (keyValuePair.value) {
-                            router.processYouTubeVideoID(keyValuePair.value, 'pageload');
-                        }
-                        break;
-                    case 'sct':
-                        if (keyValuePair.value) {
-                            router.processSoundCloudTrack(keyValuePair.value, 'pageload');
-                        }
-                        break;
-                    case 'scp':
-                        if (keyValuePair.value) {
-                            router.processSoundCloudPlaylist(keyValuePair.value, 'pageload');
-                        }
-                        break;
-                    case 'bct':
-                        if (keyValuePair.value) {
-                            router.processBandcampTrack(keyValuePair.value, 'pageload');
-                        }
-                        break;
-                    case 'bca':
-                        if (keyValuePair.value) {
-                            router.processBandcampAlbum(keyValuePair.value, 'pageload');
-                        }
-                        break;
+            var inputCount = urlParams.length;
+            if (inputcount) {
+                $.blockUI();
+                router.playlistObject.updateSettings({
+                    updateURLOnAdd: false
+                });
+                for (var param in urlParams) {
+                    var keyValuePair = urlParams[param];
+                    switch(keyValuePair.key.toString().toLowerCase()) {
+                        case 'ytv':
+                            if (keyValuePair.value) {
+                                router.processYouTubeVideoID(keyValuePair.value, 'pageload');
+                            }
+                            break;
+                        case 'sct':
+                            if (keyValuePair.value) {
+                                router.processSoundCloudTrack(keyValuePair.value, 'pageload');
+                            }
+                            break;
+                        case 'scp':
+                            if (keyValuePair.value) {
+                                router.processSoundCloudPlaylist(keyValuePair.value, 'pageload');
+                            }
+                            break;
+                        case 'bct':
+                            if (keyValuePair.value) {
+                                router.processBandcampTrack(keyValuePair.value, 'pageload');
+                            }
+                            break;
+                        case 'bca':
+                            if (keyValuePair.value) {
+                                router.processBandcampAlbum(keyValuePair.value, 'pageload');
+                            }
+                            break;
+                    }
                 }
+                var interval = window.setInterval(function() {
+                    if (!document.ajaxq.q['pageload'].length) {
+                        window.clearInterval(interval);
+                        router.playlistObject.updateSettings({
+                            updateURLOnAdd: true
+                        });
+                        $.unblockUI();
+                    }
+                }, 100);
             }
-            var interval = window.setInterval(function() {
-                if (!document.ajaxq.q['pageload'].length) {
-                    window.clearInterval(interval);
-                    router.playlistObject.updateSettings({updateURLOnAdd: true});
-                    $.unblockUI();
-                }
-            }, 100);
         });
     }
 });
