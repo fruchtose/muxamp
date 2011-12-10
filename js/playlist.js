@@ -172,7 +172,7 @@ function Playlist(soundManager) {
                     media.play({
                         showControls: false,
                         autoPlay: true,
-                        initialVideo: media.youtubeID,
+                        initialVideo: media.siteMediaID,
                         loadSWFObject: false,
                         width: 400,
                         height: 255,
