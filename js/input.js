@@ -65,7 +65,7 @@ $(document).ready(function() {
     if (urlParams) {
         soundManager.onready(function(status) {
             var inputCount = urlParams.length;
-            if (inputcount) {
+            if (inputCount) {
                 $.blockUI();
                 router.playlistObject.updateSettings({
                     updateURLOnAdd: false
