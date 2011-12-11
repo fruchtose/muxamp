@@ -109,6 +109,7 @@ $(document).ready(function() {
                     ajaxManager.clearTimeouts();
                     if (!ajaxManager.size()) {
                         window.clearInterval(interval);
+                        $.manageAjax.destroy('pageload');
                         router.playlistObject.updateSettings({
                             updateURLOnAdd: true
                         });
