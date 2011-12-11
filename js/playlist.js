@@ -68,7 +68,7 @@ function Playlist(soundManager) {
                     window.location.hash = addHashParam('ytv', mediaObject.siteMediaID);
                     break;
                 case 'soundcloud':
-                    window.location.href = addHashParam('sct', mediaObject.siteMediaID);
+                    window.location.hash = addHashParam('sct', mediaObject.siteMediaID);
                     break;
                 case 'bandcamp':
                     window.location.hash = addHashParam('bct', mediaObject.siteMediaID);
