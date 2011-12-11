@@ -70,22 +70,27 @@ $(document).ready(function() {
                 router.playlistObject.updateSettings({
                     updateURLOnAdd: false
                 });
+                var ajaxManager = $.manageAjax.create('pageload', {
+                    cacheResponse: true,
+                    preventDoubleRequests: false,
+                    queue: true
+                });
                 for (var param in urlParams) {
                     var keyValuePair = urlParams[param];
                     switch(keyValuePair.key.toString().toLowerCase()) {
                         case 'ytv':
                             if (keyValuePair.value) {
-                                router.processYouTubeVideoID(keyValuePair.value, 'pageload');
+                                router.processYouTubeVideoID(keyValuePair.value, ajaxManager);
                             }
                             break;
                         case 'sct':
                             if (keyValuePair.value) {
-                                router.processSoundCloudTrack(keyValuePair.value, 'pageload');
+                                router.processSoundCloudTrack(keyValuePair.value, ajaxManager);
                             }
                             break;
                         case 'scp':
                             if (keyValuePair.value) {
-                                router.processSoundCloudPlaylist(keyValuePair.value, 'pageload');
+                                router.processSoundCloudPlaylist(keyValuePair.value, ajaxManager);
                             }
                             break;
                         case 'bct':
@@ -101,7 +106,8 @@ $(document).ready(function() {
                     }
                 }
                 var interval = window.setInterval(function() {
-                    if (!document.ajaxq.q['pageload'].length) {
+                    ajaxManager.clearTimeouts();
+                    if (!ajaxManager.size()) {
                         window.clearInterval(interval);
                         router.playlistObject.updateSettings({
                             updateURLOnAdd: true

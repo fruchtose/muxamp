@@ -44,33 +44,6 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         return this.playlistObject.getNewTrackID();
     };
     
-    this.processBandcampArtist = function(id, queue, failure, callback) {
-        var consumerKey = this.bandcampConsumerKey;
-        var bandNameRequest = 'http://api.bandcamp.com/api/band/3/info?key=' + consumerKey + '&band_id=' + id + '&callback=?';
-        var options = {
-            url: bandNameRequest,
-            dataType: 'jsonp',
-            timeout: 10000,
-            error: function() {
-                failure();
-            },
-            success: function(namedata) {
-                if (!namedata.error){
-                    var name = namedata.name;
-                    var url = namedata.url;
-                    callback(name, url);
-                }
-                else failure();
-            }
-        };
-        if (queue) {
-            $.ajaxq(queue, options);
-        }
-        else {
-            $.ajax(options);
-        }
-    };
-    
     this.processBandcampAlbum = function(albumID, queue, failure) {
         var consumerKey = this.bandcampConsumerKey;
         var router = this;
@@ -78,7 +51,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         var options = {
             url: albumRequest,
             error: function() {
-                failure();
+                if (failure)
+                    failure();
             },
             dataType: 'jsonp',
             timeout: 10000,
@@ -99,11 +73,40 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                         });
                     });
                 }
+                else if (failure)
+                    failure();
+            }
+        };
+        if (queue) {
+            queue.add(options);
+        }
+        else {
+            $.ajax(options);
+        }
+    };
+    
+    this.processBandcampArtist = function(id, queue, failure, callback) {
+        var consumerKey = this.bandcampConsumerKey;
+        var bandNameRequest = 'http://api.bandcamp.com/api/band/3/info?key=' + consumerKey + '&band_id=' + id + '&callback=?';
+        var options = {
+            url: bandNameRequest,
+            dataType: 'jsonp',
+            timeout: 10000,
+            error: function() {
+                if (failure)
+                    failure();
+            },
+            success: function(namedata) {
+                if (!namedata.error){
+                    var name = namedata.name;
+                    var url = namedata.url;
+                    callback(name, url);
+                }
                 else failure();
             }
         };
         if (queue) {
-            $.ajaxq(queue, options);
+            queue.add(options);
         }
         else {
             $.ajax(options);
@@ -117,7 +120,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         var options = {
             url: trackRequest,
             error: function() {
-                failure();
+                if (failure)
+                    failure();
             },
             dataType: 'jsonp',
             timeout: 10000,
@@ -137,11 +141,12 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     });
                         
                 }
-                else failure();
+                else if (failure)
+                    failure();
             }
         };
         if (queue) {
-            $.ajaxq(queue, options);
+            queue.add(options);
         }
         else {
             $.ajax(options);
@@ -159,7 +164,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                         router.processSoundCloudTrack(track, queue, failure);
                     });
                 }
-                else failure();
+                else if (failure)
+                    failure();
             }
         };
         // If a data object is not provided, the data is fetched using the id
@@ -175,12 +181,13 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     if (textStatus == "success") {
                         addPlaylistData(data);
                     }
-                    else failure();
+                    else if (failure)
+                        failure();
                 },
                 timeout: 10000
             };
             if (queue) {
-                $.ajaxq(queue, options);
+                queue.add(options);
             }
             else {
                 $.ajax(options);
@@ -204,7 +211,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     router.playlistObject.addTrack(trackObject);
                     success = true;
                 }
-                else failure();
+                else if (failure)
+                    failure();
             }
         };
         // If a data object is not provided, the data is fetched using the id
@@ -220,13 +228,14 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     if (textStatus == "success") {
                         addTrackData(data);
                     }
-                    else failure();
+                    else if (failure)
+                        failure();
                     console.log("finished inside soundcloud " + new Date().toString());
                 },
                 timeout: 10000
             };
             if (queue) {
-                $.ajaxq(queue, options);
+                queue.add(options);
             }
             else {
                 $.ajax(options);
@@ -256,14 +265,14 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                 var track = new YouTubeObject(id, youtubeID, author, title, duration);
                 router.playlistObject.addTrack(track);
                 success = true;
-                console.log("finished inside youtube " + new Date().toString());
             },
             error: function() {
-                failure();
+                if (failure)
+                    failure();
             }
         };
         if (queue) {
-            $.ajaxq(queue, options);
+            queue.add(options);
         }
         else {
             $.ajax(options);
@@ -283,7 +292,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
             dataType: 'jsonp',
             timeout: 10000,
             error: function() {
-                failure()
+                if (failure)
+                    failure();
             },
             success: function(data) {
                 if (!data.error) {
@@ -295,11 +305,11 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     else if (albumID) {
                         router.processBandcampAlbum(albumID, false, failure);
                     }
-                    else {
+                    else if (failure)
                         failure();
-                    }
                 }
-                else failure();
+                else if (failure)
+                    failure();
             }
         });
     /*$.getJSON(urlRequest, function(data) {
@@ -373,7 +383,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         $.ajax({
             url: resolveURL,
             error: function(){
-                failure();
+                if (failure)
+                    failure();
             },
             timeout: 10000,
             dataType: 'jsonp',
@@ -387,7 +398,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                         else router.processSoundCloudPlaylist(data, false, failure);
                     }
                 }
-                else failure();
+                else if (failure)
+                    failure();
             }
         });
     };
@@ -404,7 +416,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
             var youtubeID = match[0];
             this.processYouTubeVideoID(youtubeID, false, failure);
         }
-        else failure();
+        else if (failure)
+            failure();
         return canBeSearched;
     }
     
