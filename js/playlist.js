@@ -63,16 +63,24 @@ function Playlist(soundManager) {
         $('#track-count').text(trackNumber.toString());
         $('#playlist-duration').text(secondsToString(this.totalDuration));
         if (this.settings.updateURLOnAdd) {
+            var newHash = '';
             switch(mediaObject.siteName.toLowerCase()) {
                 case 'youtube':
-                    window.location.hash = addHashParam('ytv', mediaObject.siteMediaID);
+                    newHash = addHashParam('ytv', mediaObject.siteMediaID);
                     break;
                 case 'soundcloud':
-                    window.location.hash = addHashParam('sct', mediaObject.siteMediaID);
+                    newHash = addHashParam('sct', mediaObject.siteMediaID);
                     break;
                 case 'bandcamp':
-                    window.location.hash = addHashParam('bct', mediaObject.siteMediaID);
+                    newHash = addHashParam('bct', mediaObject.siteMediaID);
                     break;
+            }
+            // Making sure user cannot create huuuuuuuge URL by default
+            if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
+                window.location.hash = newHash;
+            }
+            else {
+                alert("Your playlist URL will not be appended because it is too long.");
             }
         }
     };

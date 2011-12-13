@@ -15,7 +15,7 @@ function get_random_slogan()
     if (count($lines))
     {
         $random = rand(0, count($lines) - 1);
-        return $lines[$random];
+        return htmlspecialchars($lines[$random]);
     }
     else return false;
 }
