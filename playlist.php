@@ -227,7 +227,7 @@
             </div>
             <div id="footer">Powered by <a href="http://www.bandcamp.com">Bandcamp</a>, <a href="http://www.soundcloud.com">SoundCloud</a>, and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
                 <?php
-                $slogan = get_random_slogan();
+                $slogan = get_random_db_slogan();
 
                 if ($slogan !== false)
                     echo '<span class="slogan">' . $slogan . '</span>';
