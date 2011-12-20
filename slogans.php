@@ -17,7 +17,8 @@ function get_random_slogan()
         $random = rand(0, count($lines) - 1);
         return htmlspecialchars($lines[$random]);
     }
-    else return false;
+    else
+        return false;
 }
 
 function get_random_db_slogan()
@@ -28,17 +29,10 @@ function get_random_db_slogan()
     {
         if (mysql_select_db('fruchtos_playlist'))
         {
-            $size_results = mysql_query("SELECT COUNT(id) AS count FROM slogans LIMIT 1;");
-            if ($row = mysql_fetch_assoc($size_results))
+            $result = mysql_query("SELECT slogan FROM slogans WHERE id >= (SELECT COUNT(id)* RAND() FROM slogans) LIMIT 1;");
+            if ($row = mysql_fetch_assoc($result))
             {
-                $size = $row['count'];
-
-                $random_num = rand(0, $size - 1);
-                $result = mysql_query("SELECT slogan FROM slogans WHERE id='$random_num' LIMIT 1;");
-                if ($row = mysql_fetch_assoc($result))
-                {
-                    $slogan = $row['slogan'];
-                }
+                $slogan = $row['slogan'];
             }
         }
         mysql_close();
