@@ -77,30 +77,33 @@ $(document).ready(function() {
                 });
                 for (var param in urlParams) {
                     var keyValuePair = urlParams[param];
+                    var mediaHandler = function(mediaObject) {
+                        router.playlistObject.addTrack(mediaObject);
+                    }
                     switch(keyValuePair.key.toString().toLowerCase()) {
                         case 'ytv':
                             if (keyValuePair.value) {
-                                router.processYouTubeVideoID(keyValuePair.value, ajaxManager);
+                                router.processYouTubeVideoID(keyValuePair.value, mediaHandler, ajaxManager);
                             }
                             break;
                         case 'sct':
                             if (keyValuePair.value) {
-                                router.processSoundCloudTrack(keyValuePair.value, ajaxManager);
+                                router.processSoundCloudTrack(keyValuePair.value, mediaHandler, ajaxManager);
                             }
                             break;
                         case 'scp':
                             if (keyValuePair.value) {
-                                router.processSoundCloudPlaylist(keyValuePair.value, ajaxManager);
+                                router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, ajaxManager);
                             }
                             break;
                         case 'bct':
                             if (keyValuePair.value) {
-                                router.processBandcampTrack(keyValuePair.value, 'pageload');
+                                router.processBandcampTrack(keyValuePair.value, mediaHandler, ajaxManager);
                             }
                             break;
                         case 'bca':
                             if (keyValuePair.value) {
-                                router.processBandcampAlbum(keyValuePair.value, 'pageload');
+                                router.processBandcampAlbum(keyValuePair.value, mediaHandler, ajaxManager);
                             }
                             break;
                     }
