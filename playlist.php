@@ -8,7 +8,6 @@
         <script src="js/swfobject.js" type="text/javascript"></script>
         <script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
         <script src="js/jquery.ajaxmanager.js" type="text/javascript"></script>
-        <script src="js/jquery.jsonp-2.1.4.min.js"></script>
         <script src="js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
         <script src="js/jquery.layout-latest.min.js" type="text/javascript"></script>
         <script src="js/jQuery.tubeplayer.js" type="text/javascript"></script>
