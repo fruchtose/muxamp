@@ -62,6 +62,9 @@ function Playlist(soundManager) {
         this._addPlaylistDOMRow(mediaObject, trackNumber);
         $('#track-count').text(trackNumber.toString());
         $('#playlist-duration').text(secondsToString(this.totalDuration));
+        if (!index) {
+            this.setCurrentTrack(index);
+        }
         if (this.settings.updateURLOnAdd) {
             var newHash = '';
             switch(mediaObject.siteName.toLowerCase()) {
@@ -141,7 +144,7 @@ function Playlist(soundManager) {
         if (media.type == "video") {
             media.destruct();
         }
-        this.currentTrack = this.currentTrack + 1 >= this.list.length ? 0 : this.currentTrack + 1;
+        this.setCurrentTrack(this.currentTrack + 1 >= this.list.length ? 0 : this.currentTrack + 1);
         if (wasPlaying || autostart) {
             this.play();
         }
@@ -221,9 +224,6 @@ function Playlist(soundManager) {
             }
             this._started = true;
             $('#play').text('Pause');
-            $('.playing').removeClass('playing');
-            var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
-            $(rowDOM).addClass('playing');
         }
     }
     
@@ -234,7 +234,7 @@ function Playlist(soundManager) {
         if (media.type == "video") {
             media.destruct();
         }
-        this.currentTrack = this.currentTrack - 1 >= 0 ? this.currentTrack - 1 : (this.isEmpty() ? 0 : this.list.length - 1);
+        this.setCurrentTrack(this.currentTrack - 1 >= 0 ? this.currentTrack - 1 : (this.isEmpty() ? 0 : this.list.length - 1));
         if (wasPlaying || autostart) {
             this.play();
         }
@@ -254,7 +254,7 @@ function Playlist(soundManager) {
                 this.stop();
             }
             if (!this.hasNext()) {
-                this.currentTrack = 0;
+                this.setCurrentTrack(0);
             }
             var trackDuration = this.list[pos].getDuration();
             this.list[pos].destruct();
@@ -283,6 +283,15 @@ function Playlist(soundManager) {
         }
     }
     
+    this.setCurrentTrack = function(trackNumber) {
+        this.currentTrack = trackNumber;
+        if (trackNumber >= 0 && trackNumber < this.list.length) {
+            $('.playing').removeClass('playing');
+            var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
+            $(rowDOM).addClass('playing');
+        }
+    }
+    
     this.setVolume = function(intPercent) {
         intPercent = Math.round(intPercent);
         this.currentVolumePercent = intPercent;
@@ -307,12 +316,14 @@ function Playlist(soundManager) {
         if (this.isEmpty()) {
             return;
         }
-        var listNumbers = [];
+        var listNumbers = [], wasPlaying = this.isPlaying(), playlist = this;
+        var newList = [];
+        var newCurrentTrack = 0;
+        
         for (track in this.list) {
             listNumbers[track] = track;
         }
-        var newList = [];
-        var newCurrentTrack = 0;
+        
         while (listNumbers.length > 0) {
             var nextTrack = listNumbers[Math.floor(Math.random()*listNumbers.length)];
             listNumbers.splice(listNumbers.indexOf(nextTrack), 1);
@@ -321,12 +332,7 @@ function Playlist(soundManager) {
                 newCurrentTrack = newList.length - 1;
             }
         }
-        var wasPlaying = this.isPlaying();
-        if (this._started == true) {
-            this.currentTrack = newCurrentTrack;
-        }
         this.list = newList;
-        var playlist = this;
         $(this.playlistDOM.allRowsInTable).attr("class", function(index) {
             return newList[index].id;
         }).each(function(index) {
@@ -335,6 +341,7 @@ function Playlist(soundManager) {
             }
             $(this).html(playlist._getDOMTableCellsForMediaObject(newList[index], index + 1));
         });
+        this.setCurrentTrack(newCurrentTrack);
     /*.each(function() {
             playlist.removeTrack(playlist.list[0].id);
         });*/
