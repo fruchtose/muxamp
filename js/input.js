@@ -49,13 +49,24 @@ function getURLParams(useOrderedList) {
     }
 };
 
-function addHashParam(key, value) {
+var addHashParam = function(key, value) {
     var currentHash = window.location.hash;
     if (!currentHash.length) {
         return key + "=" + value;
     }
     else return currentHash + "&" + key + "=" + value;
 }
+
+var hashTableToFlatList = function(table) {
+    var flatList = [];
+    for (hash in table) {
+        var list = table[hash];
+        for (index in list) {
+            flatList.push(list[index]);
+        }
+    }
+    return flatList;
+};
 
 $(document).ready(function() {
     var urlParams = getURLParams(true);
@@ -75,44 +86,55 @@ $(document).ready(function() {
                     preventDoubleRequests: false,
                     queue: true
                 });
-                for (var param in urlParams) {
-                    var keyValuePair = urlParams[param];
-                    var mediaHandler = function(mediaObject) {
-                        router.playlistObject.addTrack(mediaObject);
+                var mediaObjectHashTable = [];
+                var mediaHandler = function(mediaObject, index) {
+                    if (!mediaObjectHashTable[index]) {
+                        mediaObjectHashTable[index] = [mediaObject];
                     }
+                    // Source playlists (SoundCloud, etc.) are lists at a given index in a hash table.
+                    // The lists arre translated into a flat structure at playlist construction.
+                    else mediaObjectHashTable[index].push(mediaObject);
+                }
+                for (param in urlParams) {
+                    var keyValuePair = urlParams[param];
                     switch(keyValuePair.key.toString().toLowerCase()) {
                         case 'ytv':
                             if (keyValuePair.value) {
-                                router.processYouTubeVideoID(keyValuePair.value, mediaHandler, ajaxManager);
+                                router.processYouTubeVideoID(keyValuePair.value, mediaHandler, [param], ajaxManager);
                             }
                             break;
                         case 'sct':
                             if (keyValuePair.value) {
-                                router.processSoundCloudTrack(keyValuePair.value, mediaHandler, ajaxManager);
+                                router.processSoundCloudTrack(keyValuePair.value, mediaHandler, [param], ajaxManager);
                             }
                             break;
                         case 'scp':
                             if (keyValuePair.value) {
-                                router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, ajaxManager);
+                                router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, [param], ajaxManager);
                             }
                             break;
                         case 'bct':
                             if (keyValuePair.value) {
-                                router.processBandcampTrack(keyValuePair.value, mediaHandler, ajaxManager);
+                                router.processBandcampTrack(keyValuePair.value, mediaHandler, [param], ajaxManager);
                             }
                             break;
                         case 'bca':
                             if (keyValuePair.value) {
-                                router.processBandcampAlbum(keyValuePair.value, mediaHandler, ajaxManager);
+                                router.processBandcampAlbum(keyValuePair.value, mediaHandler, [param], ajaxManager);
                             }
                             break;
                     }
                 }
+                // Checks every 100 milliseconds to see if AJAX manager is done
                 var interval = window.setInterval(function() {
-                    ajaxManager.clearTimeouts();
                     if (!ajaxManager.size()) {
                         window.clearInterval(interval);
                         $.manageAjax.destroy('pageload');
+                        var flatList = hashTableToFlatList(mediaObjectHashTable);
+                        for (index in flatList) {
+                            var mediaObject = flatList[index];
+                            router.playlistObject.addTrack(mediaObject);
+                        }
                         router.playlistObject.updateSettings({
                             updateURLOnAdd: true
                         });

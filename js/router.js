@@ -44,7 +44,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         return this.playlistObject.getNewTrackID();
     };
     
-    this.processBandcampAlbum = function(albumID, mediaHandler, queue, failure) {
+    this.processBandcampAlbum = function(albumID, mediaHandler, params, queue, failure) {
         var consumerKey = this.bandcampConsumerKey;
         var router = this;
         var albumRequest = 'http://api.bandcamp.com/api/album/2/info?key=' + consumerKey + '&album_id=' + albumID + '&callback=?';
@@ -69,7 +69,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                             var id = router.getNewTrackID();
                             var linkURL = url + track.url;
                             var trackObject = new BandcampObject(id, linkURL, consumerKey, track, artist, soundManager);
-                            mediaHandler(trackObject);
+                            mediaHandler && mediaHandler.apply(this, [trackObject].concat(params));
                         });
                     }, failure);
                 }
@@ -113,7 +113,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         }
     };
     
-    this.processBandcampTrack = function(trackID, mediaHandler, queue, failure) {
+    this.processBandcampTrack = function(trackID, mediaHandler, params, queue, failure) {
         var consumerKey = this.bandcampConsumerKey;
         var router = this;
         var trackRequest = 'http://api.bandcamp.com/api/track/1/info?key=' + consumerKey + '&track_id=' + trackID + '&callback=?';
@@ -137,7 +137,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                         router.allocateNewTracks(1);
                         var id = router.getNewTrackID();
                         var trackObject = new BandcampObject(id, linkURL, consumerKey, trackdata, artist, soundManager);
-                        mediaHandler(trackObject);
+                        mediaHandler && mediaHandler.apply(this, [trackObject].concat(params));
                     }, failure);
                         
                 }
@@ -153,7 +153,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         }
     };
     
-    this.processSoundCloudPlaylist = function(playlistID, mediaHandler, queue, failure) {
+    this.processSoundCloudPlaylist = function(playlistID, mediaHandler, params, queue, failure) {
         var consumerKey = this.soundcloudConsumerKey;
         var router = this;
         var addPlaylistData = function(data) {
@@ -161,7 +161,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                 //Tracks have stream URL
                 if (data.tracks && data.tracks.length > 0) {
                     $.each(data.tracks, function(index, track) {
-                        router.processSoundCloudTrack(track, mediaHandler, queue, failure);
+                        router.processSoundCloudTrack(track, mediaHandler, params, queue, failure);
                     });
                 }
                 else if (failure)
@@ -169,7 +169,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
             }
         };
         // If a data object is not provided, the data is fetched using the id
-        if (typeof input == 'string') {
+        if (typeof playlistID == 'string') {
             var resolveURL = 'http://api.soundcloud.com/playlists/' + playlistID + ".json?consumer_key=" + consumerKey + '&callback=?';
             var options = {
                 url: resolveURL,
@@ -197,7 +197,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         else addPlaylistData(playlistID);
     }
     
-    this.processSoundCloudTrack = function(trackID, mediaHandler, queue, failure) {
+    this.processSoundCloudTrack = function(trackID, mediaHandler, params, queue, failure) {
         var consumerKey = this.soundcloudConsumerKey;
         var router = this;
         var success = false;
@@ -208,7 +208,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     router.allocateNewTracks(1);
                     var id = router.getNewTrackID();
                     var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, soundManager);
-                    mediaHandler(trackObject);
+                    mediaHandler && mediaHandler.apply(this, [trackObject].concat(params));
                     success = true;
                 }
                 else if (failure)
@@ -216,7 +216,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
             }
         };
         // If a data object is not provided, the data is fetched using the id
-        if (typeof input == 'string') {
+        if (typeof trackID == 'string') {
             var resolveURL = 'http://api.soundcloud.com/tracks/' + trackID + ".json?consumer_key=" + consumerKey + '&callback=?';
             var options = {
                 url: resolveURL,
@@ -246,7 +246,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         return success;
     };
     
-    this.processYouTubeVideoID = function(youtubeID, mediaHandler, queue, failure) {
+    this.processYouTubeVideoID = function(youtubeID, mediaHandler, params, queue, failure) {
         var router = this;
         var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json';
         var success = false;
@@ -262,8 +262,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                 var duration = parseInt(entry.media$group.yt$duration.seconds);
                 router.allocateNewTracks(1);
                 var id = router.getNewTrackID();
-                var track = new YouTubeObject(id, youtubeID, author, title, duration);
-                mediaHandler(track);
+                var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
+                mediaHandler && mediaHandler.apply(this, [trackObject].concat(params));
                 success = true;
             },
             error: function() {
@@ -283,9 +283,6 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
     this.resolveBandcampTracks = function(url, failure) {
         url = encodeURIComponent(url);
         var urlRequest = 'http://api.bandcamp.com/api/url/1/info?key=' + this.bandcampConsumerKey + '&url=' + url + '&callback=?';
-        var consumerKey = this.bandcampConsumerKey;
-        var playlist = this.playlistObject;
-        var bandcampArtistURL = undefined;
         var router = this;
         var addTrack = function(mediaObject) {
                     router.playlistObject.addTrack(mediaObject);
@@ -303,10 +300,10 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     var trackID = data.track_id;
                     var albumID = data.album_id;
                     if (trackID) {
-                        router.processBandcampTrack(trackID, addTrack, false, failure);
+                        router.processBandcampTrack(trackID, addTrack, [], false, failure);
                     }
                     else if (albumID) {
-                        router.processBandcampAlbum(albumID, addTrack, false, failure);
+                        router.processBandcampAlbum(albumID, addTrack, [], false, failure);
                     }
                     else if (failure)
                         failure();
@@ -319,7 +316,6 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
     
     this.resolveSoundCloud = function(url, failure) {
         var router = this;
-        var consumerKey = router.soundcloudConsumerKey;
         var resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
         $.ajax({
             url: resolveURL,
@@ -337,9 +333,9 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
                     if (data.streamable === true) {
                         //Tracks have stream URL
                         if (data.stream_url) {
-                            router.processSoundCloudTrack(data, addTrack, false, failure);
+                            router.processSoundCloudTrack(data, addTrack, [], false, failure);
                         }
-                        else router.processSoundCloudPlaylist(data, addTrack, false, failure);
+                        else router.processSoundCloudPlaylist(data, addTrack, [], false, failure);
                     }
                 }
                 else if (failure)
@@ -361,7 +357,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, bandcampConsumer
         if (match) {
             canBeSearched = true;
             var youtubeID = match[0];
-            this.processYouTubeVideoID(youtubeID, addTrack, false, failure);
+            this.processYouTubeVideoID(youtubeID, addTrack, [], false, failure);
         }
         else if (failure)
             failure();
