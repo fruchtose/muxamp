@@ -307,35 +307,9 @@
 				this.abort();
 			}
 		},
-                clearTimeouts: function(){
-                    if (!this.requests) {
-                        return count;
-                    }
-                    else {
-                        for (var i in this.requests) {
-                            if (this.requests.hasOwnProperty(i) && this.requests[i].hasOwnProperty('status')) {
-                                if (this.requests[i].statusText == 'timeout') {
-                                    delete this.requests[i];
-                                }
-                            }
-                        }
-                    }
-                },
                 size: function(){
-                    // Not efficient, but it will work. No better options available 
-                    // that work everywhere.
-                    // http://stackoverflow.com/questions/126100/how-to-efficiently-count-the-number-of-keys-properties-of-an-object-in-javascrip
-                    var count = 0;
-                    if (!this.requests) {
-                        return count;
-                    }
-                    else {
-                        for (var i in this.requests) {
-                            if (this.requests.hasOwnProperty(i))
-                                count++;
-                        }
-                    }
-                    return count;
+                    // Counts the number of requests left in the data store.
+                    return $.queue(document, this.qName).length;
                 } 
 	};
 	$.manageAjax._manager.prototype.getXHR = $.manageAjax._manager.prototype.getData;
