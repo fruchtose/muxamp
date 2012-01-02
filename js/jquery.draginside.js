@@ -1,5 +1,15 @@
 (function($) {
     
+    //Inspired by JSONP library
+    function callSuppliedFunction(func, object, parameters) {
+        var result = false;
+        if (func) {
+            func.apply(object.context || object, parameters); 
+            result = true;
+        }
+        return result;
+    }
+    
     var defaults = {
         // All mouse events will be bound with a namespace so as not to interfere with other bindings
         snapToEdges: true,
@@ -7,11 +17,11 @@
         snapPoints: [[0, 'any'], ['any', 0], ['width()', 'any'], ['any', 'height()']],
         snapAtDistance: 4,
         namespace: 'draginside',
-        onMouseDown: function(x, y, params){},
+        onMouseDown: function(x, y){},
         onMouseDownParams: {},
-        onMouseMove: function(x, y, params){},
+        onMouseMove: function(x, y){},
         onMouseMoveParams: {},
-        onMouseUp: function(x, y, params){},
+        onMouseUp: function(x, y){},
         onMouseUpParams: {}
     };
     
@@ -43,6 +53,11 @@
                         
                         var snapX = !checkX, snapY = !checkY;
                         var newX = x, newY = y;
+                        
+                        // Goes through applicable snap points and decides if the x and y input 
+                        // should be snapped based on distance to each snap point. Loop terminates 
+                        // on the first snap point applied or after all snap points have been 
+                        // deemed inapplicable.
                         for (var i in settings.snapPoints) {
                             var point = settings.snapPoints[i];
                             var xAny = point[xArrLoc] == 'any', yAny = point[yArrLoc] == 'any';
@@ -80,7 +95,7 @@
                         var position = internal_methods.processPoints(xValue, yValue, element);
                         xValue = position.x;
                         yValue = position.y;
-                        settings.onMouseDown(xValue, yValue, params);
+                        callSuppliedFunction(settings.onMouseDown, settings, [xValue, yValue].concat(params));
                         if (event.button == 0) {
                             $(element).bind('mousemove.' + settings.namespace, function(event) {
                                 internal_methods.mousemove(event.clientX - element.offsetLeft, event.clientY - element.offsetTop, element, settings.onMouseMoveParams);
@@ -92,7 +107,7 @@
                         var position = internal_methods.processPoints(xValue, yValue, element);
                         xValue = position.x;
                         yValue = position.y;
-                        settings.onMouseMove(xValue, yValue, params);
+                        callSuppliedFunction(settings.onMouseMove, settings, [xValue, yValue].concat(params));
                     },
                     mouseup: function(x, y, element, params) {
                         $(element).unbind('mousemove.' + settings.namespace);
@@ -102,7 +117,7 @@
                         var position = internal_methods.processPoints(xValue, yValue, element);
                         xValue = position.x;
                         yValue = position.y;
-                        settings.onMouseUp(xValue, yValue, params);
+                        callSuppliedFunction(settings.onMouseUp, settings, [xValue, yValue].concat(params));
                     },
                     processPoints: function(x, y, element) {
                         return settings.snapToEdges 
