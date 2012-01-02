@@ -314,16 +314,15 @@ function Playlist(soundManager) {
     
     this.shuffle = function() {
         if (this.isEmpty()) {
-            return;
+            return false;
         }
-        var listNumbers = [], wasPlaying = this.isPlaying(), playlist = this;
-        var newList = [];
-        var newCurrentTrack = 0;
+        var listNumbers = [], newList = [], newCurrentTrack = 0;
         
         for (track in this.list) {
             listNumbers[track] = track;
         }
         
+        // Creates random playlist
         while (listNumbers.length > 0) {
             var nextTrack = listNumbers[Math.floor(Math.random()*listNumbers.length)];
             listNumbers.splice(listNumbers.indexOf(nextTrack), 1);
@@ -332,23 +331,19 @@ function Playlist(soundManager) {
                 newCurrentTrack = newList.length - 1;
             }
         }
-        this.list = newList;
-        $(this.playlistDOM.allRowsInTable).attr("class", function(index) {
-            return newList[index].id;
-        }).each(function(index) {
-            if (index == newCurrentTrack && wasPlaying) {
-                $(this).addClass('playing');
-            }
-            $(this).html(playlist._getDOMTableCellsForMediaObject(newList[index], index + 1));
-        });
-        this.setCurrentTrack(newCurrentTrack);
-    /*.each(function() {
-            playlist.removeTrack(playlist.list[0].id);
-        });*/
         
-    /*for (index in this.list){
-            this._addPlaylistDOMRow(this.list[index]);
-        }*/
+        // Rewrites the DOM for the new playlist
+        this.list = newList;
+        var listInnerHTML = '';
+        for (index in newList) {
+            var indexNum = parseInt(index);
+            listInnerHTML += this._getDOMRowForMediaObject(newList[indexNum], indexNum + 1);
+        }
+        $(this.playlistDOM.parentTable).html(listInnerHTML);
+        
+        // Refreshes the current track index, as it was possibly changed 
+        // during the shuffle.
+        this.setCurrentTrack(newCurrentTrack);
     }
     
     this.stop = function () {
