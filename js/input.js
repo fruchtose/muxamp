@@ -127,7 +127,7 @@ $(document).ready(function() {
                 }
                 // Checks every 100 milliseconds to see if AJAX manager is done
                 var interval = window.setInterval(function() {
-                    if (!ajaxManager.size()) {
+                    if (!ajaxManager.queueSize() && !ajaxManager.size(true)) {
                         window.clearInterval(interval);
                         $.manageAjax.destroy('pageload');
                         var flatList = hashTableToFlatList(mediaObjectHashTable);
