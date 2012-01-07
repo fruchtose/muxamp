@@ -49,7 +49,7 @@ function Playlist(soundManager) {
     this._getDOMTableCellsForMediaObject = function(mediaObject, index) {
         var extLink = '<a href="' + mediaObject.permalink +'" target="_blank" class="external">' + mediaObject.siteName + '</a>';
         var links = '<div class="right"><a onclick="return false;" class="remove" href>Remove</a>' + extLink + '</div>';
-        return links + '<div class="desc">' + index + ". " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
+        return links + '<div class="desc"><span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     }
     
     this._started = false;
@@ -60,11 +60,13 @@ function Playlist(soundManager) {
         this.list[index] = mediaObject;
         this.totalDuration += mediaObject.getDuration();
         this._addPlaylistDOMRow(mediaObject, trackNumber);
+        $(this.playlistDOM.getRowForID(index)).disableSelection();
         $('#track-count').text(trackNumber.toString());
         $('#playlist-duration').text(secondsToString(this.totalDuration));
         if (!index) {
             this.setCurrentTrack(index);
         }
+        $(this.playlistDOM.parentTable).sortable('refresh');
         if (this.settings.updateURLOnAdd) {
             var newHash = '';
             switch(mediaObject.siteName.toLowerCase()) {
@@ -108,6 +110,19 @@ function Playlist(soundManager) {
         return this.currentVolumePercent;
     }
     
+    this.goToTrack = function(index, autostart) {
+        var wasPlaying = this.isPlaying();
+        this.stop();
+        var media = this.list[this.currentTrack];
+        if (media.type == "video") {
+            media.destruct();
+        }
+        this.setCurrentTrack(parseInt(index));
+        if (wasPlaying || autostart) {
+            this.play();
+        }
+    }
+    
     this.hasNext = function() {
         return !this.isEmpty() && this.list.length > this.currentTrack + 1;
     }
@@ -137,17 +152,32 @@ function Playlist(soundManager) {
         return status;
     }
     
+    this.moveTrack = function(originalIndex, newIndex) {
+        if (!this.isEmpty() && originalIndex != newIndex) {
+            if (originalIndex >= 0 && newIndex >= 0 && originalIndex < this.list.length && newIndex < this.list.length) {
+                var mediaObject = this.list.splice(originalIndex, 1)[0];
+                this.list.splice(newIndex, 0, mediaObject);
+                if (this.currentTrack == originalIndex) {
+                    this.setCurrentTrack(newIndex);
+                }
+                else if (this.currentTrack < originalIndex && this.currentTrack >= newIndex) {
+                    //If track is placed before current track (1 item), increment current track pointer by 1
+                    this.setCurrentTrack(this.currentTrack + 1);
+                }
+                else if (this.currentTrack > originalIndex && this.currentTrack <= newIndex) {
+                    //If track is placed after current track (1 item), move current track pointer back by one.
+                    this.setCurrentTrack(this.currentTrack - 1);
+                }
+            }
+        }
+        var minIndex = Math.min(originalIndex, newIndex);
+        // Track numbers are now inaccurate, so they are refreshed.
+        this.renumberTracks(minIndex);
+    };
+    
     this.nextTrack = function(autostart) {
-        var wasPlaying = this.isPlaying();
-        this.stop();
-        var media = this.list[this.currentTrack];
-        if (media.type == "video") {
-            media.destruct();
-        }
-        this.setCurrentTrack(this.currentTrack + 1 >= this.list.length ? 0 : this.currentTrack + 1);
-        if (wasPlaying || autostart) {
-            this.play();
-        }
+        var trackInt = parseInt(this.currentTrack), next = trackInt + 1 >= this.list.length ? 0 : trackInt + 1;
+        this.goToTrack(next, autostart);
     }
     
     this.play = function() {
@@ -228,22 +258,14 @@ function Playlist(soundManager) {
     }
     
     this.previousTrack = function(autostart) {
-        var wasPlaying = this.isPlaying();
-        this.stop();
-        var media = this.list[this.currentTrack];
-        if (media.type == "video") {
-            media.destruct();
-        }
-        this.setCurrentTrack(this.currentTrack - 1 >= 0 ? this.currentTrack - 1 : (this.isEmpty() ? 0 : this.list.length - 1));
-        if (wasPlaying || autostart) {
-            this.play();
-        }
+        var trackInt = parseInt(this.currentTrack), next = trackInt - 1 >= 0 ? trackInt - 1 : (this.isEmpty() ? 0 : this.list.length - 1);
+        this.goToTrack(next, autostart);
     }
     
-    this.removeTrack = function(track_id) {
+    this.removeTrack = function(trackID) {
         var pos = -1;
         for (track in this.list) {
-            if (this.list[track].id == track_id) {
+            if (this.list[track].id == trackID) {
                 pos = track;
                 break;
             }
@@ -253,13 +275,17 @@ function Playlist(soundManager) {
             if (wasPlaying){
                 this.stop();
             }
-            if (!this.hasNext()) {
-                this.setCurrentTrack(0);
-            }
+            
             var trackDuration = this.list[pos].getDuration();
             this.list[pos].destruct();
             this.list.splice(pos, 1);
-            this.totalDuration -= trackDuration;
+            
+            var rowDOM = this.playlistDOM.getRowForID(trackID);
+            $(rowDOM).remove();
+            this.renumberTracks(Math.max(0, Math.min(this.list.length - 1, pos)));
+            if (pos == this.currentTrack) {
+                this.setCurrentTrack(Math.min(this.list.length - 1, pos));
+            }
             if (this.isEmpty()) {
                 $('#play').text('Play');
             }
@@ -269,11 +295,19 @@ function Playlist(soundManager) {
                     $('#play').text('Pause');
                 }
             }
-            var rowDOM = this.playlistDOM.getRowForID(track_id);
-            $(rowDOM).remove();
             $('#track-count').text(this.list.length.toString());
+            this.totalDuration -= trackDuration;
             $('#playlist-duration').text(secondsToString(this.totalDuration));
         }
+    }
+    
+    this.renumberTracks = function(startingIndex) {
+        $(this.playlistDOM.allRowsInTable).filter(function(index) {
+            return index >= startingIndex;
+        }).each(function(index, element) {
+            // Uses 1-indexed numbers for user
+            $(element).find('span.index').html((startingIndex + index) + 1);
+        });
     }
     
     this.seek = function(decimalPercent) {
@@ -372,3 +406,18 @@ function Playlist(soundManager) {
     }
 }
 var playlist = new Playlist(soundManager);
+$(document).ready(function() {
+    var startPos;
+    $(playlist.playlistDOM.parentTable).sortable({
+        axis: 'y',
+        containment: '#tracks',
+        start: function(event, ui) {
+            startPos = $(event.target).parent('li').index();
+        },
+        tolerance: 'pointer',
+        update: function(event, ui) {
+            var pos = Math.max(0, Math.min(playlist.list.length - 1, $(event.target).parent('li').index()));
+            playlist.moveTrack(startPos, pos);
+        }
+    });
+});
