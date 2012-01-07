@@ -89,10 +89,13 @@ var YouTubeObject = new JS.Class(VideoObject, {
     },
    
     destruct: function() {
-        if ($('#right-side').width() > 10) {
-            body.close('east');
-            $('#video').tubeplayer('destruct');
-            $("#video").replaceWith('<div id="video"></id>');
+        var videoID = $('#video').tubeplayer('videoId');
+        if ($('#video').width()) {
+            if (videoID == this.siteMediaID) {
+                body.close('east');
+                $('#video').tubeplayer('destruct');
+                $("#video").replaceWith('<div id="video"></id>');
+            }
         }
     },
    
@@ -144,7 +147,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
             $("#video").tubeplayer('seek', Math.floor(decimalPercent * duration));
         }
         catch(e) {
-            // Eh, don't try anything if seeking isn't possible'
+        // Eh, don't try anything if seeking isn't possible'
         }
     },
    
