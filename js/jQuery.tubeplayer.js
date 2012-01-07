@@ -585,17 +585,12 @@
 	
 	// fmt: youtube.com/watch?v=[desired-token]&
 	TubePlayer.getVideoIDFromURL = function(sURL){
-		
-		var pattern = 'youtube.com/watch?v=';
-		
-		var start = sURL.indexOf(pattern) + pattern.length;
-		
-		var end = sURL.indexOf('&', start) || sURL.length;
-		
-		if( start > end )
-			return "";
-		
-		return sURL.substring(start, end);
+		var beginningURL = "v=";
+                var beginningURLLoc = sURL.indexOf(beginningURL);
+                var beginningURLLength = beginningURL.length;
+                var idSubstring = sURL.substring(beginningURLLoc + beginningURLLength);
+                var match = idSubstring.match(/[\w\-]+/);
+		return match;
 		
 	};
 	
@@ -603,7 +598,7 @@
 	 * All the events that are bound to a TubePlayer instance
 	 */
 	var PLAYER = {
-		
+            
 		cue: buildFN(function(evt,param,p){ 
 			
 			p.ytplayer.cueVideoById(param, p.opts.preferredQuality);
@@ -613,7 +608,7 @@
 		play: buildFN(function(evt,param,p){
 			
 			if(typeof(param)=='object') 
-				p.ytplayer.loadVideoById(param.id,param.time, p.opts.preferredQuality); 
+				p.ytplayer.loadVideoById(param.id,param.time, p.opts.preferredQuality);
 		
 			else if(param) 
 				p.ytplayer.loadVideoById(param, 0, p.opts.preferredQuality); 
