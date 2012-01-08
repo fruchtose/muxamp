@@ -117,6 +117,12 @@ $(document).ready(function() {
     });
 });
 
+var clearVideo = function() {
+    body.close('east');
+    $('#video').tubeplayer('destruct');
+    $("#video").replaceWith('<div id="video"></id>');
+}
+
 var secondsToString = function(duration) {
     var str = "";
     // The duration can be a decimal, but we want it to be an integer so the user 
