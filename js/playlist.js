@@ -55,12 +55,14 @@ function Playlist(soundManager) {
     this._started = false;
     
     this.addTrack = function(mediaObject) {
-        var index = this.list.length;
+        var index = this.list.length, playlist = this;
         var trackNumber = index + 1;
         this.list[index] = mediaObject;
         this.totalDuration += mediaObject.getDuration();
         this._addPlaylistDOMRow(mediaObject, trackNumber);
-        $(this.playlistDOM.getRowForID(index)).disableSelection();
+        $(this.playlistDOM.getRowForID(index)).dblclick(function() {
+            playlist.goToTrack(playlist.indexOfTrackID(mediaObject.id), true);
+        });
         $('#track-count').text(trackNumber.toString());
         $('#playlist-duration').text(secondsToString(this.totalDuration));
         if (!index) {
@@ -131,6 +133,17 @@ function Playlist(soundManager) {
         return !this.isEmpty() && this.currentTrack - 1 >= 0;
     }
     
+    this.indexOfTrackID = function(trackID) {
+        var pos = -1;
+        for (track in this.list) {
+            if (this.list[track].id == trackID) {
+                pos = track;
+                break;
+            }
+        }
+        return pos;
+    }
+    
     this.isEmpty = function() {
         return this.list.length == 0;
     }
@@ -160,19 +173,15 @@ function Playlist(soundManager) {
                 if (this.currentTrack == originalIndex) {
                     this.setCurrentTrack(newIndex);
                 }
-                else if (this.currentTrack < originalIndex && this.currentTrack >= newIndex) {
-                    //If track is placed before current track (1 item), increment current track pointer by 1
-                    this.setCurrentTrack(this.currentTrack + 1);
+                else {
+                    this.setCurrentTrack($('li.playing').index());
                 }
-                else if (this.currentTrack > originalIndex && this.currentTrack <= newIndex) {
-                    //If track is placed after current track (1 item), move current track pointer back by one.
-                    this.setCurrentTrack(this.currentTrack - 1);
-                }
+            
+                var minIndex = Math.min(originalIndex, newIndex);
+                // Track numbers are now inaccurate, so they are refreshed.
+                this.renumberTracks(minIndex);
             }
         }
-        var minIndex = Math.min(originalIndex, newIndex);
-        // Track numbers are now inaccurate, so they are refreshed.
-        this.renumberTracks(minIndex);
     };
     
     this.nextTrack = function(autostart) {
@@ -263,13 +272,7 @@ function Playlist(soundManager) {
     }
     
     this.removeTrack = function(trackID) {
-        var pos = -1;
-        for (track in this.list) {
-            if (this.list[track].id == trackID) {
-                pos = track;
-                break;
-            }
-        }
+        var pos = this.indexOfTrackID(trackID);
         if (pos >= 0) {
             var wasPlaying = this.isPlaying() && pos == this.currentTrack;
             if (wasPlaying){
@@ -368,12 +371,21 @@ function Playlist(soundManager) {
         
         // Rewrites the DOM for the new playlist
         this.list = newList;
-        var listInnerHTML = '';
+        var listInnerHTML = '', playlist = this, indexNum;
         for (index in newList) {
             var indexNum = parseInt(index);
             listInnerHTML += this._getDOMRowForMediaObject(newList[indexNum], indexNum + 1);
+            $(this.playlistDOM.getRowForID(indexNum)).dblclick(function() {
+                playlist.goToTrack(playlist.indexOfTrackID(newList[indexNum].id), true);
+            });
         }
         $(this.playlistDOM.parentTable).html(listInnerHTML);
+        for (index in newList) {
+            indexNum = parseInt(index);
+            $(this.playlistDOM.getRowForID(indexNum)).dblclick(function() {
+                playlist.goToTrack(playlist.indexOfTrackID(newList[indexNum].id), true);
+            });
+        }
         
         // Refreshes the current track index, as it was possibly changed 
         // during the shuffle.
