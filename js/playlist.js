@@ -269,7 +269,7 @@ function Playlist(soundManager) {
     
     this.nextTrack = function(autostart) {
         var trackInt = parseInt(this.currentTrack), next = trackInt + 1 >= this.list.length ? 0 : trackInt + 1;
-        this.goToTrack(next, true);
+        this.goToTrack(next, autostart);
     }
     
     this.play = function() {
@@ -351,7 +351,7 @@ function Playlist(soundManager) {
     
     this.previousTrack = function(autostart) {
         var trackInt = parseInt(this.currentTrack), next = trackInt - 1 >= 0 ? trackInt - 1 : (this.isEmpty() ? 0 : this.list.length - 1);
-        this.goToTrack(next, true);
+        this.goToTrack(next, autostart);
     }
     
     this.removeTrack = function(index) {
