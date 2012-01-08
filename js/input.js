@@ -61,8 +61,10 @@ var hashTableToFlatList = function(table) {
     var flatList = [];
     for (hash in table) {
         var list = table[hash];
-        for (index in list) {
-            flatList.push(list[index]);
+        if (list) {
+            for (index in list) {
+                flatList.push(list[index]);
+            }
         }
     }
     return flatList;
@@ -131,10 +133,7 @@ $(document).ready(function() {
                         window.clearInterval(interval);
                         $.manageAjax.destroy('pageload');
                         var flatList = hashTableToFlatList(mediaObjectHashTable);
-                        for (index in flatList) {
-                            var mediaObject = flatList[index];
-                            router.playlistObject.addTrack(mediaObject);
-                        }
+                        router.playlistObject.addTracks(flatList);
                         router.playlistObject.updateSettings({
                             updateURLOnAdd: true
                         });

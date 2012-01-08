@@ -12,9 +12,11 @@ var PlaylistDOMInformation = function() {
     };
     
     this.getRemovalHyperlinkForID =  function(id) {
-        var selector = this.getRowForID(id) + " a.remove";
+        var selector = this.getRowForID(id) + " " + this.removalHyperlink;
         return selector;
     };
+    
+    this.removalHyperlink = "a.remove";
 };
 
 function Playlist(soundManager) {
@@ -40,6 +42,43 @@ function Playlist(soundManager) {
         $(this.playlistDOM.getRemovalHyperlinkForID(id)).live('click', function() {
             obj.removeTrack(id);
         });
+    }
+    
+    this._addPlaylistDOMRows = function(mediaObjects) {
+        if ( !(mediaObjects instanceof Array) ) {
+            mediaObjects = [mediaObjects];
+        }
+        var playlist = this, appendedHTML = '';
+        for (index in mediaObjects){
+            var mediaObject = mediaObjects[index];
+            appendedHTML += this._getDOMRowForMediaObject(mediaObject, parseInt(index) + 1);
+        }
+        $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
+        for (index in mediaObjects){
+            $(this.playlistDOM.getRowForID(mediaObjects[index].id)).dblclick(function() {
+                playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
+            });
+            $(this.playlistDOM.getRemovalHyperlinkForID(mediaObjects[index].id)).live('click', function() {
+                playlist.removeTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index());
+            });
+        }
+        /*
+        $(this.playlistDOM.allRowsInTable).each(function(index, element){
+            $(element).dblclick(function() {
+                playlist.goToTrack(index, true);
+            });
+            $(element).find(playlist.playlistDOM.removalHyperlink).live('click', function() {
+                playlist.removeTrack(index);
+            });
+        });
+    /*for (index in mediaObjects){
+            $(this.playlistDOM.getRowForID(mediaObjects[index].id)).dblclick(function() {
+                playlist.goToTrack(playlist.indexOfTrackID(mediaObjects[index].id), true);
+            });
+            $(this.playlistDOM.getRemovalHyperlinkForID(mediaObjects[index].id)).live('click', function() {
+                playlist.removeTrack(mediaObjects[index].id);
+            });
+        }*/
     }
     
     this._getDOMRowForMediaObject = function(mediaObject, index) {
@@ -92,6 +131,50 @@ function Playlist(soundManager) {
         }
     };
     
+    this.addTracks = function(mediaObjects, currentTrack) {
+        if ( !(mediaObjects instanceof Array) ) {
+            mediaObjects = [mediaObjects];
+        }
+        var addedDuration = 0;
+        this.list = this.list.concat(mediaObjects);
+        this._addPlaylistDOMRows(mediaObjects);
+        for (i in mediaObjects) {
+            var mediaObject = mediaObjects[i];
+            addedDuration += mediaObject.getDuration();
+            if (this.settings.updateURLOnAdd) {
+                var newHash = '';
+                switch(mediaObject.siteName.toLowerCase()) {
+                    case 'youtube':
+                        newHash = addHashParam('ytv', mediaObject.siteMediaID);
+                        break;
+                    case 'soundcloud':
+                        newHash = addHashParam('sct', mediaObject.siteMediaID);
+                        break;
+                    case 'bandcamp':
+                        newHash = addHashParam('bct', mediaObject.siteMediaID);
+                        break;
+                }
+                // Making sure user cannot create huuuuuuuge URL by default
+                if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
+                    window.location.hash = newHash;
+                }
+                else {
+                    alert("Your playlist URL will not be appended because it is too long.");
+                }
+            }
+        }
+        if (currentTrack) {
+            this.setCurrentTrack(currentTrack);
+        }
+        else {
+            this.setCurrentTrack(this.currentTrack);
+        }
+        $('#track-count').text(this.list.length.toString());
+        this.totalDuration += addedDuration;
+        $('#playlist-duration').text(secondsToString(this.totalDuration));
+        $(this.playlistDOM.parentTable).sortable('refresh');
+    }
+    
     this.allocateNewIDs = function(count) {
         var firstNewID = this.nextNewID;
         this.nextNewID += count;
@@ -117,7 +200,7 @@ function Playlist(soundManager) {
         this.stop();
         var media = this.list[this.currentTrack];
         if (media.type == "video") {
-            media.destruct();
+            clearVideo();
         }
         this.setCurrentTrack(parseInt(index));
         if (wasPlaying || autostart) {
@@ -174,7 +257,7 @@ function Playlist(soundManager) {
                     this.setCurrentTrack(newIndex);
                 }
                 else {
-                    this.setCurrentTrack(Math.min(0, $('li.playing').index()));
+                    this.setCurrentTrack(Math.max(0, $('li.playing').index()));
                 }
             
                 var minIndex = Math.min(originalIndex, newIndex);
@@ -271,23 +354,21 @@ function Playlist(soundManager) {
         this.goToTrack(next, autostart);
     }
     
-    this.removeTrack = function(trackID) {
-        var pos = this.indexOfTrackID(trackID);
-        if (pos >= 0) {
-            var wasPlaying = this.isPlaying() && pos == this.currentTrack;
+    this.removeTrack = function(index) {
+        if (index >= 0) {
+            var wasPlaying = this.isPlaying() && index == this.currentTrack;
             if (wasPlaying){
                 this.stop();
             }
             
-            var trackDuration = this.list[pos].getDuration();
-            this.list[pos].destruct();
-            this.list.splice(pos, 1);
+            var trackDuration = this.list[index].getDuration();
+            this.list[index].destruct();
+            this.list.splice(index, 1);
             
-            var rowDOM = this.playlistDOM.getRowForID(trackID);
-            $(rowDOM).remove();
-            this.renumberTracks(Math.max(0, Math.min(this.list.length - 1, pos)));
-            if (pos == this.currentTrack) {
-                this.setCurrentTrack(Math.min(this.list.length - 1, pos));
+            $($(this.playlistDOM.allRowsInTable).get(index)).remove();
+            this.renumberTracks(Math.max(0, Math.min(this.list.length - 1, index)));
+            if (index == this.currentTrack) {
+                this.setCurrentTrack(Math.min(this.list.length - 1, index));
             }
             if (this.isEmpty()) {
                 $('#play').text('Play');
@@ -353,43 +434,37 @@ function Playlist(soundManager) {
         if (this.isEmpty()) {
             return false;
         }
-        var listNumbers = [], newList = [], newCurrentTrack = 0;
         
-        for (track in this.list) {
-            listNumbers[track] = track;
-        }
-        
-        // Creates random playlist
-        while (listNumbers.length > 0) {
-            var nextTrack = listNumbers[Math.floor(Math.random()*listNumbers.length)];
-            listNumbers.splice(listNumbers.indexOf(nextTrack), 1);
-            newList[newList.length] = this.list[nextTrack];
-            if (nextTrack == this.currentTrack) {
-                newCurrentTrack = newList.length - 1;
+        // Fisher-Yates shuffle implementation by Cristoph (http://stackoverflow.com/users/48015/christoph),
+        // some changes by me
+        var newCurrentTrack = this.currentTrack, arrayShuffle = function(array) {
+            var tmp, current, top = array.length;
+
+            if(top) while(--top) {
+                current = Math.floor(Math.random() * (top + 1));
+                tmp = array[current];
+                array[current] = array[top];
+                array[top] = tmp;
+                if (newCurrentTrack == top) {
+                    newCurrentTrack = current;
+                }
+                else if (newCurrentTrack == current) {
+                    newCurrentTrack = top;
+                }
             }
+
+            return array;
         }
         
+        var newList = this.list.slice(0);
+        newList = arrayShuffle(newList);
         // Rewrites the DOM for the new playlist
-        this.list = newList;
-        var listInnerHTML = '', playlist = this, indexNum;
-        for (index in newList) {
-            var indexNum = parseInt(index);
-            listInnerHTML += this._getDOMRowForMediaObject(newList[indexNum], indexNum + 1);
-            $(this.playlistDOM.getRowForID(indexNum)).dblclick(function() {
-                playlist.goToTrack(playlist.indexOfTrackID(newList[indexNum].id), true);
-            });
-        }
-        $(this.playlistDOM.parentTable).html(listInnerHTML);
-        for (index in newList) {
-            indexNum = parseInt(index);
-            $(this.playlistDOM.getRowForID(indexNum)).dblclick(function() {
-                playlist.goToTrack(playlist.indexOfTrackID(newList[indexNum].id), true);
-            });
-        }
-        
-        // Refreshes the current track index, as it was possibly changed 
-        // during the shuffle.
-        this.setCurrentTrack(newCurrentTrack);
+        this.list = [];
+        this.totalDuration = 0;
+        $(this.playlistDOM.parentTable).html('');
+        this.settings.updateURLOnAdd = false;
+        this.addTracks(newList, newCurrentTrack);
+        this.settings.updateURLOnAdd = true;
     }
     
     this.stop = function () {
