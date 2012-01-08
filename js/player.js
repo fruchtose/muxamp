@@ -92,9 +92,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
         if ($('#video').width()) {
             var videoID = $('#video').tubeplayer('videoId');
             if (videoID == this.siteMediaID) {
-                body.close('east');
-                $('#video').tubeplayer('destruct');
-                $("#video").replaceWith('<div id="video"></id>');
+                clearVideo();
             }
         }
     },
