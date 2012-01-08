@@ -124,9 +124,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
     },
    
     play: function(options) {
-        if ($('.flashContainer').length == 0) {
-            body.open('east');
-        }
+        body.open('east');
         $(document).ready(function() {
             if (options) {
                 $("#video").tubeplayer(options);

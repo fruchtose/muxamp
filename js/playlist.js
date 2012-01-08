@@ -269,7 +269,7 @@ function Playlist(soundManager) {
     
     this.nextTrack = function(autostart) {
         var trackInt = parseInt(this.currentTrack), next = trackInt + 1 >= this.list.length ? 0 : trackInt + 1;
-        this.goToTrack(next, autostart);
+        this.goToTrack(next, true);
     }
     
     this.play = function() {
@@ -351,7 +351,7 @@ function Playlist(soundManager) {
     
     this.previousTrack = function(autostart) {
         var trackInt = parseInt(this.currentTrack), next = trackInt - 1 >= 0 ? trackInt - 1 : (this.isEmpty() ? 0 : this.list.length - 1);
-        this.goToTrack(next, autostart);
+        this.goToTrack(next, true);
     }
     
     this.removeTrack = function(index) {
@@ -468,9 +468,7 @@ function Playlist(soundManager) {
     }
     
     this.stop = function () {
-        for (track in this.list) {
-            this.list[track].stop();
-        }
+        this.list[this.currentTrack].stop();
         timebar.width(0);
         $('#time-elapsed').text('0:00');
         $('#play').text('Play');
