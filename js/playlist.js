@@ -174,7 +174,7 @@ function Playlist(soundManager) {
                     this.setCurrentTrack(newIndex);
                 }
                 else {
-                    this.setCurrentTrack($('li.playing').index());
+                    this.setCurrentTrack(Math.min(0, $('li.playing').index()));
                 }
             
                 var minIndex = Math.min(originalIndex, newIndex);
@@ -322,7 +322,7 @@ function Playlist(soundManager) {
     
     this.setCurrentTrack = function(trackNumber) {
         this.currentTrack = trackNumber;
-        if (trackNumber >= 0 && trackNumber < this.list.length) {
+        if (!this.isEmpty() && trackNumber >= 0 && trackNumber < this.list.length) {
             $('.playing').removeClass('playing');
             var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
             $(rowDOM).addClass('playing');
