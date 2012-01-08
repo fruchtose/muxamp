@@ -590,7 +590,7 @@
                 var beginningURLLength = beginningURL.length;
                 var idSubstring = sURL.substring(beginningURLLoc + beginningURLLength);
                 var match = idSubstring.match(/[\w\-]+/);
-		return match;
+		return match[0];
 		
 	};
 	
