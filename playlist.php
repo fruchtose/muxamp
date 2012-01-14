@@ -229,7 +229,7 @@
                 $slogan = get_random_db_slogan();
 
                 if ($slogan !== false)
-                    echo '<span class="slogan">' . $slogan . '</span>';
+                    echo "<span class=\"slogan\">$slogan</span>";
                 ?>
             </div>
         </div>
