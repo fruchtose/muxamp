@@ -62,7 +62,7 @@ function Playlist(soundManager) {
                 playlist.removeTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index());
             });
         }
-        /*
+    /*
         $(this.playlistDOM.allRowsInTable).each(function(index, element){
             $(element).dblclick(function() {
                 playlist.goToTrack(index, true);
@@ -140,30 +140,26 @@ function Playlist(soundManager) {
         this._addPlaylistDOMRows(mediaObjects);
         for (i in mediaObjects) {
             var mediaObject = mediaObjects[i];
-            addedDuration += mediaObject.getDuration();
-            if (this.settings.updateURLOnAdd) {
-                var newHash = '';
-                switch(mediaObject.siteName.toLowerCase()) {
-                    case 'youtube':
-                        newHash = addHashParam('ytv', mediaObject.siteMediaID);
-                        break;
-                    case 'soundcloud':
-                        newHash = addHashParam('sct', mediaObject.siteMediaID);
-                        break;
-                    case 'bandcamp':
-                        newHash = addHashParam('bct', mediaObject.siteMediaID);
-                        break;
-                }
-                // Making sure user cannot create huuuuuuuge URL by default
-                if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
-                    window.location.hash = newHash;
-                }
-                else {
-                    alert("Your playlist URL will not be appended because it is too long.");
-                }
+            addedDuration += mediaObject.getDuration()
+        }
+        if (this.settings.updateURLOnAdd) {
+            var newHash = '', slicedList = [];
+            if (mediaObjects.length > 0) {
+                newHash = mediaObjects[0].siteCode + '=' + mediaObjects[0].siteMediaID;
+                slicedList = mediaObjects.slice(1);
+            }
+            for (i in slicedList) {
+                newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
+            }
+            // Making sure user cannot create huuuuuuuge URL by default
+            if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
+                window.location.hash += newHash;
+            }
+            else {
+                alert("Your playlist URL will not be appended because it is too long.");
             }
         }
-        if (currentTrack) {
+        if (currentTrack != undefined && currentTrack.toString()) {
             this.setCurrentTrack(currentTrack);
         }
         else {
@@ -265,6 +261,10 @@ function Playlist(soundManager) {
                 this.renumberTracks(minIndex);
             }
         }
+        else {
+            this.renumberTracks();
+        }
+        this.refreshWindowLocationHash();
     };
     
     this.nextTrack = function(autostart) {
@@ -354,6 +354,24 @@ function Playlist(soundManager) {
         this.goToTrack(next, autostart);
     }
     
+    this.refreshWindowLocationHash = function() {
+        var newHash = '', slicedList = [];
+        if (!this.isEmpty()) {
+            newHash = this.list[0].siteCode + '=' + this.list[0].siteMediaID;
+            slicedList = this.list.slice(1);
+        }
+        for (i in slicedList) {
+            newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
+        }
+        // Making sure user cannot create huuuuuuuge URL by default
+        if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
+            window.location.hash = newHash;
+        }
+        else {
+            alert("Your playlist URL will not be appended because it is too long.");
+        }
+    }
+    
     this.removeTrack = function(index) {
         if (index >= 0) {
             var wasPlaying = this.isPlaying() && index == this.currentTrack;
@@ -367,6 +385,7 @@ function Playlist(soundManager) {
             
             $($(this.playlistDOM.allRowsInTable).get(index)).remove();
             this.renumberTracks(Math.max(0, Math.min(this.list.length - 1, index)));
+            this.refreshWindowLocationHash();
             if (index == this.currentTrack) {
                 this.setCurrentTrack(Math.min(this.list.length - 1, index));
             }
@@ -437,6 +456,7 @@ function Playlist(soundManager) {
         
         // Fisher-Yates shuffle implementation by Cristoph (http://stackoverflow.com/users/48015/christoph),
         // some changes by me
+        var currentSiteMediaID = this.list[this.currentTrack].siteMediaID;
         var newCurrentTrack = this.currentTrack, arrayShuffle = function(array) {
             var tmp, current, top = array.length;
 
@@ -445,12 +465,6 @@ function Playlist(soundManager) {
                 tmp = array[current];
                 array[current] = array[top];
                 array[top] = tmp;
-                if (newCurrentTrack == top) {
-                    newCurrentTrack = current;
-                }
-                else if (newCurrentTrack == current) {
-                    newCurrentTrack = top;
-                }
             }
 
             return array;
@@ -459,12 +473,19 @@ function Playlist(soundManager) {
         var newList = this.list.slice(0);
         newList = arrayShuffle(newList);
         // Rewrites the DOM for the new playlist
-        this.list = [];
         this.totalDuration = 0;
         $(this.playlistDOM.parentTable).html('');
+        this.list = [];
         this.settings.updateURLOnAdd = false;
         this.addTracks(newList, newCurrentTrack);
+        this.refreshWindowLocationHash();
         this.settings.updateURLOnAdd = true;
+        for (i in newList) {
+            if (this.list[i].siteMediaID == currentSiteMediaID) {
+                this.setCurrentTrack(parseInt(i));
+                break;
+            }
+        }
     }
     
     this.stop = function () {
@@ -495,7 +516,7 @@ $(document).ready(function() {
     var startPos;
     $(playlist.playlistDOM.parentTable).sortable({
         axis: 'y',
-        containment: '#tracks',
+        containment: '#main',
         start: function(event, ui) {
             startPos = $(event.target).parent('li').index();
         },

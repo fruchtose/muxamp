@@ -1,7 +1,8 @@
 var MediaObject = new JS.Class({
-    initialize: function(siteName, url, permalink, id, siteMediaID, artist, mediaName, type) {
+    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, artist, mediaName, type) {
         this.id = id.toString() != "" ? id.toString() : "";
         this.siteMediaID = siteMediaID != "" ? siteMediaID.toString() : "";
+        this.siteCode = siteCode != "" ? siteCode.toString() : "";
         this.permalink = permalink != "" ? permalink : "";
         this.url = url;
         this.artist = artist != "" ? artist : "";
@@ -12,7 +13,7 @@ var MediaObject = new JS.Class({
 });
 
 var SoundObject = new JS.Class(MediaObject, {
-    initialize: function(siteName, url, permalink, id, siteMediaID, soundManager, artist, soundName, duration) {
+    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, soundManager, artist, soundName, duration) {
         this.soundManager = (soundManager != undefined && soundManager != null) ? soundManager : null;
         this.duration = duration;
         this.sound = soundManager.createSound({
@@ -22,7 +23,7 @@ var SoundObject = new JS.Class(MediaObject, {
         if (this.sound == false) {
             alert("Unable to play sound.");
         }
-        this.callSuper(siteName, url, permalink, id, siteMediaID, artist, soundName, "audio");
+        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, artist, soundName, "audio");
     },
     
     destruct: function() {
@@ -63,7 +64,7 @@ var SoundCloudObject = new JS.Class(SoundObject, {
         var apiURL = url;
         (apiURL.toString().indexOf("secret_token") == -1) ? apiURL = apiURL + '?' : apiURL = apiURL + '&';
         apiURL = apiURL + 'consumer_key=' + consumerKey;
-        this.callSuper("SoundCloud", apiURL, track.permalink_url, id, track.id, soundManager, track.user.username, track.title, track.duration / 1000);
+        this.callSuper("SoundCloud", apiURL, track.permalink_url, id, track.id, 'sct',soundManager, track.user.username, track.title, track.duration / 1000);
     }
 });
 
@@ -71,13 +72,13 @@ var BandcampObject = new JS.Class(SoundObject, {
     initialize: function(id, linkURL, consumerKey, track, artistName, soundManager) {
         var apiURL = track.streaming_url;
         apiURL = apiURL + '&api_key=' + consumerKey;
-        this.callSuper("Bandcamp", apiURL, linkURL, id, track.track_id, soundManager, artistName, track.title, track.duration);
+        this.callSuper("Bandcamp", apiURL, linkURL, id, track.track_id, 'bct', soundManager, artistName, track.title, track.duration);
     }
 });
 
 var VideoObject = new JS.Class(MediaObject, {
-    initialize: function(siteName, url, permalink, id, siteMediaID, artist, videoName, duration) {
-        this.callSuper(siteName, url, permalink, id, siteMediaID, artist, videoName, "video");
+    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, artist, videoName, duration) {
+        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, artist, videoName, "video");
         this.duration = duration;
     }
 });
@@ -85,7 +86,7 @@ var VideoObject = new JS.Class(MediaObject, {
 var YouTubeObject = new JS.Class(VideoObject, {
     initialize: function(id, youtubeID, uploader, title, duration) {
         var permalink = 'http://www.youtube.com/watch?v=' + youtubeID;
-        this.callSuper("YouTube", permalink, permalink, id, youtubeID, uploader, title, duration);
+        this.callSuper("YouTube", permalink, permalink, id, youtubeID, 'ytv', uploader, title, duration);
     },
    
     destruct: function() {
