@@ -145,6 +145,9 @@
                 padding-right: 0;
                 text-decoration: none;
             }
+            #tracks a.remove {
+                font-size: 75%;
+            }
             #tracks .desc a {
                 padding-left: 0.5em;
                 padding-right: 0.5em;
