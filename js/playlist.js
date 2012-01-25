@@ -62,23 +62,6 @@ function Playlist(soundManager) {
                 playlist.removeTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index());
             });
         }
-    /*
-        $(this.playlistDOM.allRowsInTable).each(function(index, element){
-            $(element).dblclick(function() {
-                playlist.goToTrack(index, true);
-            });
-            $(element).find(playlist.playlistDOM.removalHyperlink).live('click', function() {
-                playlist.removeTrack(index);
-            });
-        });
-    /*for (index in mediaObjects){
-            $(this.playlistDOM.getRowForID(mediaObjects[index].id)).dblclick(function() {
-                playlist.goToTrack(playlist.indexOfTrackID(mediaObjects[index].id), true);
-            });
-            $(this.playlistDOM.getRemovalHyperlinkForID(mediaObjects[index].id)).live('click', function() {
-                playlist.removeTrack(mediaObjects[index].id);
-            });
-        }*/
     }
     
     this._getDOMRowForMediaObject = function(mediaObject, index) {
@@ -87,8 +70,9 @@ function Playlist(soundManager) {
     
     this._getDOMTableCellsForMediaObject = function(mediaObject, index) {
         var extLink = '<a href="' + mediaObject.permalink +'" target="_blank" class="external">' + mediaObject.siteName + '</a>';
-        var links = '<div class="right"><a onclick="return false;" class="remove" href>Remove</a>' + extLink + '</div>';
-        return links + '<div class="desc"><span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
+        var remove = '<a href onclick="return false;" class="remove" >X</a>';
+        var links = '<div class="right">' + extLink + '</div>';
+        return links + '<div class="desc">' + remove + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     }
     
     this._started = false;

@@ -27,6 +27,9 @@
             }
             body {
                 margin-left: 0;
+                overflow: auto;
+                overflow-y: hidden;
+                -ms-overflow-y: hidden;
             }
             li {
                 margin: 0px;
@@ -139,9 +142,15 @@
             }
             #tracks a {
                 font-weight: bold;
-                padding-left: 1em;
                 padding-right: 0;
                 text-decoration: none;
+            }
+            #tracks .desc a {
+                padding-left: 0.5em;
+                padding-right: 0.5em;
+            }
+            #tracks .right a {
+                padding-left: 1em;
             }
             #tracks li.playing {
                 background-color: #333;
@@ -224,7 +233,7 @@
             <div id="right-side">
                 <div id="video"></div>
             </div>
-            <div id="footer">Powered by <a href="http://www.bandcamp.com">Bandcamp</a>, <a href="http://www.soundcloud.com">SoundCloud</a>, and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
+            <div id="footer">Powered by <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
                 <?php
                 $slogan = get_random_db_slogan();
 
