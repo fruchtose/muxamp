@@ -28,8 +28,6 @@ function Playlist(soundManager) {
     this.playlistDOM = new PlaylistDOMInformation();
     this.soundManager = soundManager;
     this.totalDuration = 0; // Duration in seconds
-    this.tracksByClass = new Object();
-    this.tracksByID = new Object();
     this.settings = {
         updateURLOnAdd: true
     };
@@ -75,46 +73,6 @@ function Playlist(soundManager) {
         return links + '<div class="desc">' + remove + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     }
     
-    this._started = false;
-    
-    this.addTrack = function(mediaObject) {
-        var index = this.list.length, playlist = this;
-        var trackNumber = index + 1;
-        this.list[index] = mediaObject;
-        this.totalDuration += mediaObject.getDuration();
-        this._addPlaylistDOMRow(mediaObject, trackNumber);
-        $(this.playlistDOM.getRowForID(index)).dblclick(function() {
-            playlist.goToTrack(playlist.indexOfTrackID(mediaObject.id), true);
-        });
-        $('#track-count').text(trackNumber.toString());
-        $('#playlist-duration').text(secondsToString(this.totalDuration));
-        if (!index) {
-            this.setCurrentTrack(index);
-        }
-        $(this.playlistDOM.parentTable).sortable('refresh');
-        if (this.settings.updateURLOnAdd) {
-            var newHash = '';
-            switch(mediaObject.siteName.toLowerCase()) {
-                case 'youtube':
-                    newHash = addHashParam('ytv', mediaObject.siteMediaID);
-                    break;
-                case 'soundcloud':
-                    newHash = addHashParam('sct', mediaObject.siteMediaID);
-                    break;
-                case 'bandcamp':
-                    newHash = addHashParam('bct', mediaObject.siteMediaID);
-                    break;
-            }
-            // Making sure user cannot create huuuuuuuge URL by default
-            if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
-                window.location.hash = newHash;
-            }
-            else {
-                alert("Your playlist URL will not be appended because it is too long.");
-            }
-        }
-    };
-    
     this.addTracks = function(mediaObjects, currentTrack) {
         if ( !(mediaObjects instanceof Array) ) {
             mediaObjects = [mediaObjects];
@@ -158,10 +116,8 @@ function Playlist(soundManager) {
     this.allocateNewIDs = function(count) {
         var firstNewID = this.nextNewID;
         this.nextNewID += count;
-        var trackIDsLength = this.newTrackIDs.length;
-        var i = 0;
         for (i = 0; i < count; i++) {
-            this.newTrackIDs[trackIDsLength + i] = firstNewID + i;
+            this.newTrackIDs.push(firstNewID + i);
         }
     }
     
@@ -328,7 +284,6 @@ function Playlist(soundManager) {
                     });
                 }
             }
-            this._started = true;
             $('#play').text('Pause');
         }
     }
@@ -346,7 +301,7 @@ function Playlist(soundManager) {
         }
         for (i in slicedList) {
             newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
-        }
+    }
         // Making sure user cannot create huuuuuuuge URL by default
         if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
             window.location.hash = newHash;

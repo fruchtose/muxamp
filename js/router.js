@@ -181,7 +181,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
             dataType: 'jsonp',
             success: function(data, textStatus) {
                 var addTrack = function(mediaObject) {
-                    router.playlistObject.addTrack(mediaObject);
+                    router.playlistObject.addTracks(mediaObject);
                 };
                 if (textStatus == "success") {
                     if (data.streamable === true) {
@@ -206,7 +206,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         var match = idSubstring.match(/[\w\-]+/);
         var canBeSearched = false;
         var addTrack = function(mediaObject) {
-            router.playlistObject.addTrack(mediaObject);
+            router.playlistObject.addTracks(mediaObject);
         };
         if (match) {
             canBeSearched = true;
