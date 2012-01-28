@@ -47,7 +47,7 @@ function Playlist(soundManager) {
             mediaObjects = [mediaObjects];
         }
         var playlist = this, appendedHTML = '';
-        var currentLength = this.list.length;
+        var currentLength = $(this.playlistDOM.allRowsInTable).length;
         for (index in mediaObjects){
             var mediaObject = mediaObjects[index];
             appendedHTML += this._getDOMRowForMediaObject(mediaObject, currentLength + parseInt(index) + 1);
