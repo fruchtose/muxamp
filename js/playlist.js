@@ -47,9 +47,10 @@ function Playlist(soundManager) {
             mediaObjects = [mediaObjects];
         }
         var playlist = this, appendedHTML = '';
+        var currentLength = this.list.length;
         for (index in mediaObjects){
             var mediaObject = mediaObjects[index];
-            appendedHTML += this._getDOMRowForMediaObject(mediaObject, parseInt(index) + 1);
+            appendedHTML += this._getDOMRowForMediaObject(mediaObject, currentLength + parseInt(index) + 1);
         }
         $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
         for (index in mediaObjects){
