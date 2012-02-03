@@ -4,7 +4,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Robert's Unnamed Playlist App</title>
+        <title>Unified Playlist</title>
         <script src="js/swfobject.js" type="text/javascript"></script>
         <script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
         <script src="js/jquery.ajaxmanager.js" type="text/javascript"></script>
@@ -236,7 +236,7 @@
             <div id="right-side">
                 <div id="video"></div>
             </div>
-            <div id="footer">Powered by <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
+            <div id="footer"><b>Unified Playlist</b> powered by <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
                 <?php
                 $slogan = get_random_db_slogan();
 
