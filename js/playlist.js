@@ -64,14 +64,14 @@ function Playlist(soundManager) {
     }
     
     this._getDOMRowForMediaObject = function(mediaObject, index) {
-        return '<li class="ui-corner-all ' + mediaObject.id + '">' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</li>';
+        return '<li class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</li>';
     }
     
     this._getDOMTableCellsForMediaObject = function(mediaObject, index) {
         var extLink = '<a href="' + mediaObject.permalink +'" target="_blank" class="external">' + mediaObject.siteName + '</a>';
-        var remove = '<a href onclick="return false;" class="remove" >X</a>';
-        var links = '<div class="right">' + extLink + '</div>';
-        return links + '<div class="desc">' + remove + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
+        var remove = '<div class="col2"><a href onclick="return false;" class="remove" >X</a></div>';
+        var links = '<div class="col3">' + extLink + '</div>';
+        return '<div class="colmask"><div class="colmid"><div class="colleft"><div class="col1wrap"><div class="col1">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span></div></div>' + remove + links + '</div></div></div>';
     }
     
     this.addTracks = function(mediaObjects, currentTrack) {
@@ -285,13 +285,7 @@ function Playlist(soundManager) {
                     });
                 }
             }
-            $("#play").button({
-                text: false,
-                icons: {
-                    primary: 'ui-icon-pause'
-                }
-            });
-            timebar.slider("enable");
+            $('#play').text('Pause');
         }
     }
     
@@ -308,7 +302,7 @@ function Playlist(soundManager) {
         }
         for (i in slicedList) {
             newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
-        }
+    }
         // Making sure user cannot create huuuuuuuge URL by default
         if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
             window.location.hash = newHash;
@@ -336,16 +330,12 @@ function Playlist(soundManager) {
                 this.setCurrentTrack(Math.min(this.list.length - 1, index));
             }
             if (this.isEmpty()) {
-                $("#play").button({
-                    text: false,
-                    icons: {
-                        primary: 'ui-icon-play'
-                    }
-                });
+                $('#play').text('Play');
             }
             else {
                 if (wasPlaying) {
                     this.play();
+                    $('#play').text('Pause');
                 }
             }
             $('#track-count').text(this.list.length.toString());
@@ -440,33 +430,17 @@ function Playlist(soundManager) {
     
     this.stop = function () {
         this.list[this.currentTrack].stop();
-        timebar.slider("value", 0);
-        timebar.slider("disable");
+        timebar.width(0);
         $('#time-elapsed').text('0:00');
-        $("#play").button({
-            text: false,
-            icons: {
-                primary: 'ui-icon-play'
-            }
-        });
+        $('#play').text('Play');
     }
     
     this.togglePause = function() {
         if (this.isPaused()) {
-            $("#play").button({
-                text: false,
-                icons: {
-                    primary: 'ui-icon-pause'
-                }
-            });
+            $('#play').text('Pause');
         }
         else {
-            $("#play").button({
-                text: false,
-                icons: {
-                    primary: 'ui-icon-play'
-                }
-            });
+            $('#play').text('Resume');
         }
         this.list[this.currentTrack].togglePause();
     }

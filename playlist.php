@@ -21,7 +21,7 @@
         <script src="js/router.js" type="text/javascript"></script>
         <script src="js/ui.js" type="text/javascript"></script>
         <script src="js/input.js" type="text/javascript"></script>
-        <link rel="stylesheet" href="css/jquery-ui-1.8.17.custom.css" type="text/css"/>
+        <link rel="stylesheet" href="css/3column.css" type="text/css"/>
         <style type="text/css">
             html {font-family: Verdana, Tahoma, Helvetica, Arial;
                   font-size: 13px;
@@ -40,6 +40,11 @@
                 list-style: none;
                 margin: 0px;
                 padding: 0px;
+            }
+            left {
+                left: 0px;
+                position: absolute;
+                text-align: left;
             }
             .right {
                 position: absolute;
@@ -73,6 +78,9 @@
                 width: 350px;
                 z-index: 10;
             }
+            #adder-link {
+                margin-left: 0;
+            }
             #controls {
                 float: left;
                 z-index: 12;
@@ -93,8 +101,11 @@
                 width: 46px;
             }
             #timebar-outer {
+                border: 1px solid #333;
                 float: left;
-                margin-top: 8px;
+                height: 20px;
+                margin-top: 4px;
+                overflow: hidden;
                 width: 350px;
             }
             #timebar-inner {
@@ -137,16 +148,8 @@
                 overflow: auto;
             }
             #tracks li {
-                padding-left: 1em;
-                padding-right: 1em;
-            }
-            #tracks li .desc {
-                padding-right: 171px;
-            }
-            #tracks li div.right {
-                padding-right: 1em;
-                width: 171px;
-                z-index: 9;
+                /*padding-right: 1em;*/
+                z-index: 8;
             }
             #tracks a {
                 font-weight: bold;
@@ -155,22 +158,30 @@
             }
             #tracks a.remove {
                 font-size: 75%;
+                line-height: 100%;
             }
-            #tracks .desc a {
-                padding-right: 0.5em;
+            #tracks li .colleft {
+                line-height: 100%;
             }
-            #tracks .right a {
-                padding-left: 1em;
+            #tracks li .col2 {
+                text-align: center;
             }
-            #tracks li.playing {
+            #tracks li .col3 {
+                text-align: right;
+            }
+            #tracks li .col3 a {
+                padding-right: 13px;
+            }
+            #tracks li.playing .colleft, #tracks li.playing .colmid, #tracks li.playing .colmask {
                 background-color: #333;
                 color: #ddd;
             }
-            #tracks li.playing a {
+            #tracks li.playing .colleft a, #tracks li.playing .colmask a {
                 color: #eeeecc;
                 text-decoration: none;
             }
-            #tracks li.playing a:hover {text-decoration: underline; }
+            #tracks li.playing .col2 a:hover, #tracks li.playing .col3 a:hover { text-decoration: underline; }
+            
             #footer {
                 line-height: 20px;
                 min-height: 20px;
@@ -211,11 +222,11 @@
                     </div>
                     <div class="player-row">
                         <div id ="controls">
-                            <a href onclick="return false;" id="previous"></a>
-                            <a href onclick="return false;" id="play"></a>
-                            <a href onclick="return false;" id="next"></a>
-                            <a href onclick="return false;" id="stop"></a>
-                            <a href onclick="return false;" id="shuffle"></a>
+                            <a href onclick="return false;" id="previous">Previous</a>
+                            <a href onclick="return false;" id="play">Play</a>
+                            <a href onclick="return false;" id="next">Next</a>
+                            <a href onclick="return false;" id="stop">Stop</a>
+                            <a href onclick="return false;" id="shuffle">Shuffle</a>
                         </div>
                         <div id="time-elapsed">0:00</div>
                     </div>
@@ -229,7 +240,9 @@
                     </div>
                     <div class="player-row">
                         <div id="timebar">
-                            <div id="timebar-outer"></div>
+                            <div id="timebar-outer">
+                                <div id="timebar-inner"></div>
+                            </div>
                         </div>
                     </div>
                 </div>

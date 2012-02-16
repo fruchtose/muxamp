@@ -1,0 +1,54 @@
+/* Holy Grail Liquid-Layout: No quirks mode by Matthew James Taylor */
+.colmask {
+    position:relative;		/* This fixes the IE7 overflow hidden bug and stops the layout jumping out of place */
+    clear:both;
+    float:left;
+    width:100%;				/* width of whole page */
+    overflow:hidden;		/* This chops off any overhanging divs */
+}
+.colmid {
+    float:left;
+    width:200%;
+    margin-left:-171px; 	/* Width of right column */
+    position:relative;
+    right:100%;
+    /*background:#fff;*/    	/* Centre column background colour */
+}
+.colleft {
+    float:left;
+    width:100%;
+    margin-left:-50%;
+    position:relative;
+    left:197px;         	/* Left column width + right column width */
+    /*background:#FFD8B7;*/    	/* Left column background colour */
+}
+.col1wrap {
+    float:left;
+    width:50%;
+    position:relative;
+    right:26px;        	/* Width of left column */
+    /*padding-bottom:1em;*/ 	/* Centre column bottom padding. Leave it out if it's zero */
+}
+.col1 {
+    margin:0 26px;     	/* Centre column side padding:
+                                Left padding = left column width + centre column left padding width
+                                Right padding = right column width + centre column right padding width */
+    position:relative;
+    left:200%;
+    overflow:hidden;
+}
+.col2 {
+    float:left;
+    float:right;			/* This overrides the float:left above */
+    width:26px;        	/* Width of left column content (left column width minus left and right padding) */
+    position:relative;
+    right:0px;         	/* Width of the left-had side padding on the left column */
+}
+.col3 {
+    float:left;
+    float:right;			/* This overrides the float:left above */
+    width:171px;        	/* Width of right column content (right column width minus left and right padding) */
+    margin-right:0px;  	/* Width of right column right-hand padding + left column left and right padding */
+    position:relative;
+    left:50%;
+}

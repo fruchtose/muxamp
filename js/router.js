@@ -118,6 +118,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
                     }
                     else if (failure)
                         failure();
+                    console.log("finished inside soundcloud " + new Date().toString());
                 },
                 timeout: 10000
             };
