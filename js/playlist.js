@@ -68,10 +68,11 @@ function Playlist(soundManager) {
     }
     
     this._getDOMTableCellsForMediaObject = function(mediaObject, index) {
-        var extLink = '<a href="' + mediaObject.permalink +'" target="_blank" class="external">' + mediaObject.siteName + '</a>';
-        var remove = '<div class="col2"><a href onclick="return false;" class="remove" >X</a></div>';
-        var links = '<div class="col3">' + extLink + '</div>';
-        return '<div class="colmask"><div class="colmid"><div class="colleft"><div class="col1wrap"><div class="col1">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span></div></div>' + remove + links + '</div></div></div>';
+        var extLink = '<a href="' + mediaObject.permalink +'" target="_blank"><img src="' + mediaObject.icon + '"/></a>';
+        var remove = '<div class="remove"><a href onclick="return false;" class="remove" >x</a></div>';
+        var links = '<div class="link">' + extLink + '</div>';
+        var left = '<div class ="left">' + remove + links + '</div>';
+        return left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     }
     
     this.addTracks = function(mediaObjects, currentTrack) {
@@ -93,6 +94,9 @@ function Playlist(soundManager) {
             }
             for (i in slicedList) {
                 newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
+            }
+            if (this.list.length > 0) {
+                newHash = '&' + newHash;
             }
             // Making sure user cannot create huuuuuuuge URL by default
             if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
@@ -248,8 +252,8 @@ function Playlist(soundManager) {
                         autoPlay: true,
                         initialVideo: media.siteMediaID,
                         loadSWFObject: false,
-                        width: 400,
-                        height: 255,
+                        width: 392,
+                        height: 250,
                         onStop: clearMediaInterval,
                         onPlayerUnstarted: function() {
                             playlist.setVolume(playlist.currentVolumePercent);
@@ -302,7 +306,7 @@ function Playlist(soundManager) {
         }
         for (i in slicedList) {
             newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
-    }
+        }
         // Making sure user cannot create huuuuuuuge URL by default
         if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
             window.location.hash = newHash;
@@ -433,15 +437,15 @@ function Playlist(soundManager) {
         timebar.width(0);
         $('#time-elapsed').text('0:00');
         $('#play').text('Play');
-    }
+            }
     
     this.togglePause = function() {
         if (this.isPaused()) {
             $('#play').text('Pause');
-        }
+                }
         else {
-            $('#play').text('Resume');
-        }
+            $('#play').text('Play');
+                }
         this.list[this.currentTrack].togglePause();
     }
     

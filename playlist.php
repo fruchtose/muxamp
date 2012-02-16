@@ -21,7 +21,6 @@
         <script src="js/router.js" type="text/javascript"></script>
         <script src="js/ui.js" type="text/javascript"></script>
         <script src="js/input.js" type="text/javascript"></script>
-        <link rel="stylesheet" href="css/3column.css" type="text/css"/>
         <style type="text/css">
             html {font-family: Verdana, Tahoma, Helvetica, Arial;
                   font-size: 13px;
@@ -32,6 +31,9 @@
                 overflow-y: hidden;
                 -ms-overflow-y: hidden;
             }
+            img {
+                float: left;
+            }
             li {
                 margin: 0px;
                 white-space: pre-line;
@@ -41,9 +43,16 @@
                 margin: 0px;
                 padding: 0px;
             }
-            left {
-                left: 0px;
+            a {
+                color: #666622;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            .left {
                 position: absolute;
+                left: 0px;
                 text-align: left;
             }
             .right {
@@ -53,6 +62,14 @@
             }
             #wrapper {
                 top: 0;
+            }
+            #player-header {
+                background: url("img/bg.png");
+                padding-left: 52px;
+            }
+            #player-header, #footer {
+                color: #fff;
+                font-weight: bold;
             }
             .rows {
                 float: left;
@@ -64,7 +81,7 @@
             #playlist-info {
                 float: left;
                 min-width: 200px;
-                width: 278px;
+                width: 250px;
             }
             #track-count-wrapper {
                 float: left;
@@ -75,7 +92,6 @@
             }
             #adder {
                 float: left;
-                width: 350px;
                 z-index: 10;
             }
             #adder-link {
@@ -95,18 +111,18 @@
             #time-elapsed {
                 float: left;
                 height: 50px;
-                margin-left: 13px;
                 margin-right: 13px;
                 text-align: center;
                 width: 46px;
             }
             #timebar-outer {
+                background-color: #fff;
                 border: 1px solid #333;
                 float: left;
                 height: 20px;
                 margin-top: 4px;
                 overflow: hidden;
-                width: 350px;
+                width: 339px;
             }
             #timebar-inner {
                 background-color: #3d3;
@@ -148,41 +164,77 @@
                 overflow: auto;
             }
             #tracks li {
-                /*padding-right: 1em;*/
-                z-index: 8;
+                padding-bottom: 0.25em;
+                padding-right: 1em;
+                padding-top: 0.25em;
+            }
+            #tracks li .desc {
+                padding-left: 52px;
+                vertical-align: middle;
+            }
+            #tracks li div.left {
+                float: left;
+                width: 48px;
+                text-align: center;
+                vertical-align: middle;
+                z-index: 9;
+            }
+            #tracks li div.right {
+                padding-right: 1em;
+                width: 171px;
+                z-index: 9;
             }
             #tracks a {
                 font-weight: bold;
                 padding-right: 0;
-                text-decoration: none;
             }
-            #tracks a.remove {
-                font-size: 75%;
-                line-height: 100%;
+            #tracks .desc a {
+                padding-right: 0.5em;
             }
-            #tracks li .colleft {
-                line-height: 100%;
+            #tracks .right a {
+                padding-left: 1em;
             }
-            #tracks li .col2 {
+            #tracks li .remove {
+                float: left;
                 text-align: center;
+                width: 22px;
             }
-            #tracks li .col3 {
-                text-align: right;
+            #tracks li .link {
+                float: left;
+                height: 16px;
+                margin: 0 auto;
+                text-align: center;
+                width: 26px;
             }
-            #tracks li .col3 a {
-                padding-right: 13px;
+            #tracks li .link img {
+                margin-left: 5px;
             }
-            #tracks li.playing .colleft, #tracks li.playing .colmid, #tracks li.playing .colmask {
+            #tracks li.playing {
                 background-color: #333;
                 color: #ddd;
             }
-            #tracks li.playing .colleft a, #tracks li.playing .colmask a {
+            #tracks li.playing a {
                 color: #eeeecc;
                 text-decoration: none;
             }
-            #tracks li.playing .col2 a:hover, #tracks li.playing .col3 a:hover { text-decoration: underline; }
-            
+            #tracks li.playing a:hover {text-decoration: underline; }
+            #video {
+                height: 250px;
+                padding-left: 4px;
+                padding-right: 4px;
+                padding-top: 4px;
+                position: absolute;
+                right: 0px;
+                text-align: right;
+                width: 392px;
+                z-index: 15;
+            }
+            #right-side {
+                background: url("img/bg-right.png");
+                background-repeat: no-repeat;
+            }
             #footer {
+                background: url("img/bg-footer.png");
                 line-height: 20px;
                 min-height: 20px;
                 text-align: center;
@@ -228,6 +280,11 @@
                             <a href onclick="return false;" id="stop">Stop</a>
                             <a href onclick="return false;" id="shuffle">Shuffle</a>
                         </div>
+                    </div>
+                </div>
+                <div class="rows">
+                    <div class="player-row"></div>
+                    <div class="player-row">
                         <div id="time-elapsed">0:00</div>
                     </div>
                 </div>

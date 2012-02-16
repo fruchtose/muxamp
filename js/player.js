@@ -1,8 +1,9 @@
 var MediaObject = new JS.Class({
-    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, artist, mediaName, type) {
+    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, icon, artist, mediaName, type) {
         this.id = id.toString() != "" ? id.toString() : "";
         this.siteMediaID = siteMediaID != "" ? siteMediaID.toString() : "";
         this.siteCode = siteCode != "" ? siteCode.toString() : "";
+        this.icon = icon != "" ? icon.toString() : "";
         this.permalink = permalink != "" ? permalink : "";
         this.url = url;
         this.artist = artist != "" ? artist : "";
@@ -23,7 +24,7 @@ var SoundObject = new JS.Class(MediaObject, {
         if (this.sound == false) {
             alert("Unable to play sound.");
         }
-        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, artist, soundName, "audio");
+        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, "img/soundcloud_orange_white_16.png", artist, soundName, "audio");
     },
     
     destruct: function() {
@@ -68,17 +69,9 @@ var SoundCloudObject = new JS.Class(SoundObject, {
     }
 });
 
-var BandcampObject = new JS.Class(SoundObject, {
-    initialize: function(id, linkURL, consumerKey, track, artistName, soundManager) {
-        var apiURL = track.streaming_url;
-        apiURL = apiURL + '&api_key=' + consumerKey;
-        this.callSuper("Bandcamp", apiURL, linkURL, id, track.track_id, 'bct', soundManager, artistName, track.title, track.duration);
-    }
-});
-
 var VideoObject = new JS.Class(MediaObject, {
-    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, artist, videoName, duration) {
-        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, artist, videoName, "video");
+    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, icon, artist, videoName, duration) {
+        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, icon, artist, videoName, "video");
         this.duration = duration;
     }
 });
@@ -86,7 +79,7 @@ var VideoObject = new JS.Class(MediaObject, {
 var YouTubeObject = new JS.Class(VideoObject, {
     initialize: function(id, youtubeID, uploader, title, duration) {
         var permalink = 'http://www.youtube.com/watch?v=' + youtubeID;
-        this.callSuper("YouTube", permalink, permalink, id, youtubeID, 'ytv', uploader, title, duration);
+        this.callSuper("YouTube", permalink, permalink, id, youtubeID, 'ytv', "img/youtube.png", uploader, title, duration);
     },
    
     destruct: function() {
@@ -125,7 +118,6 @@ var YouTubeObject = new JS.Class(VideoObject, {
     },
    
     play: function(options) {
-        body.open('east');
         $(document).ready(function() {
             if (options) {
                 $("#video").tubeplayer(options);

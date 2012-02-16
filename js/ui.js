@@ -1,13 +1,13 @@
 var body;
 var bodyLayoutOptions = {
     center: {
-        minSize: 400,
+        minSize: 810,
         paneSelector: "#main"
     },
     east: {
-        closable: true,
+        closable: false,
         minSize: 400,
-        initClosed: true,
+        initClosed: false,
         paneSelector: "#right-side",
         resizable: false,
         size: 400,
@@ -34,6 +34,7 @@ var bodyLayoutOptions = {
 
 $(document).ready(function() {
     body = $('body').layout(bodyLayoutOptions);
+    body.allowOverflow('north');
 });
 
 $('#previous').live('click', function() {
@@ -118,7 +119,6 @@ $(document).ready(function() {
 });
 
 var clearVideo = function() {
-    body.close('east');
     $('#video').tubeplayer('destruct');
     $("#video").replaceWith('<div id="video"></id>');
 }
