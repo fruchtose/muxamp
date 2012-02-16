@@ -34,6 +34,36 @@ var bodyLayoutOptions = {
 
 $(document).ready(function() {
     body = $('body').layout(bodyLayoutOptions);
+    $("#previous").button({
+       text: false,
+       icons: {
+           primary: 'ui-icon-seek-prev'
+       }
+    });
+    $("#play").button({
+       text: false,
+       icons: {
+           primary: 'ui-icon-play'
+       }
+    });
+    $("#next").button({
+       text: false,
+       icons: {
+           primary: 'ui-icon-seek-next'
+       }
+    });
+    $("#stop").button({
+       text: false,
+       icons: {
+           primary: 'ui-icon-stop'
+       }
+    });
+    $("#shuffle").button({
+       text: false,
+       icons: {
+           primary: 'ui-icon-shuffle'
+       }
+    });
 });
 
 $('#previous').live('click', function() {
@@ -67,6 +97,11 @@ $('#adder-button').live('click', function(){
     $('#adder-link').val("");
 });
 
+$('#login-button').live('click', function() {
+    var openid = new OpenID();
+    openid.openLoginWindow();
+});
+
 $(document).ready(function() {
     var volumeOuter = $("#volume-outer");
     var adjustVolume = function(x, y) {
@@ -92,28 +127,29 @@ var updateTimebar = function(percentage) {
         if (timebarNowUpdated - timebarLastUpdated < 333) {
             return;
         }
-        timebar.width(percentage.toFixed(2) + "%");
+        timebar.slider("value", percentage);
         timebarLastUpdated = new Date();
     }   
 }
 
 $(function() {
-    timebar = $('#timebar-inner');
+    timebar = $('#timebar-outer');
     timeElapsed = $('#time-elapsed');
 });
 
 $(document).ready(function() {
     var timebarOuter = $("#timebar-outer");
     var timebarSeek = function(x) {
-        var fraction = (x/timebarOuter.width());
-        playlist.seek(fraction.toFixed(4)); 
-    };
-    timebarOuter.draginside({
-        snapAtDistance: 2,
-        snapDimensions: 'x',
-        snapPoints: [[0, 'any'], ['width()', 'any']],
-        onMouseDown: timebarSeek,
-        onMouseMove: timebarSeek
+        var fraction = x/timebarOuter.slider("option", "max");
+        playlist.seek(fraction.toFixed(4));
+    }
+    timebarOuter.slider({
+        disabled: true,
+        range: "min",
+        slide: function(event, ui) {
+            timebarSeek(ui.value);
+        },
+        step: 0.5
     });
 });
 

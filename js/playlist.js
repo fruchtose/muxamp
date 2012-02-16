@@ -64,7 +64,7 @@ function Playlist(soundManager) {
     }
     
     this._getDOMRowForMediaObject = function(mediaObject, index) {
-        return '<li class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</li>';
+        return '<li class="ui-corner-all ' + mediaObject.id + '">' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</li>';
     }
     
     this._getDOMTableCellsForMediaObject = function(mediaObject, index) {
@@ -285,7 +285,13 @@ function Playlist(soundManager) {
                     });
                 }
             }
-            $('#play').text('Pause');
+            $("#play").button({
+                text: false,
+                icons: {
+                    primary: 'ui-icon-pause'
+                }
+            });
+            timebar.slider("enable");
         }
     }
     
@@ -302,7 +308,7 @@ function Playlist(soundManager) {
         }
         for (i in slicedList) {
             newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
-    }
+        }
         // Making sure user cannot create huuuuuuuge URL by default
         if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
             window.location.hash = newHash;
@@ -330,12 +336,16 @@ function Playlist(soundManager) {
                 this.setCurrentTrack(Math.min(this.list.length - 1, index));
             }
             if (this.isEmpty()) {
-                $('#play').text('Play');
+                $("#play").button({
+                    text: false,
+                    icons: {
+                        primary: 'ui-icon-play'
+                    }
+                });
             }
             else {
                 if (wasPlaying) {
                     this.play();
-                    $('#play').text('Pause');
                 }
             }
             $('#track-count').text(this.list.length.toString());
@@ -430,17 +440,33 @@ function Playlist(soundManager) {
     
     this.stop = function () {
         this.list[this.currentTrack].stop();
-        timebar.width(0);
+        timebar.slider("value", 0);
+        timebar.slider("disable");
         $('#time-elapsed').text('0:00');
-        $('#play').text('Play');
+        $("#play").button({
+            text: false,
+            icons: {
+                primary: 'ui-icon-play'
+            }
+        });
     }
     
     this.togglePause = function() {
         if (this.isPaused()) {
-            $('#play').text('Pause');
+            $("#play").button({
+                text: false,
+                icons: {
+                    primary: 'ui-icon-pause'
+                }
+            });
         }
         else {
-            $('#play').text('Resume');
+            $("#play").button({
+                text: false,
+                icons: {
+                    primary: 'ui-icon-play'
+                }
+            });
         }
         this.list[this.currentTrack].togglePause();
     }

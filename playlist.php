@@ -21,6 +21,7 @@
         <script src="js/router.js" type="text/javascript"></script>
         <script src="js/ui.js" type="text/javascript"></script>
         <script src="js/input.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="css/jquery-ui-1.8.17.custom.css" type="text/css"/>
         <style type="text/css">
             html {font-family: Verdana, Tahoma, Helvetica, Arial;
                   font-size: 13px;
@@ -48,7 +49,7 @@
             #wrapper {
                 top: 0;
             }
-            #rows {
+            .rows {
                 float: left;
             }
             .player-row {
@@ -58,7 +59,7 @@
             #playlist-info {
                 float: left;
                 min-width: 200px;
-                width: 266px;
+                width: 278px;
             }
             #track-count-wrapper {
                 float: left;
@@ -74,8 +75,10 @@
             }
             #controls {
                 float: left;
-                min-width: 225px;
                 z-index: 12;
+            }
+            #controls a {
+                margin-top: 8px;
             }
             #timebar {
                 float: left;
@@ -84,14 +87,14 @@
             #time-elapsed {
                 float: left;
                 height: 50px;
+                margin-left: 13px;
+                margin-right: 13px;
+                text-align: center;
+                width: 46px;
             }
             #timebar-outer {
-                border: 1px solid #333;
                 float: left;
-                height: 20px;
-                margin-left: 1em;
-                margin-top: 4px;
-                overflow: hidden;
+                margin-top: 8px;
                 width: 350px;
             }
             #timebar-inner {
@@ -133,10 +136,15 @@
                 min-width: 400px;
                 overflow: auto;
             }
+            #tracks li {
+                padding-left: 1em;
+                padding-right: 1em;
+            }
             #tracks li .desc {
                 padding-right: 171px;
             }
             #tracks li div.right {
+                padding-right: 1em;
                 width: 171px;
                 z-index: 9;
             }
@@ -149,7 +157,6 @@
                 font-size: 75%;
             }
             #tracks .desc a {
-                padding-left: 0.5em;
                 padding-right: 0.5em;
             }
             #tracks .right a {
@@ -191,8 +198,8 @@
     <body>
         <div id="wrapper">
             <div id="player-header">
-                <div id="rows">
-                    <div id="player-row-1" class="player-row">
+                <div class="rows">
+                    <div class="player-row">
                         <div id="playlist-info">
                             <div id="track-count-wrapper">
                                 Tracks: <span id="track-count">0</span>
@@ -201,24 +208,28 @@
                                 Duration: <span id="playlist-duration">0:00</span>
                             </div>
                         </div>
+                    </div>
+                    <div class="player-row">
+                        <div id ="controls">
+                            <a href onclick="return false;" id="previous"></a>
+                            <a href onclick="return false;" id="play"></a>
+                            <a href onclick="return false;" id="next"></a>
+                            <a href onclick="return false;" id="stop"></a>
+                            <a href onclick="return false;" id="shuffle"></a>
+                        </div>
+                        <div id="time-elapsed">0:00</div>
+                    </div>
+                </div>
+                <div class="rows">
+                    <div class="player-row">
                         <div id="adder">
                             <input type="text" id="adder-link" size="30"/>
                             <a href onclick="return false;" id="adder-button">Add Media Source</a>
                         </div>
                     </div>
-                    <div id="player-row-2" class="player-row">
-                        <div id ="controls">
-                            <a href onclick="return false;" id="previous">Previous</a>
-                            <a href onclick="return false;" id="play">Play</a>
-                            <a href onclick="return false;" id="next">Next</a>
-                            <a href onclick="return false;" id="stop">Stop</a>
-                            <a href onclick="return false;" id="shuffle">Shuffle</a>
-                        </div>
+                    <div class="player-row">
                         <div id="timebar">
-                            <div id="time-elapsed">0:00</div>
-                            <div id="timebar-outer">
-                                <div id="timebar-inner"></div>
-                            </div>
+                            <div id="timebar-outer"></div>
                         </div>
                     </div>
                 </div>
