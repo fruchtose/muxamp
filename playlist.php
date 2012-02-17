@@ -64,11 +64,15 @@
                 top: 0;
             }
             #player-header {
-                background: url("img/bg.png");
+                border-bottom: solid #aaa 1px;
                 padding-left: 52px;
             }
-            #player-header, #footer {
-                color: #fff;
+            #player-header, #footer-content, #video {
+                background-color: #EEE;
+                color: #2E2E2E;
+            }
+            #player-header a, #footer a, #video a {
+                color: #775739;
                 font-weight: bold;
             }
             .rows {
@@ -102,7 +106,45 @@
                 z-index: 12;
             }
             #controls a {
-                margin-top: 8px;
+                float: left;
+                display: block;
+                height: 20px;
+                margin-left: 0;
+                margin-right: 0;
+                margin-top: 6px;
+                padding-left: 0;
+                padding-right: 0;
+                width: 40px;
+            }
+            #previous {
+                background: url("img/prev.png");
+            }
+            #previous:active {
+                background: url("img/prev-hi.png");
+            }
+            #play {
+                background: url("img/play.png");
+            }
+            #play:active {
+                background: url("img/play-hi.png");
+            }
+            #next {
+                background: url("img/next.png");
+            }
+            #next:active {
+                background: url("img/next-hi.png");
+            }
+            #stop {
+                background: url("img/stop.png");
+            }
+            #stop:active {
+                background: url("img/stop-hi.png");
+            }
+            #shuffle {
+                background: url("img/shuffle.png");
+            }
+            #shuffle:active {
+                background: url("img/shuffle-hi.png");
             }
             #timebar {
                 float: left;
@@ -210,6 +252,7 @@
                 margin-left: 5px;
             }
             #tracks li.playing {
+                border: solid #111 1px;
                 background-color: #333;
                 color: #ddd;
             }
@@ -219,24 +262,24 @@
             }
             #tracks li.playing a:hover {text-decoration: underline; }
             #video {
-                height: 250px;
-                padding-left: 4px;
-                padding-right: 4px;
-                padding-top: 4px;
+                background-image: url("img/bg-right.png");
+                height: 260px;
                 position: absolute;
                 right: 0px;
                 text-align: right;
-                width: 392px;
+                width: 400px;
                 z-index: 15;
             }
-            #right-side {
-                background: url("img/bg-right.png");
-                background-repeat: no-repeat;
-            }
-            #footer {
-                background: url("img/bg-footer.png");
+            #footer-content {
+                -webkit-border-top-left-radius: 4px;
+                -moz-border-radius-topleft: 4px;
+                border-top-left-radius: 4px;
+                border: solid #aaa 1px;
+                border-bottom-width: 0;
+                border-right-width: 0;
                 line-height: 20px;
                 min-height: 20px;
+                padding: 5px;
                 text-align: center;
             }
             span.slogan {
@@ -274,11 +317,11 @@
                     </div>
                     <div class="player-row">
                         <div id ="controls">
-                            <a href onclick="return false;" id="previous">Previous</a>
-                            <a href onclick="return false;" id="play">Play</a>
-                            <a href onclick="return false;" id="next">Next</a>
-                            <a href onclick="return false;" id="stop">Stop</a>
-                            <a href onclick="return false;" id="shuffle">Shuffle</a>
+                            <a href onclick="return false;" id="previous"></a>
+                            <a href onclick="return false;" id="play"></a>
+                            <a href onclick="return false;" id="next"></a>
+                            <a href onclick="return false;" id="stop"></a>
+                            <a href onclick="return false;" id="shuffle"></a>
                         </div>
                     </div>
                 </div>
@@ -315,15 +358,19 @@
                 </ol>
             </div>
             <div id="right-side">
-                <div id="video"></div>
-            </div>
-            <div id="footer"><b>Unified Playlist</b> powered by <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
-                <?php
-                $slogan = get_random_db_slogan();
+                <div id="video-container">
+                    <div id="video"></div>
+                </div>
+                <div id="footer">
+                    <div id="footer-content"><b>Unified Playlist</b> powered by <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
+                        <?php
+                        $slogan = get_random_db_slogan();
 
-                if ($slogan !== false)
-                    echo "<span class=\"slogan\">$slogan</span>";
-                ?>
+                        if ($slogan !== false)
+                            echo "<span class=\"slogan\">$slogan</span>";
+                        ?>
+                    </div>
+                </div>
             </div>
         </div>
     </body>

@@ -252,8 +252,8 @@ function Playlist(soundManager) {
                         autoPlay: true,
                         initialVideo: media.siteMediaID,
                         loadSWFObject: false,
-                        width: 392,
-                        height: 250,
+                        width: 399,
+                        height: 256,
                         onStop: clearMediaInterval,
                         onPlayerUnstarted: function() {
                             playlist.setVolume(playlist.currentVolumePercent);
@@ -289,7 +289,8 @@ function Playlist(soundManager) {
                     });
                 }
             }
-            $('#play').text('Pause');
+            $('#play').css("background-image", 'url("img/pause.png")');
+            $('#play:active').css("background-image", 'url("img/pause-hi.png)');
         }
     }
     
@@ -334,12 +335,14 @@ function Playlist(soundManager) {
                 this.setCurrentTrack(Math.min(this.list.length - 1, index));
             }
             if (this.isEmpty()) {
-                $('#play').text('Play');
+                $('#play').css("background-image", 'url("img/play.png")');
+                $('#play:active').css("background-image", 'url("img/play-hi.png")');
             }
             else {
                 if (wasPlaying) {
                     this.play();
-                    $('#play').text('Pause');
+                    $('#play').css("background-image", 'url("img/pause.png")');
+                    $('#play:active').css("background-image", 'url("img/pause-hi.png)');
                 }
             }
             $('#track-count').text(this.list.length.toString());
@@ -436,16 +439,19 @@ function Playlist(soundManager) {
         this.list[this.currentTrack].stop();
         timebar.width(0);
         $('#time-elapsed').text('0:00');
-        $('#play').text('Play');
-            }
+        $('#play').css("background-image", 'url("img/play.png")');
+        $('#play:active').css("background-image", 'url("img/play-hi.png")');
+    }
     
     this.togglePause = function() {
         if (this.isPaused()) {
-            $('#play').text('Pause');
-                }
+            $('#play').css("background-image", 'url("img/pause.png")');
+            $('#play:active').css("background-image", 'url("img/pause-hi.png)');
+        }
         else {
-            $('#play').text('Play');
-                }
+            $('#play').css("background-image", 'url("img/play.png")');
+            $('#play:active').css("background-image", 'url("img/play-hi.png")');
+        }
         this.list[this.currentTrack].togglePause();
     }
     

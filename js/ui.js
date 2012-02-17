@@ -22,19 +22,28 @@ var bodyLayoutOptions = {
         size: 60,
         slidable: false,
         spacing_open: 0
+    }
+};
+
+var eastOptions = {
+    center: {
+        paneSelector: "#video-container"
     },
     south: {
         closable: false,
         paneSelector: "#footer",
         resizable: false,
         size: "auto",
-        slidable: false
+        slidable: false,
+        spacing_open: 0
     }
 };
 
 $(document).ready(function() {
     body = $('body').layout(bodyLayoutOptions);
     body.allowOverflow('north');
+    
+    east = $("#right-side").layout(eastOptions);
 });
 
 $('#previous').live('click', function() {
