@@ -105,18 +105,21 @@
                 margin-right: 0;
                 margin-top: 5px;
             }
-            #adder-button {
-                background-image: url("img/addmediasource.png");
+            #adder-button-container  {
                 float: left;
                 display: block;
-                height: 20px;
-                margin-left: 0px;
+            }
+            #adder-button-container img {
                 margin-top: 5px;
-                padding-left: 0;
-                width: 135px;
+                vertical-align: middle;
+                z-index: 14;
+            }
+            #adder-button {
+                margin-left: -133px;
+                z-index: 15;
             }
             #adder-button:active {
-                background-image: url("img/addmediasource-hi.png");
+                color: #99795b;
             }
             #controls {
                 float: left;
@@ -357,7 +360,10 @@
                     <div class="player-row">
                         <div id="adder">
                             <input type="text" id="adder-link" size="30"/>
-                            <a href onclick="return false;" id="adder-button"></a>
+                            <div id="adder-button-container">
+                                <img src="img/addmediasource.png" />
+                                <a href onclick="return false;" id="adder-button">Add Media Source</a>
+                            </div>
                         </div>
                     </div>
                     <div class="player-row">
