@@ -84,8 +84,7 @@
             }
             #playlist-info {
                 float: left;
-                min-width: 200px;
-                width: 250px;
+                width: 210px;
             }
             #track-count-wrapper {
                 float: left;
@@ -99,7 +98,25 @@
                 z-index: 10;
             }
             #adder-link {
+                border: solid #888 1px;
+                float: left;
+                display: block;
                 margin-left: 0;
+                margin-right: 0;
+                margin-top: 5px;
+            }
+            #adder-button {
+                background-image: url("img/addmediasource.png");
+                float: left;
+                display: block;
+                height: 20px;
+                margin-left: 0px;
+                margin-top: 5px;
+                padding-left: 0;
+                width: 135px;
+            }
+            #adder-button:active {
+                background-image: url("img/addmediasource-hi.png");
             }
             #controls {
                 float: left;
@@ -153,18 +170,20 @@
             #time-elapsed {
                 float: left;
                 height: 50px;
+                margin-left: 6px;
                 margin-right: 13px;
-                text-align: center;
-                width: 46px;
             }
             #timebar-outer {
+                -webkit-border-radius: 4px;
+                -moz-border-radius: 4px;
+                border-radius: 4px;
                 background-color: #fff;
-                border: 1px solid #333;
+                border: solid #aaa 1px;
                 float: left;
                 height: 20px;
                 margin-top: 4px;
                 overflow: hidden;
-                width: 339px;
+                width: 346px;
             }
             #timebar-inner {
                 background-color: #3d3;
@@ -177,10 +196,13 @@
                 margin-left: 2em;
             }
             #volume-outer {
+                -webkit-border-radius: 4px;
+                -moz-border-radius: 4px;
+                border-radius: 4px;
+                border: solid #aaa 1px;
                 -khtml-user-select: none;
                 -moz-user-select: none;
                 background-color: #d33;
-                border: 1px solid #333;
                 float: left;
                 height: 50px;
                 margin-top: 5px;
@@ -335,7 +357,7 @@
                     <div class="player-row">
                         <div id="adder">
                             <input type="text" id="adder-link" size="30"/>
-                            <a href onclick="return false;" id="adder-button">Add Media Source</a>
+                            <a href onclick="return false;" id="adder-button"></a>
                         </div>
                     </div>
                     <div class="player-row">
