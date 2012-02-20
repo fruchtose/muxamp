@@ -79,9 +79,11 @@ a:hover {
     border: solid #888 1px;
     float: left;
     display: block;
+    height: 16px;
     margin-left: 0;
     margin-right: 0;
     margin-top: 5px;
+    width: 209px;
 }
 #adder-button-container  {
     float: left;
