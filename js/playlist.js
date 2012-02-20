@@ -289,8 +289,7 @@ function Playlist(soundManager) {
                     });
                 }
             }
-            $('#play').css("background-image", 'url("img/pause.png")');
-            $('#play:active').css("background-image", 'url("img/pause-hi.png)');
+            $('#play').addClass("playstate");
         }
     }
     
@@ -335,14 +334,12 @@ function Playlist(soundManager) {
                 this.setCurrentTrack(Math.min(this.list.length - 1, index));
             }
             if (this.isEmpty()) {
-                $('#play').css("background-image", 'url("img/play.png")');
-                $('#play:active').css("background-image", 'url("img/play-hi.png")');
+                $("#play").removeClass("playstate");
             }
             else {
                 if (wasPlaying) {
                     this.play();
-                    $('#play').css("background-image", 'url("img/pause.png")');
-                    $('#play:active').css("background-image", 'url("img/pause-hi.png)');
+                    $('#play').addClass("playstate");
                 }
             }
             $('#track-count').text(this.list.length.toString());
@@ -439,18 +436,15 @@ function Playlist(soundManager) {
         this.list[this.currentTrack].stop();
         timebar.width(0);
         $('#time-elapsed').text('0:00');
-        $('#play').css("background-image", 'url("img/play.png")');
-        $('#play:active').css("background-image", 'url("img/play-hi.png")');
+        $('#play').removeClass("playstate");
     }
     
     this.togglePause = function() {
         if (this.isPaused()) {
-            $('#play').css("background-image", 'url("img/pause.png")');
-            $('#play:active').css("background-image", 'url("img/pause-hi.png)');
+            $('#play').addClass("playstate");
         }
         else {
-            $('#play').css("background-image", 'url("img/play.png")');
-            $('#play:active').css("background-image", 'url("img/play-hi.png")');
+            $("#play").removeClass("playstate");
         }
         this.list[this.currentTrack].togglePause();
     }

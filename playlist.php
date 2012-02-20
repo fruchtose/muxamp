@@ -126,6 +126,7 @@
                 z-index: 12;
             }
             #controls a {
+                background-image: url("img/controls.png");
                 float: left;
                 display: block;
                 height: 20px;
@@ -137,34 +138,40 @@
                 width: 40px;
             }
             #previous {
-                background: url("img/prev.png");
+                background-position: 0px 0px;
             }
             #previous:active {
-                background: url("img/prev-hi.png");
+                background-position: 0px 20px;
             }
             #play {
-                background: url("img/play.png");
+                background-position: -40px 0px;
             }
             #play:active {
-                background: url("img/play-hi.png");
+                background-position: -40px 20px;
             }
-            #next {
-                background: url("img/next.png");
+            #play.playstate {
+                background-position: -80px 0px;
             }
-            #next:active {
-                background: url("img/next-hi.png");
+            #play.playstate:active {
+                background-position: -80px 20px;
             }
             #stop {
-                background: url("img/stop.png");
+                background-position: -120px 0px;
             }
             #stop:active {
-                background: url("img/stop-hi.png");
+                background-position: -120px 20px;
+            }
+            #next {
+                background-position: -160px 0px;
+            }
+            #next:active {
+                background-position: -160px 20px;
             }
             #shuffle {
-                background: url("img/shuffle.png");
+                background-position: -200px 0px;
             }
             #shuffle:active {
-                background: url("img/shuffle-hi.png");
+                background-position: -200px 20px;
             }
             #timebar {
                 float: left;
@@ -344,8 +351,8 @@
                         <div id ="controls">
                             <a href onclick="return false;" id="previous"></a>
                             <a href onclick="return false;" id="play"></a>
-                            <a href onclick="return false;" id="next"></a>
                             <a href onclick="return false;" id="stop"></a>
+                            <a href onclick="return false;" id="next"></a>
                             <a href onclick="return false;" id="shuffle"></a>
                         </div>
                     </div>
