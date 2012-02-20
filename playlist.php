@@ -32,6 +32,7 @@
                 -ms-overflow-y: hidden;
             }
             img {
+                border: none;
                 float: left;
             }
             li {
@@ -122,6 +123,7 @@
                 color: #99795b;
             }
             #controls {
+                cursor: pointer;
                 float: left;
                 z-index: 12;
             }
@@ -189,6 +191,7 @@
                 border-radius: 4px;
                 background-color: #fff;
                 border: solid #aaa 1px;
+                cursor: pointer;
                 float: left;
                 height: 20px;
                 margin-top: 4px;
@@ -213,6 +216,7 @@
                 -khtml-user-select: none;
                 -moz-user-select: none;
                 background-color: #d33;
+                cursor: pointer;
                 float: left;
                 height: 50px;
                 margin-top: 5px;
