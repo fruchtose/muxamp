@@ -295,7 +295,7 @@
             #tracks li.playing a:hover {text-decoration: underline; }
             #video {
                 background-image: url("img/bg-right.png");
-                height: 260px;
+                height: 257px;
                 position: absolute;
                 right: 0px;
                 text-align: right;
