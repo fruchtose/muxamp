@@ -105,7 +105,7 @@ a:hover {
     z-index: 12;
 }
 #controls a {
-    background-image: url("img/controls.png");
+    background-image: url("../img/controls.png");
     float: left;
     display: block;
     height: 20px;
@@ -278,7 +278,7 @@ a:hover {
     display: none;
 }
 #video {
-    background-image: url("img/bg-right.png");
+    background-image: url("../img/bg-right.png");
     height: 257px;
     position: absolute;
     right: 0px;
