@@ -5,22 +5,6 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Unified Playlist</title>
-        <script src="js/swfobject.js" type="text/javascript"></script>
-        <script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
-        <script src="js/jquery.ajaxmanager.js" type="text/javascript"></script>
-        <script src="js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
-        <script src="js/jquery.layout-latest.min.js" type="text/javascript"></script>
-        <script src="js/jQuery.tubeplayer.js" type="text/javascript"></script>
-        <script src="js/jquery.blockUI.js" type="text/javascript"></script>
-        <script src="js/jquery.draginside.js" type="text/javascript"></script>
-        <script src="js/soundmanager2-nodebug-jsmin.js" type="text/javascript"></script>
-        <script src="js/jsclass.js" type="text/javascript"></script>
-        <script src="js/config.js" type="text/javascript"></script>
-        <script src="js/player.js" type="text/javascript"></script>
-        <script src="js/playlist.js" type="text/javascript"></script>
-        <script src="js/router.js" type="text/javascript"></script>
-        <script src="js/ui.js" type="text/javascript"></script>
-        <script src="js/input.js" type="text/javascript"></script>
         <style type="text/css">
             html {font-family: Verdana, Tahoma, Helvetica, Arial;
                   font-size: 13px;
@@ -66,6 +50,7 @@
             }
             #player-header {
                 border-bottom: solid #aaa 1px;
+                display: none;
                 padding-left: 52px;
             }
             #player-header, #footer-content, #video {
@@ -297,6 +282,9 @@
                 text-decoration: none;
             }
             #tracks li.playing a:hover {text-decoration: underline; }
+            #video-container {
+                display: none;
+            }
             #video {
                 background-image: url("img/bg-right.png");
                 height: 257px;
@@ -305,6 +293,9 @@
                 text-align: right;
                 width: 400px;
                 z-index: 15;
+            }
+            #footer {
+                display: none;
             }
             #footer-content {
                 -webkit-border-top-left-radius: 4px;
@@ -412,5 +403,21 @@
                 </div>
             </div>
         </div>
+        <script src="js/swfobject.js" type="text/javascript"></script>
+        <script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
+        <script src="js/jquery.ajaxmanager.js" type="text/javascript"></script>
+        <script src="js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
+        <script src="js/jquery.layout-latest.min.js" type="text/javascript"></script>
+        <script src="js/jQuery.tubeplayer.js" type="text/javascript"></script>
+        <script src="js/jquery.blockUI.js" type="text/javascript"></script>
+        <script src="js/jquery.draginside.js" type="text/javascript"></script>
+        <script src="js/soundmanager2-nodebug-jsmin.js" type="text/javascript"></script>
+        <script src="js/jsclass.js" type="text/javascript"></script>
+        <script src="js/config.js" type="text/javascript"></script>
+        <script src="js/player.js" type="text/javascript"></script>
+        <script src="js/playlist.js" type="text/javascript"></script>
+        <script src="js/router.js" type="text/javascript"></script>
+        <script src="js/ui.js" type="text/javascript"></script>
+        <script src="js/input.js" type="text/javascript"></script>
     </body>
 </html>
