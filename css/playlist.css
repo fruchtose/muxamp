@@ -62,7 +62,7 @@ a:hover {
 }
 #playlist-info {
     float: left;
-    width: 210px;
+    width: 200px;
 }
 #track-count-wrapper {
     float: left;
@@ -96,13 +96,14 @@ a:hover {
 }
 #adder-button {
     margin-left: -133px;
+    margin-right: 0;
+    padding-right: 0;
     z-index: 15;
 }
 #adder-button:active {
     color: #99795b;
 }
 #controls {
-    cursor: pointer;
     float: left;
     z-index: 12;
 }
@@ -185,7 +186,8 @@ a:hover {
 }
 #volume {
     float: left;
-    margin-left: 2em;
+    margin-left: 10px;
+    width: 135px;
 }
 #volume-outer {
     -webkit-border-radius: 4px;
@@ -195,7 +197,6 @@ a:hover {
     -khtml-user-select: none;
     -moz-user-select: none;
     background-color: #d33;
-    cursor: pointer;
     float: left;
     height: 50px;
     margin-top: 5px;
@@ -287,6 +288,9 @@ a:hover {
     text-align: right;
     width: 400px;
     z-index: 15;
+}
+#right-side {
+    display: none;
 }
 #footer {
     display: none;
