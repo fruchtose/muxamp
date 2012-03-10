@@ -40,18 +40,17 @@ a:hover {
 #wrapper {
     top: 0;
 }
-#player-header {
-    border-bottom: solid #aaa 1px;
-    display: none;
-    padding-left: 52px;
-}
-#player-header, #footer-content, #video {
+#side-content, #footer-content, #video {
     background-color: #EEE;
     color: #2E2E2E;
 }
-#player-header a, #footer a, #video a {
+#side-content a, #footer a, #video a {
     color: #775739;
     font-weight: bold;
+}
+#side-content {
+    color: #2E2E2E;
+    padding-left: 1px;
 }
 .rows {
     float: left;
@@ -62,7 +61,6 @@ a:hover {
 }
 #playlist-info {
     float: left;
-    width: 200px;
 }
 #track-count-wrapper {
     float: left;
@@ -83,7 +81,7 @@ a:hover {
     margin-left: 0;
     margin-right: 0;
     margin-top: 5px;
-    width: 209px;
+    width: 199px;
 }
 #adder-button-container  {
     float: left;
@@ -163,7 +161,6 @@ a:hover {
     float: left;
     height: 50px;
     margin-left: 6px;
-    margin-right: 13px;
 }
 #timebar-outer {
     -webkit-border-radius: 4px;
@@ -176,7 +173,7 @@ a:hover {
     height: 20px;
     margin-top: 4px;
     overflow: hidden;
-    width: 346px;
+    width: 336px;
 }
 #timebar-inner {
     background-color: #3d3;
@@ -186,8 +183,7 @@ a:hover {
 }
 #volume {
     float: left;
-    margin-left: 10px;
-    width: 135px;
+    margin-left: 13px;
 }
 #volume-outer {
     -webkit-border-radius: 4px;

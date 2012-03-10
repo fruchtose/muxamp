@@ -33,27 +33,28 @@
                     <div id="video"></div>
                 </div>
                 <div id="side-controls">
-                    <div id="playlist-info">
-                        <div class="rows">
-                            <div class="player-row">
-                                <div id="track-count-wrapper">
-                                    Tracks: <span id="track-count">0</span>
+                    <div id="side-content">
+                        <div id="playlist-info">
+                            <div class="rows">
+                                <div class="player-row">
+                                    <div id="track-count-wrapper">
+                                        Tracks: <span id="track-count">0</span>
+                                    </div>
+                                    <div id="playlist-duration-wrapper">
+                                        Duration: <span id="playlist-duration">0:00</span>
+                                    </div>
                                 </div>
-                                <div id="playlist-duration-wrapper">
-                                    Duration: <span id="playlist-duration">0:00</span>
-                                </div>
-                            </div>
-                            <div class="player-row">
-                                <div id ="controls">
-                                    <a href onclick="return false;" id="previous"></a>
-                                    <a href onclick="return false;" id="play"></a>
-                                    <a href onclick="return false;" id="stop"></a>
-                                    <a href onclick="return false;" id="next"></a>
-                                    <a href onclick="return false;" id="shuffle"></a>
+                                <div class="player-row">
+                                    <div id ="controls">
+                                        <a href onclick="return false;" id="previous"></a>
+                                        <a href onclick="return false;" id="play"></a>
+                                        <a href onclick="return false;" id="stop"></a>
+                                        <a href onclick="return false;" id="next"></a>
+                                        <a href onclick="return false;" id="shuffle"></a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                         <div id="volume">
                             <div id="volume-outer">
                                 <div id="volume-inner"></div>
@@ -79,6 +80,7 @@
                                 <div id="time-elapsed">0:00</div>
                             </div>
                         </div>
+                    </div>
                 </div>
                 <div id="footer">
                     <div id="footer-content"><b>Unified Playlist</b> powered by <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
