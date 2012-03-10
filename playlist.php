@@ -22,66 +22,63 @@
     </head>
     <body>
         <div id="wrapper">
-            <div id="player-header">
-                <div class="rows">
-                    <div class="player-row">
-                        <div id="playlist-info">
-                            <div id="track-count-wrapper">
-                                Tracks: <span id="track-count">0</span>
-                            </div>
-                            <div id="playlist-duration-wrapper">
-                                Duration: <span id="playlist-duration">0:00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="player-row">
-                        <div id ="controls">
-                            <a href onclick="return false;" id="previous"></a>
-                            <a href onclick="return false;" id="play"></a>
-                            <a href onclick="return false;" id="stop"></a>
-                            <a href onclick="return false;" id="next"></a>
-                            <a href onclick="return false;" id="shuffle"></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="rows">
-                    <div class="player-row"></div>
-                    <div class="player-row">
-                        <div id="time-elapsed">0:00</div>
-                    </div>
-                </div>
-                <div class="rows">
-                    <div class="player-row">
-                        <div id="adder">
-                            <input type="text" id="adder-link" size="30"/>
-                            <div id="adder-button-container">
-                                <img src="img/addmediasource.png" />
-                                <a href onclick="return false;" id="adder-button">Add Media Source</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="player-row">
-                        <div id="timebar">
-                            <div id="timebar-outer">
-                                <div id="timebar-inner"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="volume">
-                    <div id="volume-outer">
-                        <div id="volume-inner"></div>
-                    </div>
-                    <div id="volume-amount">50% Volume</div>
-                </div>
-            </div>
             <div id="main">
-                <ol id="tracks">
-                </ol>
+                <div id="playlist-view">
+                    <ol id="tracks"></ol>
+                </div>
+                <div id="search-view"></div>
             </div>
             <div id="right-side">
                 <div id="video-container">
                     <div id="video"></div>
+                </div>
+                <div id="side-controls">
+                    <div id="playlist-info">
+                        <div class="rows">
+                            <div class="player-row">
+                                <div id="track-count-wrapper">
+                                    Tracks: <span id="track-count">0</span>
+                                </div>
+                                <div id="playlist-duration-wrapper">
+                                    Duration: <span id="playlist-duration">0:00</span>
+                                </div>
+                            </div>
+                            <div class="player-row">
+                                <div id ="controls">
+                                    <a href onclick="return false;" id="previous"></a>
+                                    <a href onclick="return false;" id="play"></a>
+                                    <a href onclick="return false;" id="stop"></a>
+                                    <a href onclick="return false;" id="next"></a>
+                                    <a href onclick="return false;" id="shuffle"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <div id="volume">
+                            <div id="volume-outer">
+                                <div id="volume-inner"></div>
+                            </div>
+                            <div id="volume-amount">Volume: 50%</div>
+                        </div>
+                        <div class="rows">
+                            <div class="player-row">
+                                <div id="adder">
+                                    <input type="text" id="adder-link" size="30"/>
+                                    <div id="adder-button-container">
+                                        <img src="img/addmediasource.png" />
+                                        <a href onclick="return false;" id="adder-button">Add Media Source</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="player-row">
+                                <div id="timebar">
+                                    <div id="timebar-outer">
+                                        <div id="timebar-inner"></div>
+                                    </div>
+                                </div>
+                                <div id="time-elapsed">0:00</div>
+                            </div>
+                        </div>
                 </div>
                 <div id="footer">
                     <div id="footer-content"><b>Unified Playlist</b> powered by <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.

@@ -27,7 +27,15 @@ var bodyLayoutOptions = {
 
 var eastOptions = {
     center: {
-        paneSelector: "#video-container"
+        paneSelector: "#side-controls"
+    },
+    north: {
+        closable: false,
+        paneSelector: "#video-container",
+        resizable: false,
+        size: 257,
+        slidable: false,
+        spacing_open: 0
     },
     south: {
         closable: false,
@@ -79,19 +87,15 @@ $('#adder-button').live('click', function(){
 
 $(document).ready(function() {
     var volumeOuter = $("#volume-outer");
-    var adjustVolume = function(x, y) {
-        var volumePossible = volumeOuter.height();
-        var amount =  Math.max(0, volumeOuter.height() - y);
-        var percent = (amount / volumePossible) * 100;
-        playlist.setVolume(percent);
-    };
-    volumeOuter.draginside({
-        snapAtDistance: 2,
-        snapDimensions: 'y',
-        snapPoints: [['any', 0], ['any', 'height()']],
-        onMouseDown: adjustVolume,
-        onMouseMove: adjustVolume,
-        onMouseUp: adjustVolume
+    volumeOuter.slider({
+        orientation: "vertical",
+        range: "min",
+        min: 0,
+        max: 100,
+        value: 50,
+        slide: function(event, ui) {
+            playlist.setVolume(ui.value);
+        }
     });
 });
 
@@ -114,16 +118,16 @@ $(function() {
 
 $(document).ready(function() {
     var timebarOuter = $("#timebar-outer");
-    var timebarSeek = function(x) {
-        var fraction = (x/timebarOuter.width());
-        playlist.seek(fraction.toFixed(4)); 
-    };
-    timebarOuter.draginside({
-        snapAtDistance: 2,
-        snapDimensions: 'x',
-        snapPoints: [[0, 'any'], ['width()', 'any']],
-        onMouseDown: timebarSeek,
-        onMouseMove: timebarSeek
+    var timebarPrecisionFactor = timebarOuter.width();
+    timebarOuter.slider({
+        range: "min",
+        value: 0,
+        min: 0,
+        max: timebarOuter.width() * timebarPrecisionFactor,
+        slide: function(event, ui) {
+            var fraction = ui.value/ timebarOuter.slider("option", "max");
+            playlist.seek(fraction.toFixed(4));
+        }
     });
 });
 

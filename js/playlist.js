@@ -390,7 +390,7 @@ function Playlist(soundManager) {
         //Update volume bar
         var volumeBarHeight = 100 - intPercent;
         $("#volume-inner").height(volumeBarHeight.toString() + "%");
-        $("#volume-amount").text(intPercent + "% Volume");
+        $("#volume-amount").text("Volume: " + intPercent + "%");
     }
     
     this.shuffle = function() {
