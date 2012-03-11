@@ -26,7 +26,18 @@
                 <div id="playlist-view">
                     <ol id="tracks"></ol>
                 </div>
-                <div id="search-view"></div>
+                <div id="search-view">
+                    <div id="search-form">
+                        <div>
+                            <input type="text" class="search-link" size="30"/>
+                            <a href onclick="return false;" id="search-button-text">Search</a>
+                        </div>
+                        <div id="search-options">
+                            <label><input type="checkbox" value="YouTube" /><span>YouTube</span></label>
+                            <label><input type="checkbox" value="SoundCloud" /><span>SoundCloud</span></label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div id="right-side">
                 <div id="video-container">
@@ -64,10 +75,10 @@
                         <div class="rows">
                             <div class="player-row">
                                 <div id="adder">
-                                    <input type="text" id="adder-link" size="30"/>
-                                    <div id="adder-button-container">
+                                    <input type="text" class="search-link" size="30"/>
+                                    <div class="search-button-container">
                                         <img src="img/addmediasource.png" />
-                                        <a href onclick="return false;" id="adder-button">Add Media Source</a>
+                                        <a href onclick="return false;" class="search-button" id="adder-button">Add Media Source</a>
                                     </div>
                                 </div>
                             </div>
@@ -78,6 +89,11 @@
                                     </div>
                                 </div>
                                 <div id="time-elapsed">0:00</div>
+                            </div>
+                        </div>
+                        <div class="rows">
+                            <div class="player-row">
+                                <a href onclick="return false;" id="search-activate">Search</a>
                             </div>
                         </div>
                     </div>

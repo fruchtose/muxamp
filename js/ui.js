@@ -166,3 +166,7 @@ var secondsToString = function(duration) {
     str += seconds.toString();
     return str;
 };
+
+$("#search-activate").live('click', function() {
+    $("#search-view").toggle('fast');
+});
