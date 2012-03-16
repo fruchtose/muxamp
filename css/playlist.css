@@ -1,59 +1,4 @@
-#wrapper > #main {
-    margin-right: 380px;
-}
-#wrapper > #right-side {
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-radius: 0;
-    bottom: 0;
-    margin-bottom: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 380px;
-}
-#video {
-    height: 230px;
-}
-/*#track-count-wrapper {
-    float: left;
-}
-#playlist-duration-wrapper {
-    float: right;
-}*/
-#controls {
-    float: left;
-}
-#timebar-outer {
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    background-color: #fff;
-    border: solid #aaa 1px;
-    cursor: pointer;
-    float: left;
-    height: 18px;
-    overflow: hidden;
-    margin-top: 10px;
-    width: 218px;
-}
-#timebar-inner {
-    background-color: #3d3;
-    height: 18px;
-    min-width: 0;
-    width: 0;
-}
-#time-elapsed {
-    height: 40px;
-    line-height: 40px;
-    vertical-align: middle;
-}
-#footer {
-    bottom: 0;
-    margin-bottom: 20px;
-    position:absolute;
-}
-/*html {font-family: Verdana, Tahoma, Helvetica, Arial;
+html {font-family: Verdana, Tahoma, Helvetica, Arial;
       font-size: 13px;
 }
 body {
@@ -124,11 +69,7 @@ a:hover {
 #playlist-duration-wrapper {
     float: left;
 }
-#adder {
-    float: left;
-    z-index: 10;
-}
-#adder-link {
+.search-link {
     border: solid #888 1px;
     float: left;
     display: block;
@@ -138,22 +79,22 @@ a:hover {
     margin-top: 5px;
     width: 199px;
 }
-#adder-button-container  {
+.search-button-container  {
     float: left;
     display: block;
 }
-#adder-button-container img {
+.search-button-container img {
     margin-top: 5px;
     vertical-align: middle;
     z-index: 14;
 }
-#adder-button {
+.search-button {
     margin-left: -133px;
     margin-right: 0;
     padding-right: 0;
     z-index: 15;
 }
-#adder-button:active {
+.search-button:active {
     color: #99795b;
 }
 #controls {
@@ -214,7 +155,6 @@ a:hover {
 }
 #time-elapsed {
     float: left;
-    height: 50px;
     margin-left: 6px;
 }
 #timebar-outer {
@@ -328,6 +268,51 @@ a:hover {
     text-decoration: none;
 }
 #tracks li.playing a:hover {text-decoration: underline; }
+#search-view {
+    background-color: #eee;
+    border-left: solid #aaa 1px;
+    display: none;
+    height: 100%;
+    padding-left: 1px;
+    padding-right: 1px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 400px;
+    z-index: 15;
+}
+#search-view a {
+    font-weight: bold;
+    vertical-align: middle;
+}
+#search-form {
+    height: 20px;
+    line-height: 20px;
+    vertical-align: middle;
+}
+#search-form input {
+    margin: 2px 0 0;
+}
+#search-button-text {
+    margin-left: 6px;
+}
+#search-options {
+    float: left;
+}
+#search-options label {
+    display: block;
+    float: left;
+    line-height: 20px;
+    padding-right: 13px;
+    white-space: nowrap;
+}
+#search-options input {
+    margin: 0;
+    vertical-align: middle;
+}
+#search-options label span {
+    vertical-align: middle;
+}
 #video-container {
     display: none;
 }
@@ -341,18 +326,14 @@ a:hover {
     z-index: 15;
 }
 #right-side {
+    border-left: solid #aaa 1px;
     display: none;
 }
 #footer {
     display: none;
 }
 #footer-content {
-    -webkit-border-top-left-radius: 4px;
-    -moz-border-radius-topleft: 4px;
-    border-top-left-radius: 4px;
-    border: solid #aaa 1px;
-    border-bottom-width: 0;
-    border-right-width: 0;
+    border-top: solid #aaa 1px;
     line-height: 20px;
     min-height: 20px;
     padding: 5px;
@@ -361,4 +342,4 @@ a:hover {
 span.slogan {
     font-style: italic;
     z-index: inherit; 
-}*/
+}

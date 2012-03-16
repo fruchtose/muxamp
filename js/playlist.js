@@ -252,8 +252,8 @@ function Playlist(soundManager) {
                         autoPlay: true,
                         initialVideo: media.siteMediaID,
                         loadSWFObject: false,
-                        width: 360,
-                        height: 230,
+                        width: 399,
+                        height: 256,
                         onStop: clearMediaInterval,
                         onPlayerUnstarted: function() {
                             playlist.setVolume(playlist.currentVolumePercent);
@@ -390,7 +390,7 @@ function Playlist(soundManager) {
         //Update volume bar
         var volumeBarHeight = 100 - intPercent;
         $("#volume-inner").height(volumeBarHeight.toString() + "%");
-        $("#volume-amount").text("Volume: " + intPercent + "%");
+        $("#volume-amount").text("Volume: " + intPercent);
     }
     
     this.shuffle = function() {
