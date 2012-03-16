@@ -252,8 +252,8 @@ function Playlist(soundManager) {
                         autoPlay: true,
                         initialVideo: media.siteMediaID,
                         loadSWFObject: false,
-                        width: 399,
-                        height: 256,
+                        width: 360,
+                        height: 230,
                         onStop: clearMediaInterval,
                         onPlayerUnstarted: function() {
                             playlist.setVolume(playlist.currentVolumePercent);

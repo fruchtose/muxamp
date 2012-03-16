@@ -1,4 +1,59 @@
-html {font-family: Verdana, Tahoma, Helvetica, Arial;
+#wrapper > #main {
+    margin-right: 380px;
+}
+#wrapper > #right-side {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    bottom: 0;
+    margin-bottom: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 380px;
+}
+#video {
+    height: 230px;
+}
+/*#track-count-wrapper {
+    float: left;
+}
+#playlist-duration-wrapper {
+    float: right;
+}*/
+#controls {
+    float: left;
+}
+#timebar-outer {
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #fff;
+    border: solid #aaa 1px;
+    cursor: pointer;
+    float: left;
+    height: 18px;
+    overflow: hidden;
+    margin-top: 10px;
+    width: 218px;
+}
+#timebar-inner {
+    background-color: #3d3;
+    height: 18px;
+    min-width: 0;
+    width: 0;
+}
+#time-elapsed {
+    height: 40px;
+    line-height: 40px;
+    vertical-align: middle;
+}
+#footer {
+    bottom: 0;
+    margin-bottom: 20px;
+    position:absolute;
+}
+/*html {font-family: Verdana, Tahoma, Helvetica, Arial;
       font-size: 13px;
 }
 body {
@@ -69,7 +124,11 @@ a:hover {
 #playlist-duration-wrapper {
     float: left;
 }
-.search-link {
+#adder {
+    float: left;
+    z-index: 10;
+}
+#adder-link {
     border: solid #888 1px;
     float: left;
     display: block;
@@ -79,22 +138,22 @@ a:hover {
     margin-top: 5px;
     width: 199px;
 }
-.search-button-container  {
+#adder-button-container  {
     float: left;
     display: block;
 }
-.search-button-container img {
+#adder-button-container img {
     margin-top: 5px;
     vertical-align: middle;
     z-index: 14;
 }
-.search-button {
+#adder-button {
     margin-left: -133px;
     margin-right: 0;
     padding-right: 0;
     z-index: 15;
 }
-.search-button:active {
+#adder-button:active {
     color: #99795b;
 }
 #controls {
@@ -155,6 +214,7 @@ a:hover {
 }
 #time-elapsed {
     float: left;
+    height: 50px;
     margin-left: 6px;
 }
 #timebar-outer {
@@ -268,45 +328,6 @@ a:hover {
     text-decoration: none;
 }
 #tracks li.playing a:hover {text-decoration: underline; }
-#search-view {
-    color: #eee;
-    filter: alpha(opacity=85);
-    opacity: .85;
-    background-color: #111;
-    display: none;
-    height: 100%;
-    padding-left: 1px;
-    padding-right: 1px;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 400px;
-    z-index: 15;
-}
-#search-view a {
-    color: #3d3;
-    font-weight: bold;
-}
-#search-form {
-    height: 20px;
-    line-height: 30px;
-}
-#search-button-text {
-    margin-left: 6px;
-}
-#search-options label {
-    display: block;
-    float: left;
-    line-height: 15px;
-    padding-right: 13px;
-    white-space: nowrap;
-}
-#search-options input {
-    vertical-align: middle;
-}
-#search-options label span {
-    vertical-align: middle;
-}
 #video-container {
     display: none;
 }
@@ -326,6 +347,9 @@ a:hover {
     display: none;
 }
 #footer-content {
+    -webkit-border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    border-top-left-radius: 4px;
     border: solid #aaa 1px;
     border-bottom-width: 0;
     border-right-width: 0;
@@ -337,4 +361,4 @@ a:hover {
 span.slogan {
     font-style: italic;
     z-index: inherit; 
-}
+}*/
