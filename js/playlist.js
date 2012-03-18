@@ -172,6 +172,14 @@ function Playlist(soundManager) {
         return this.list.length == 0;
     }
     
+    this.isMuted = function() {
+        var result = false;
+        if (!this.isEmpty()) {
+            result = this.list[this.currentTrack].isMuted();
+        }
+        return result;
+    }
+    
     this.isPaused = function() {
         var status = false;
         if (!this.isEmpty()) {
@@ -371,6 +379,12 @@ function Playlist(soundManager) {
         }
     }
     
+    this.setMute = function(mute) {
+        if (!this.isEmpty()) {
+            this.list[this.currentTrack].setMute(mute);
+        }
+    }
+    
     this.setVolume = function(intPercent) {
         intPercent = Math.round(intPercent);
         this.currentVolumePercent = intPercent;
@@ -384,6 +398,7 @@ function Playlist(soundManager) {
                     $('#video').tubeplayer('volume', intPercent);
                 }
             }
+            this.setMute(false);
         }
         this.setVolumeSymbol(intPercent);
     }
@@ -397,10 +412,10 @@ function Playlist(soundManager) {
             $("#volume-symbol").removeClass("icon-volume-down").removeClass("icon-volume-off").addClass("icon-volume-up");
         }
         else if (intPercent > 0) {
-             $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-off").addClass("icon-volume-down");
+            $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-off").addClass("icon-volume-down");
         }
         else if (intPercent == 0) {
-             $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-down").addClass("icon-volume-off");
+            $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-down").addClass("icon-volume-off");
         }
     }
     
@@ -451,12 +466,15 @@ function Playlist(soundManager) {
     }
     
     this.toggleMute = function() {
-        this.list[this.currentTrack].toggleMute();
-        if (this.list[this.currentTrack].isMuted()) {
-            this.setVolumeSymbol(0);
-        }
-        else {
-            this.setVolumeSymbol(this.currentVolumePercent);
+        if (!this.isEmpty()) {
+            var shouldUnmute = this.list[this.currentTrack].isMuted();
+            this.list[this.currentTrack].toggleMute();
+            if (shouldUnmute) {
+                this.setVolumeSymbol(this.currentVolumePercent);
+            }
+            else {
+                this.setVolumeSymbol(0);
+            }
         }
     }
     

@@ -55,6 +55,15 @@ var SoundObject = new JS.Class(MediaObject, {
         return this.sound.setPosition(Math.floor(decimalPercent * this.sound.duration));
     },
     
+    setMute: function(mute) {
+        if (mute) {
+            this.sound.mute();
+        }
+        else {
+            this.sound.unmute();
+        }
+    },
+    
     stop: function() {
         return this.sound.stop();
     },
@@ -157,10 +166,19 @@ var YouTubeObject = new JS.Class(VideoObject, {
         // Eh, don't try anything if seeking isn't possible'
         }
     },
+    
+    setMute: function(mute) {
+        $(document).ready(function() {
+            if (mute) {
+                $("#video").tubeplayer('mute');
+            }
+            else {
+                $("#video").tubeplayer('unmute');
+            }
+        });
+    },
    
     stop: function() {
-        var track = this;
-        //$("#video").tubeplayer('stop');
         $(document).ready(function() {
             $("#video").tubeplayer('pause');
             $("#video").tubeplayer('seek', 0);
@@ -189,7 +207,5 @@ var YouTubeObject = new JS.Class(VideoObject, {
                 $("#video").tubeplayer('mute');
             }
         });
-        if (this.isMuted()) {
-        }
     }
 });
