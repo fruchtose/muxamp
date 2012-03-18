@@ -69,7 +69,7 @@ function Playlist(soundManager) {
     
     this._getDOMTableCellsForMediaObject = function(mediaObject, index) {
         var extLink = '<a href="' + mediaObject.permalink +'" target="_blank"><img src="' + mediaObject.icon + '"/></a>';
-        var remove = '<div class="remove"><a href onclick="return false;" class="remove" >x</a></div>';
+        var remove = '<div class="remove"><a href onclick="return false;" class="remove" >&times;</a></div>';
         var links = '<div class="link">' + extLink + '</div>';
         var left = '<div class ="left">' + remove + links + '</div>';
         return left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';

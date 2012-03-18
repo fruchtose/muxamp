@@ -249,6 +249,9 @@ a:hover {
     vertical-align: middle;
     z-index: 9;
 }
+#tracks li {
+    padding: 1px;
+}
 #tracks a {
     font-weight: bold;
     padding-right: 0;
@@ -261,6 +264,7 @@ a:hover {
 }
 #tracks li .remove {
     float: left;
+    font-size: 18px;
     height: 24px;
     line-height: 24px;
     text-align: center;
@@ -282,8 +286,7 @@ a:hover {
     background-color: #333;
     color: #ddd;
     min-height: 24px;
-    padding-bottom: 0px;
-    padding-top: 0px;
+    padding: 0;
 }
 #tracks li.playing a {
     color: #eeeecc;
