@@ -35,6 +35,10 @@ var SoundObject = new JS.Class(MediaObject, {
         return this.duration;
     },
     
+    isMuted: function() {
+        return this.sound.muted;
+    },
+    
     isPaused: function() {
         return this.sound.paused;  
     },
@@ -57,6 +61,10 @@ var SoundObject = new JS.Class(MediaObject, {
     
     togglePause: function() {
         return this.sound.togglePause();
+    },
+    
+    toggleMute: function() {
+        return this.sound.toggleMute();
     }
 });
 
@@ -80,11 +88,12 @@ var YouTubeObject = new JS.Class(VideoObject, {
     initialize: function(id, youtubeID, uploader, title, duration) {
         var permalink = 'http://www.youtube.com/watch?v=' + youtubeID;
         this.callSuper("YouTube", permalink, permalink, id, youtubeID, 'ytv', "img/youtube.png", uploader, title, duration);
+        this.video = $("#video");
     },
    
     destruct: function() {
-        if ($('#video').width()) {
-            var videoID = $('#video').tubeplayer('videoId');
+        if (this.video.width()) {
+            var videoID = this.video.tubeplayer('videoId');
             if (videoID == this.siteMediaID) {
                 clearVideo();
             }
@@ -94,14 +103,24 @@ var YouTubeObject = new JS.Class(VideoObject, {
     getDuration: function() {
         return this.duration;
     },
-   
-    isPaused: function() {
-        var paused;
+    
+    isMuted: function() {
+        var muted = false;
         try {
-            paused = $('#video').tubeplayer('isPaused');
+            muted = this.video.tubeplayer('isMuted');
         }
         catch(e) {
-            paused = false;
+            
+        }
+        return muted;
+    },
+   
+    isPaused: function() {
+        var paused = false;
+        try {
+            paused = this.video.tubeplayer('isPaused');
+        }
+        catch(e) {
         }
         return paused;
     },
@@ -109,7 +128,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
     isPlaying: function() {
         var playing;
         try {
-            playing = $('#video').tubeplayer('isPlaying');
+            playing = this.video.tubeplayer('isPlaying');
         }
         catch(e) {
             playing = false;
@@ -118,12 +137,13 @@ var YouTubeObject = new JS.Class(VideoObject, {
     },
    
     play: function(options) {
+        var video = this;
         $(document).ready(function() {
             if (options) {
-                $("#video").tubeplayer(options);
+                video.video.tubeplayer(options);
             }
             else {
-                $("#video").tubeplayer();
+                video.video.tubeplayer();
             }
         });
     },
@@ -133,7 +153,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
         try {
             // Use floor function in case rounding would otherwise result in 
             // a value of 101% of the total time
-            $("#video").tubeplayer('seek', Math.floor(decimalPercent * duration));
+            this.video.tubeplayer('seek', Math.floor(decimalPercent * duration));
         }
         catch(e) {
         // Eh, don't try anything if seeking isn't possible'
@@ -141,20 +161,37 @@ var YouTubeObject = new JS.Class(VideoObject, {
     },
    
     stop: function() {
-        $(document).ready(function() {
-            $('#video').tubeplayer('stop');
-        });
+        var track = this;
+        track.video.tubeplayer('stop');
+        /*$(document).ready(function() {
+            track.video.tubeplayer('pause');
+            track.video.tubeplayer('seek', 0);
+        });*/
     },
    
     togglePause: function() {
         var track = this;
         $(document).ready(function() {
             if (track.isPlaying()) {
-                $('#video').tubeplayer('pause');
+                track.video.tubeplayer('pause');
             }
             else if (track.isPaused()) {
-                $('#video').tubeplayer('play');
+                track.video.tubeplayer('play');
             }
         });
+    },
+    
+    toggleMute: function() {
+        var track = this;
+        $(document).ready(function() {
+            if (track.isMuted()) {
+                track.video.tubeplayer('unmute');
+            }
+            else {
+                track.video.tubeplayer('mute');
+            }
+        });
+        if (this.isMuted()) {
+        }
     }
 });

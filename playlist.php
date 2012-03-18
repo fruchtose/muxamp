@@ -5,6 +5,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Unified Playlist</title>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="css/playlist.css" />
         <script type="text/javascript">
 
@@ -21,32 +22,53 @@
         </script>
     </head>
     <body>
-        <div id="wrapper">
+        <div id="wrapper" class="container-fluid">
             <div id="main">
                 <div id="playlist-view">
                     <ol id="tracks"></ol>
                 </div>
                 <div id="search-view">
-                    <div id="search-form">
-                        <div>
-                            <input type="text" class="search-link" size="30"/>
-                            <a href onclick="return false;" id="search-button-text">Search</a>
-                        </div>
-                        <div id="search-options">
-                            <label><input type="checkbox" value="YouTube" /><span>YouTube</span></label>
-                            <label><input type="checkbox" value="SoundCloud" /><span>SoundCloud</span></label>
-                        </div>
-                    </div>
+                    <form class="form-horizontal form-search">
+                        <fieldset>
+                            <legend>Search</legend>
+                            <div class="control-group">
+                                <label class="control-label" for="search-query">Search Query</label>
+                                <div class="controls">
+                                    <input type="text" class="input-medium search-query" id="search-query" />
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="search-sites">Search Sites</label>
+                                <div class="controls">
+                                    <label class="checkbox inline">
+                                        <input type="checkbox" id="search-site1" value="soundcloud">SoundCloud</input>
+                                    </label>
+                                    <label class="checkbox inline">
+                                        <input type="checkbox" id="search-site2" value="youtube">YouTube</input>
+                                    </label>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
                 </div>
             </div>
             <div id="right-side">
                 <div id="video-container">
                     <div id="video"></div>
                 </div>
-                <div id="side-controls">
-                    <div id="side-content">
-                        <div id="playlist-info">
-                            <div class="rows">
+                <div id="side-content">
+                    <div class="rows">
+                        <div id="timebar-row" class="player-row">
+                            <div id="timebar">
+                                <div id="timebar-outer">
+                                    <div id="timebar-inner"></div>
+                                </div>
+                            </div>
+                            <div id="time-elapsed">0:00</div>
+                        </div>
+                        <div class="player-row2">
+                            <div id="playlist-info">
                                 <div class="player-row">
                                     <div id="track-count-wrapper">
                                         Tracks: <span id="track-count">0</span>
@@ -56,45 +78,32 @@
                                     </div>
                                 </div>
                                 <div class="player-row">
-                                    <div id ="controls">
-                                        <a href onclick="return false;" id="previous"></a>
-                                        <a href onclick="return false;" id="play"></a>
-                                        <a href onclick="return false;" id="stop"></a>
-                                        <a href onclick="return false;" id="next"></a>
-                                        <a href onclick="return false;" id="shuffle"></a>
+                                    <div id="controls" class="btn-group">
+                                        <a href onclick="return false;" id="previous" class="btn"><i class="icon-step-backward"></i></a>
+                                        <a href onclick="return false;" id="play" class="btn"><i class="icon-play"></i></a>
+                                        <a href onclick="return false;" id="stop" class="btn"><i class="icon-stop"></i></a>
+                                        <a href onclick="return false;" id="next" class="btn"><i class="icon-step-forward"></i></a>
+                                        <a href onclick="return false;" id="shuffle" class="btn"><i class="icon-random"></i></a>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div id="volume">
-                            <div id="volume-outer">
-                                <div id="volume-inner"></div>
-                            </div>
-                            <div id="volume-amount">Volume: 50</div>
-                        </div>
-                        <div class="rows">
-                            <div class="player-row">
-                                <div id="adder">
-                                    <input type="text" class="search-link" size="30"/>
-                                    <div class="search-button-container">
-                                        <img src="img/addmediasource.png" />
-                                        <a href onclick="return false;" class="search-button" id="adder-button">Add Media Source</a>
-                                    </div>
+                            <div id="volume">
+                                <div id="volume-outer">
+                                    <div id="volume-inner"></div>
                                 </div>
-                            </div>
-                            <div class="player-row">
-                                <div id="timebar">
-                                    <div id="timebar-outer">
-                                        <div id="timebar-inner"></div>
-                                    </div>
-                                </div>
-                                <div id="time-elapsed">0:00</div>
+                                <div id="volume-amount"><i id="volume-symbol" class="icon-volume-up"></i><span id="volume-number">50</span></div>
                             </div>
                         </div>
-                        <div class="rows">
-                            <div class="player-row">
-                                <a href onclick="return false;" id="search-activate">Search</a>
-                            </div>
+                        <div class="player-row">
+                            <form id="adder-form" class="form-inline">
+                                <div id="adder" class="input-append">
+                                    <input type="text" id="adder-link" />
+                                    <button class="btn" id="adder-button" type="button">Add Media Source</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="player-row">
+                            <a href onclick="return false;" id="search-activate">Search</a>
                         </div>
                     </div>
                 </div>

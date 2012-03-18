@@ -1,5 +1,5 @@
 var body;
-var bodyLayoutOptions = {
+/*var bodyLayoutOptions = {
     center: {
         minSize: 810,
         paneSelector: "#main"
@@ -53,12 +53,12 @@ $(document).ready(function() {
     
     east = $("#right-side").layout(eastOptions);
 });
-
-$('#previous').live('click', function() {
+*/
+$('#previous').click(function() {
     playlist.previousTrack();
 });
 
-$('#play').live('click', function() {
+$('#play').click(function() {
     if (playlist.isPlaying()) {
         playlist.togglePause();
     }
@@ -67,19 +67,19 @@ $('#play').live('click', function() {
     }
 });
 
-$('#next').live('click', function() {
+$('#next').click(function() {
     playlist.nextTrack();
 });
 
-$('#stop').live('click', function() {
+$('#stop').click(function() {
     playlist.stop();
 });
 
-$('#shuffle').live('click', function() {
+$('#shuffle').click(function() {
     playlist.shuffle();
 });
 
-$('#adder-button').live('click', function(){
+$('#adder-button').click(function(){
     var value = $('#adder-link').val();
     router.addTracks(value);
     $('#adder-link').val("");
@@ -97,6 +97,10 @@ $(document).ready(function() {
             playlist.setVolume(ui.value);
         }
     });
+});
+
+$("#volume-symbol").click(function() {
+    playlist.toggleMute();
 });
 
 var timebar, timebarLastUpdated = new Date(), timebarNowUpdated, timeElapsed;
@@ -167,6 +171,6 @@ var secondsToString = function(duration) {
     return str;
 };
 
-$("#search-activate").live('click', function() {
+$("#search-activate").click(function() {
     $("#search-view").toggle('fast');
 });

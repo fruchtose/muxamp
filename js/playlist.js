@@ -242,6 +242,9 @@ function Playlist(soundManager) {
             }
             else if (media.type == 'video') {
                 if (media.siteName == 'YouTube') {
+                    if (media.interval != undefined) {
+                        window.clearInterval(media.interval);
+                    }
                     var clearMediaInterval = function() {
                         if (media.interval != undefined) {
                             window.clearInterval(media.interval);
@@ -266,10 +269,10 @@ function Playlist(soundManager) {
                         onPlayerPlaying: function() {
                             playlist.setVolume(playlist.currentVolumePercent);
                             media.interval = window.setInterval(function() {
-                                var data = $("#video").tubeplayer('data');
+                                /*var data = $("#video").tubeplayer('data');
                                 var percent =  (data.currentTime / data.duration) * 100;
                                 timeElapsed.text(secondsToString(data.currentTime));
-                                updateTimebar(percent);
+                                updateTimebar(percent);*/
                             }, 334);
                         },
                         onPlayerEnded: function() {
@@ -289,7 +292,7 @@ function Playlist(soundManager) {
                     });
                 }
             }
-            $('#play').addClass("playstate");
+            this.setPlayButton(false);
         }
     }
     
@@ -333,15 +336,10 @@ function Playlist(soundManager) {
             if (index == this.currentTrack) {
                 this.setCurrentTrack(Math.min(this.list.length - 1, index));
             }
-            if (this.isEmpty()) {
-                $("#play").removeClass("playstate");
+            if (!this.isEmpty() && wasPlaying) {
+                this.play();
             }
-            else {
-                if (wasPlaying) {
-                    this.play();
-                    $('#play').addClass("playstate");
-                }
-            }
+            this.setPlayButton(this.isEmpty());
             $('#track-count').text(this.list.length.toString());
             this.totalDuration -= trackDuration;
             $('#playlist-duration').text(secondsToString(this.totalDuration));
@@ -387,10 +385,23 @@ function Playlist(soundManager) {
                 }
             }
         }
+        this.setVolumeSymbol(intPercent);
+    }
+    
+    this.setVolumeSymbol = function(intPercent) {
         //Update volume bar
         var volumeBarHeight = 100 - intPercent;
         $("#volume-inner").height(volumeBarHeight.toString() + "%");
-        $("#volume-amount").text("Volume: " + intPercent);
+        $("#volume-number").text(intPercent);
+        if (intPercent >= 50) {
+            $("#volume-symbol").removeClass("icon-volume-down").removeClass("icon-volume-off").addClass("icon-volume-up");
+        }
+        else if (intPercent > 0) {
+             $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-off").addClass("icon-volume-down");
+        }
+        else if (intPercent == 0) {
+             $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-down").addClass("icon-volume-off");
+        }
     }
     
     this.shuffle = function() {
@@ -436,17 +447,31 @@ function Playlist(soundManager) {
         this.list[this.currentTrack].stop();
         timebar.width(0);
         $('#time-elapsed').text('0:00');
-        $('#play').removeClass("playstate");
+        this.setPlayButton(true);
+    }
+    
+    this.toggleMute = function() {
+        this.list[this.currentTrack].toggleMute();
+        if (this.list[this.currentTrack].isMuted()) {
+            this.setVolumeSymbol(0);
+        }
+        else {
+            this.setVolumeSymbol(this.currentVolumePercent);
+        }
     }
     
     this.togglePause = function() {
-        if (this.isPaused()) {
-            $('#play').addClass("playstate");
+        this.setPlayButton(!this.isPaused());
+        this.list[this.currentTrack].togglePause();
+    }
+    
+    this.setPlayButton = function(on) {
+        if (on) {
+            $('#play').find('i').removeClass('icon-pause').addClass('icon-play');
         }
         else {
-            $("#play").removeClass("playstate");
+            $('#play').find('i').removeClass('icon-play').addClass('icon-pause');
         }
-        this.list[this.currentTrack].togglePause();
     }
     
     this.updateSettings = function(options) {

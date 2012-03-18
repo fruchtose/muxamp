@@ -38,19 +38,34 @@ a:hover {
     text-align: right;
 }
 #wrapper {
+    padding-left: 0;
+    padding-right: 0; 
     top: 0;
 }
-#side-content, #footer-content, #video {
+#main {
+    margin-right: 400px;
+    min-width: 200px;
+}
+#right-side {
+    border-left: solid #aaa 1px;
+    bottom: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 399px;
+}
+#side-content, #footer-content, #video-container {
     background-color: #EEE;
     color: #2E2E2E;
 }
-#side-content a, #footer a, #video a {
+/*#side-content a, #footer a, #video a {
     color: #775739;
     font-weight: bold;
-}
+}*/
 #side-content {
     color: #2E2E2E;
-    padding-left: 1px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 .rows {
     float: left;
@@ -58,6 +73,9 @@ a:hover {
 .player-row {
     height: 30px;
     line-height: 30px;
+}
+.player-row2 {
+    height: 60px;
 }
 #playlist-info {
     float: left;
@@ -69,7 +87,7 @@ a:hover {
 #playlist-duration-wrapper {
     float: left;
 }
-.search-link {
+/*.search-link {
     border: solid #888 1px;
     float: left;
     display: block;
@@ -96,12 +114,12 @@ a:hover {
 }
 .search-button:active {
     color: #99795b;
-}
+}*/
 #controls {
     float: left;
     z-index: 12;
 }
-#controls a {
+/*#controls a {
     background-image: url("../img/controls.png");
     float: left;
     display: block;
@@ -112,50 +130,39 @@ a:hover {
     padding-left: 0;
     padding-right: 0;
     width: 40px;
+}*/
+#controls a.btn {
+    padding: 0 7px 0 7px;
+    top: 5px;
 }
-#previous {
-    background-position: 0px 0px;
+#adder-form {
+    margin-bottom: 0;
 }
-#previous:active {
-    background-position: 0px 20px;
+#adder {
+    padding: 0;
 }
-#play {
-    background-position: -40px 0px;
+#adder input, #adder button {
+    margin-top: -4px;
 }
-#play:active {
-    background-position: -40px 20px;
+#adder-link {
+    padding-top: 0;
+    padding-bottom: 0;
+    width: 222px;
 }
-#play.playstate {
-    background-position: -80px 0px;
+#adder-button {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-left: -5px;
 }
-#play.playstate:active {
-    background-position: -80px 20px;
-}
-#stop {
-    background-position: -120px 0px;
-}
-#stop:active {
-    background-position: -120px 20px;
-}
-#next {
-    background-position: -160px 0px;
-}
-#next:active {
-    background-position: -160px 20px;
-}
-#shuffle {
-    background-position: -200px 0px;
-}
-#shuffle:active {
-    background-position: -200px 20px;
+#timebar-row {
+    width: 360px;
 }
 #timebar {
     float: left;
     z-index: 11;
 }
 #time-elapsed {
-    float: left;
-    margin-left: 6px;
+    float: right;
 }
 #timebar-outer {
     -webkit-border-radius: 4px;
@@ -165,14 +172,20 @@ a:hover {
     border: solid #aaa 1px;
     cursor: pointer;
     float: left;
-    height: 20px;
-    margin-top: 4px;
+    height: 18px;
+    margin-top: 5px;
     overflow: hidden;
-    width: 336px;
+    width: 308px;
 }
 #timebar-inner {
+    -webkit-border-top-right-radius: 1px;
+    -webkit-border-bottom-right-radius: 1px;
+    -moz-border-radius-topright: 1px;
+    -moz-border-radius-bottomright: 1px;
+    border-top-right-radius: 1px;
+    border-bottom-right-radius: 1px;
     background-color: #3d3;
-    height: 20px;
+    height: 18px;
     min-width: 0;
     width: 0;
 }
@@ -189,11 +202,11 @@ a:hover {
     -moz-user-select: none;
     background-color: #d33;
     float: left;
-    height: 50px;
+    height: 48px;
     margin-top: 5px;
     overflow: hidden;
     user-select: none;
-    width: 20px;
+    width: 18px;
 }
 #volume-inner {
     background-color: #fff;
@@ -208,29 +221,32 @@ a:hover {
     margin-left: 1em;
     vertical-align: middle;
 }
-#main {
-    min-width: 400px;
-    overflow: auto;
+#volume-amount i {
+    cursor: pointer;
+    margin-top: -4px;
+    vertical-align: middle;
 }
-#tracks li {
+#volume-number {
+    margin-left: 6px;
+}
+#tracks li .playlist-item {
+    min-height: 24px;
+    padding-bottom: 1px;
+    padding-top: 1px;
+}
+#tracks li .desc {
     padding-bottom: 0.25em;
     padding-right: 1em;
     padding-top: 0.25em;
-}
-#tracks li .desc {
     padding-left: 52px;
     vertical-align: middle;
+
 }
-#tracks li div.left {
+#tracks li .left {
     float: left;
     width: 48px;
     text-align: center;
     vertical-align: middle;
-    z-index: 9;
-}
-#tracks li div.right {
-    padding-right: 1em;
-    width: 171px;
     z-index: 9;
 }
 #tracks a {
@@ -245,13 +261,16 @@ a:hover {
 }
 #tracks li .remove {
     float: left;
+    height: 24px;
+    line-height: 24px;
     text-align: center;
+    vertical-align: middle;
     width: 22px;
 }
 #tracks li .link {
     float: left;
     height: 16px;
-    margin: 0 auto;
+    margin: 4px auto 0 0;
     text-align: center;
     width: 26px;
 }
@@ -262,6 +281,9 @@ a:hover {
     border: solid #111 1px;
     background-color: #333;
     color: #ddd;
+    min-height: 24px;
+    padding-bottom: 0px;
+    padding-top: 0px;
 }
 #tracks li.playing a {
     color: #eeeecc;
@@ -269,17 +291,20 @@ a:hover {
 }
 #tracks li.playing a:hover {text-decoration: underline; }
 #search-view {
-    background-color: #eee;
+    background-color: #fff;
     border-left: solid #aaa 1px;
     display: none;
     height: 100%;
-    padding-left: 1px;
-    padding-right: 1px;
+    padding-left: 20px;
+    padding-right: 20px;
     position: absolute;
-    right: 0;
+    right: 400px;
     top: 0;
-    width: 400px;
+    width: 360px;
     z-index: 15;
+}
+#search-view .control-group {
+    margin-left: -20px;
 }
 #search-view a {
     font-weight: bold;
@@ -314,26 +339,17 @@ a:hover {
     vertical-align: middle;
 }
 #video-container {
-    display: none;
-}
-#video {
-    background-image: url("../img/bg-right.png");
-    height: 257px;
-    position: absolute;
-    right: 0px;
-    text-align: right;
+    border-bottom: solid #aaa 1px;
+    height: 256px;
     width: 400px;
-    z-index: 15;
-}
-#right-side {
-    border-left: solid #aaa 1px;
-    display: none;
+    z-index: 15
 }
 #footer {
-    display: none;
+    border-top: solid #aaa 1px;
+    bottom: 0;
+    position: absolute;
 }
 #footer-content {
-    border-top: solid #aaa 1px;
     line-height: 20px;
     min-height: 20px;
     padding: 5px;
