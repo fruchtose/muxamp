@@ -88,12 +88,11 @@ var YouTubeObject = new JS.Class(VideoObject, {
     initialize: function(id, youtubeID, uploader, title, duration) {
         var permalink = 'http://www.youtube.com/watch?v=' + youtubeID;
         this.callSuper("YouTube", permalink, permalink, id, youtubeID, 'ytv', "img/youtube.png", uploader, title, duration);
-        this.video = $("#video");
     },
    
     destruct: function() {
-        if (this.video.width()) {
-            var videoID = this.video.tubeplayer('videoId');
+        if ($("#video").width()) {
+            var videoID = $("#video").tubeplayer('videoId');
             if (videoID == this.siteMediaID) {
                 clearVideo();
             }
@@ -107,7 +106,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
     isMuted: function() {
         var muted = false;
         try {
-            muted = this.video.tubeplayer('isMuted');
+            muted = $("#video").tubeplayer('isMuted');
         }
         catch(e) {
             
@@ -118,7 +117,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
     isPaused: function() {
         var paused = false;
         try {
-            paused = this.video.tubeplayer('isPaused');
+            paused = $("#video").tubeplayer('isPaused');
         }
         catch(e) {
         }
@@ -128,7 +127,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
     isPlaying: function() {
         var playing;
         try {
-            playing = this.video.tubeplayer('isPlaying');
+            playing = $("#video").tubeplayer('isPlaying');
         }
         catch(e) {
             playing = false;
@@ -137,13 +136,12 @@ var YouTubeObject = new JS.Class(VideoObject, {
     },
    
     play: function(options) {
-        var video = this;
         $(document).ready(function() {
             if (options) {
-                video.video.tubeplayer(options);
+                $("#video").tubeplayer(options);
             }
             else {
-                video.video.tubeplayer();
+                $("#video").tubeplayer();
             }
         });
     },
@@ -153,7 +151,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
         try {
             // Use floor function in case rounding would otherwise result in 
             // a value of 101% of the total time
-            this.video.tubeplayer('seek', Math.floor(decimalPercent * duration));
+            $("#video").tubeplayer('seek', Math.floor(decimalPercent * duration));
         }
         catch(e) {
         // Eh, don't try anything if seeking isn't possible'
@@ -162,21 +160,21 @@ var YouTubeObject = new JS.Class(VideoObject, {
    
     stop: function() {
         var track = this;
-        track.video.tubeplayer('stop');
-        /*$(document).ready(function() {
-            track.video.tubeplayer('pause');
-            track.video.tubeplayer('seek', 0);
-        });*/
+        //$("#video").tubeplayer('stop');
+        $(document).ready(function() {
+            $("#video").tubeplayer('pause');
+            $("#video").tubeplayer('seek', 0);
+        });
     },
    
     togglePause: function() {
         var track = this;
         $(document).ready(function() {
             if (track.isPlaying()) {
-                track.video.tubeplayer('pause');
+                $("#video").tubeplayer('pause');
             }
             else if (track.isPaused()) {
-                track.video.tubeplayer('play');
+                $("#video").tubeplayer('play');
             }
         });
     },
@@ -185,10 +183,10 @@ var YouTubeObject = new JS.Class(VideoObject, {
         var track = this;
         $(document).ready(function() {
             if (track.isMuted()) {
-                track.video.tubeplayer('unmute');
+                $("#video").tubeplayer('unmute');
             }
             else {
-                track.video.tubeplayer('mute');
+                $("#video").tubeplayer('mute');
             }
         });
         if (this.isMuted()) {

@@ -269,10 +269,10 @@ function Playlist(soundManager) {
                         onPlayerPlaying: function() {
                             playlist.setVolume(playlist.currentVolumePercent);
                             media.interval = window.setInterval(function() {
-                                /*var data = $("#video").tubeplayer('data');
+                                var data = $("#video").tubeplayer('data');
                                 var percent =  (data.currentTime / data.duration) * 100;
                                 timeElapsed.text(secondsToString(data.currentTime));
-                                updateTimebar(percent);*/
+                                updateTimebar(percent);
                             }, 334);
                         },
                         onPlayerEnded: function() {
