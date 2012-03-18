@@ -126,7 +126,6 @@
         <script src="js/jquery.layout-latest.min.js" type="text/javascript"></script>
         <script src="js/jQuery.tubeplayer.js" type="text/javascript"></script>
         <script src="js/jquery.blockUI.js" type="text/javascript"></script>
-        <script src="js/jquery.draginside.js" type="text/javascript"></script>
         <script src="js/soundmanager2-nodebug-jsmin.js" type="text/javascript"></script>
         <script src="js/jsclass.js" type="text/javascript"></script>
         <script src="js/config.js" type="text/javascript"></script>
