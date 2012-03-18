@@ -387,9 +387,12 @@ function Playlist(soundManager) {
     
     this.setVolume = function(intPercent) {
         intPercent = Math.round(intPercent);
-        this.currentVolumePercent = intPercent;
         if (this.isPlaying() || this.isPaused()) {
             var media = this.list[this.currentTrack];
+            var setUnmute = intPercent == 0;
+            if (setUnmute) {
+                intPercent = 50;
+            }
             if (media.type == 'audio') {
                 soundManager.setVolume(media.id, intPercent);
             }
@@ -398,9 +401,10 @@ function Playlist(soundManager) {
                     $('#video').tubeplayer('volume', intPercent);
                 }
             }
-            this.setMute(false);
+            this.setMute(setUnmute);
         }
-        this.setVolumeSymbol(intPercent);
+        this.currentVolumePercent = intPercent;
+        this.setVolumeSymbol(setUnmute ? 0 : intPercent);
     }
     
     this.setVolumeSymbol = function(intPercent) {

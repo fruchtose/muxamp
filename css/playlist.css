@@ -1,8 +1,4 @@
-html {font-family: Verdana, Tahoma, Helvetica, Arial;
-      font-size: 13px;
-}
 body {
-    margin-left: 0;
     overflow: auto;
     overflow-y: hidden;
     -ms-overflow-y: hidden;
