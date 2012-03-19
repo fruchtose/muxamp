@@ -1,5 +1,8 @@
+html {
+    overflow-x: hidden;
+}
 body {
-    overflow: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
     -ms-overflow-y: hidden;
 }
@@ -340,7 +343,7 @@ a:hover {
 #video-container {
     border-bottom: solid #aaa 1px;
     height: 256px;
-    width: 400px;
+    width: 399px;
     z-index: 15
 }
 #footer {
