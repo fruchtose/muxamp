@@ -214,12 +214,12 @@ a:hover {
 #volume-amount {
     float: left;
     line-height: 60px;
-    margin-left: 1em;
+    margin-left: 9px;
     vertical-align: middle;
 }
 #volume-amount i {
     cursor: pointer;
-    margin-top: -4px;
+    margin-top: -3px;
     vertical-align: middle;
 }
 #volume-number {
