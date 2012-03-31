@@ -1,3 +1,56 @@
+var body, east; var bodyLayoutOptions = {
+    center: {
+        minSize: 810,
+        paneSelector: "#main"
+    },
+    east: {
+        closable: false,
+        minSize: 400,
+        initClosed: false,
+        paneSelector: "#right-side",
+        resizable: false,
+        size: 400,
+        slidable: false,
+        spacing_closed: 0,
+        spacing_open: 0
+    },
+    north: {
+        closable: false,
+        paneSelector: "#player-header",
+        resizable: false,
+        size: 60,
+        slidable: false,
+        spacing_open: 0
+    }
+};
+
+var eastOptions = {
+    center: {
+        paneSelector: "#side-content"
+    },
+    north: {
+        closable: false,
+        paneSelector: "#video-container",
+        resizable: false,
+        size: 257,
+        slidable: false,
+        spacing_open: 0
+    },
+    south: {
+        closable: false,
+        paneSelector: "#footer",
+        resizable: false,
+        size: "auto",
+        slidable: false,
+        spacing_open: 0
+    }
+};
+
+$(document).ready(function() {
+    body = $("body").layout(bodyLayoutOptions); 
+    east = $("#right-side").layout(eastOptions);
+});
+
 $('#previous').click(function() {
     playlist.previousTrack();
 });
