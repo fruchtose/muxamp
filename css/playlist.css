@@ -53,7 +53,7 @@ a:hover {
     top: 0;
     width: 399px;
 }
-#side-content, #footer-content, #video-container {
+#footer-content, #video-container {
     background-color: #EEE;
     color: #2E2E2E;
 }
