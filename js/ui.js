@@ -114,27 +114,3 @@ var secondsToString = function(duration) {
     str += seconds.toString();
     return str;
 };
-
-$("#search-activate").click(function() {
-    $("#search-view").toggle('fast');
-});
-
-$("#search-submit").click(function() {
-    var sendData = {
-            query: $("#search-query").val(),
-            soundcloud: $("#search-soundcloud").is(':checked'),
-            youtube: $("#search-youtube").is(':checked')
-        };
-    $.ajax({
-        url: "search.php",
-        dataType: "json",
-        data: sendData,
-        type: "post",
-        success: function(data) {
-            alert(data);
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert(textStatus);
-        }
-    });
-});
