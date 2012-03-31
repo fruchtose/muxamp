@@ -1,59 +1,3 @@
-var body;
-/*var bodyLayoutOptions = {
-    center: {
-        minSize: 810,
-        paneSelector: "#main"
-    },
-    east: {
-        closable: false,
-        minSize: 400,
-        initClosed: false,
-        paneSelector: "#right-side",
-        resizable: false,
-        size: 400,
-        slidable: false,
-        spacing_closed: 0,
-        spacing_open: 0
-    },
-    north: {
-        closable: false,
-        paneSelector: "#player-header",
-        resizable: false,
-        size: 60,
-        slidable: false,
-        spacing_open: 0
-    }
-};
-
-var eastOptions = {
-    center: {
-        paneSelector: "#side-controls"
-    },
-    north: {
-        closable: false,
-        paneSelector: "#video-container",
-        resizable: false,
-        size: 257,
-        slidable: false,
-        spacing_open: 0
-    },
-    south: {
-        closable: false,
-        paneSelector: "#footer",
-        resizable: false,
-        size: "auto",
-        slidable: false,
-        spacing_open: 0
-    }
-};
-
-$(document).ready(function() {
-    body = $('body').layout(bodyLayoutOptions);
-    body.allowOverflow('north');
-    
-    east = $("#right-side").layout(eastOptions);
-});
-*/
 $('#previous').click(function() {
     playlist.previousTrack();
 });
@@ -173,4 +117,24 @@ var secondsToString = function(duration) {
 
 $("#search-activate").click(function() {
     $("#search-view").toggle('fast');
+});
+
+$("#search-submit").click(function() {
+    var sendData = {
+            query: $("#search-query").val(),
+            soundcloud: $("#search-soundcloud").is(':checked'),
+            youtube: $("#search-youtube").is(':checked')
+        };
+    $.ajax({
+        url: "search.php",
+        dataType: "json",
+        data: sendData,
+        type: "post",
+        success: function(data) {
+            alert(data);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert(textStatus);
+        }
+    });
 });

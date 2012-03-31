@@ -157,6 +157,7 @@ a:hover {
     width: 360px;
 }
 #timebar {
+    cursor: pointer;
     float: left;
     z-index: 11;
 }
@@ -169,7 +170,6 @@ a:hover {
     border-radius: 4px;
     background-color: #fff;
     border: solid #aaa 1px;
-    cursor: pointer;
     float: left;
     height: 18px;
     margin-top: 5px;
@@ -189,6 +189,7 @@ a:hover {
     width: 0;
 }
 #volume {
+    cursor: pointer;
     float: left;
     margin-left: 13px;
 }
@@ -307,6 +308,12 @@ a:hover {
 }
 #search-view .control-group {
     margin-left: -20px;
+}
+#search-view .control-label {
+    width: 100px;
+}
+#search-view .controls {
+    margin-left: 120px;
 }
 #search-view a {
     font-weight: bold;

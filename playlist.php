@@ -35,22 +35,24 @@
                                 <label class="control-label" for="search-query">Search Query</label>
                                 <div class="controls">
                                     <input type="text" class="input-medium search-query" id="search-query" />
-                                    <button type="submit" class="btn btn-primary">Search</button>
+                                    <a href onclick="return false;" id="search-submit" class="btn btn-primary" >Search</a>
                                 </div>
                             </div>
                             <div class="control-group">
                                 <label class="control-label" for="search-sites">Search Sites</label>
                                 <div class="controls">
                                     <label class="checkbox inline">
-                                        <input type="checkbox" id="search-site1" value="soundcloud">SoundCloud</input>
+                                        <input type="checkbox" id="search-soundcloud" value="soundcloud" checked="true">SoundCloud</input>
                                     </label>
                                     <label class="checkbox inline">
-                                        <input type="checkbox" id="search-site2" value="youtube">YouTube</input>
+                                        <input type="checkbox" id="search-youtube" value="youtube" checked="true">YouTube</input>
                                     </label>
                                 </div>
                             </div>
                         </fieldset>
                     </form>
+                    <hr />
+                    <div id="search-results"></div>
                 </div>
             </div>
             <div id="right-side">

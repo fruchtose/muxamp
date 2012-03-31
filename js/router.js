@@ -109,8 +109,9 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
             var options = {
                 url: resolveURL,
                 dataType: 'jsonp',
-                error: function() {
-                    failure();
+                error: function(jqXHR, textStatus, errorThrown) {
+                    if (failure)
+                        failure();
                 },
                 success: function(data, textStatus) {
                     if (textStatus == "success") {

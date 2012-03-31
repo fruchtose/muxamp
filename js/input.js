@@ -99,30 +99,23 @@ $(document).ready(function() {
                 }
                 for (param in urlParams) {
                     var keyValuePair = urlParams[param];
+                    var failure = function() {
+                        alert("The media ID " + keyValuePair.value + " could not be found.");
+                    };
                     switch(keyValuePair.key.toString().toLowerCase()) {
                         case 'ytv':
                             if (keyValuePair.value) {
-                                router.processYouTubeVideoID(keyValuePair.value, mediaHandler, [param], ajaxManager);
+                                router.processYouTubeVideoID(keyValuePair.value, mediaHandler, [param], ajaxManager, failure);
                             }
                             break;
                         case 'sct':
                             if (keyValuePair.value) {
-                                router.processSoundCloudTrack(keyValuePair.value, mediaHandler, [param], ajaxManager);
+                                router.processSoundCloudTrack(keyValuePair.value, mediaHandler, [param], ajaxManager, failure);
                             }
                             break;
                         case 'scp':
                             if (keyValuePair.value) {
-                                router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, [param], ajaxManager);
-                            }
-                            break;
-                        case 'bct':
-                            if (keyValuePair.value) {
-                                router.processBandcampTrack(keyValuePair.value, mediaHandler, [param], ajaxManager);
-                            }
-                            break;
-                        case 'bca':
-                            if (keyValuePair.value) {
-                                router.processBandcampAlbum(keyValuePair.value, mediaHandler, [param], ajaxManager);
+                                router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, [param], ajaxManager, failure);
                             }
                             break;
                     }
