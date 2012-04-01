@@ -44,6 +44,7 @@ a:hover {
 #main {
     margin-right: 400px;
     min-width: 200px;
+    overflow: auto;
 }
 #right-side {
     border-left: solid #aaa 1px;
