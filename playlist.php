@@ -4,7 +4,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Unified Playlist</title>
+        <title>Muxamp</title>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="css/playlist.css" />
         <script type="text/javascript">
@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div id="footer">
-                    <div id="footer-content"><b>Unified Playlist</b> powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>. <a id="instructions-button" href onclick="return false;">Instructions here</a>. <noscript>This playlist is written entirely in JavaScript, so if you don't enable it you won't see anything!</noscript>
+                    <div id="footer-content"><b>Muxamp</b> powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>. <a id="instructions-button" href onclick="return false;">Instructions here</a>. <noscript>This playlist is written entirely in JavaScript, so if you don't enable it you won't see anything!</noscript>
                         <?php
                         $slogan = get_random_db_slogan();
 
@@ -97,7 +97,7 @@
                 <h3>Instructions</h3>
             </div>
             <div class="modal-body">
-                <p>Unified Playlist wants to get out of your way. To use it, copy links into the the textbox next to the "Add Media Source" button. Here are the kinds of links you can add:</p>
+                <p>Muxamp wants to get out of your way. To use it, copy links into the the textbox next to the "Add Media Source" button. Here are the kinds of links you can add:</p>
                 
                 <ol>
                     <li>Reddit subreddits</li> 
