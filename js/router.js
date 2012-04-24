@@ -3,8 +3,9 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     this.soundcloudConsumerKey = soundcloudConsumerKey != "" ? soundcloudConsumerKey : "";
     this.playlistObject = playlist != null ? playlist : new Playlist();
     this.youtubeKey = youtubeKey != null ? youtubeKey : "";
+    this.lastRedditRequest = new Date(0);  
     
-    var _buildRoutingTable = function() {
+    this._buildRoutingTable = function() {
         var router = this;
         var failure = function(url) {
             alert("Unable to add track from specified URL " + url);
@@ -46,7 +47,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         return table;
     }
     
-    this.routingTable = _buildRoutingTable();
+    this.routingTable = this._buildRoutingTable();
     
     this.addTrack = function(url) {
         url = $.trim(url.toString());
@@ -74,46 +75,59 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     this.processRedditLink = function(url, mediaHandler, params, queue, failure) {
         var router = this;
         var resolveURL = url + ".json?limit=25&jsonp=?";
-        queue.add({
-           url: resolveURL,
-            data: null,
-            dataType: 'json',
-            error: function() {
+        var error = function() {
+            if (failure)
+                failure();
+        };
+        var success = function(data, textStatus) {
+            if (textStatus != "success") {
                 if (failure)
                     failure();
-            },
-            success: function(data, textStatus) {
-                if (textStatus != "success") {
-                    if (failure)
-                        failure();
+                return;
+            }
+
+            if (data.error == "404") {
+                if (failure)
+                    failure();
+                return;
+            }
+
+            if ( !(data.kind && data.kind == 'Listing' && data.data && data.data.children) ) {
+                if (failure) {
+                    failure();
                     return;
-                }
-                
-                if (data.error == "404") {
-                    if (failure)
-                        failure();
-                    return;
-                }
-                
-                if ( !(data.kind && data.kind == 'Listing' && data.data && data.data.children) ) {
-                    if (failure) {
-                        failure();
-                        return;
-                    }
-                }
-                var item;
-                for (item in data.data.children) {
-                    var entry = data.data.children[item].data;
-                    var link = entry.url;
-                    if (link.indexOf('soundcloud.com/') >= 0) {
-                        router.resolveSoundCloud(link, failure, queue, mediaHandler, params);
-                    }
-                    else if(/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link)) {
-                        router.resolveYouTube(link, failure, queue, mediaHandler, params);
-                    }
                 }
             }
-        });
+            var item;
+            for (item in data.data.children) {
+                var entry = data.data.children[item].data;
+                var link = entry.url;
+                if (link.indexOf('soundcloud.com/') >= 0) {
+                    router.resolveSoundCloud(link, failure, queue, mediaHandler, params);
+                }
+                else if(/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link)) {
+                    router.resolveYouTube(link, failure, queue, mediaHandler, params);
+                }
+            }
+        };
+        while (new Date() - router.lastRedditRequest < 2000) {}
+        router.lastRedditRequest = new Date();
+        if (queue) {
+            queue.add({
+               url: resolveURL,
+                data: null,
+                dataType: 'json',
+                error: error,
+                success: success
+            });
+        }
+        else {
+            var jqXHR = $.ajax({
+                url: resolveURL,
+                data: null,
+                dataType: 'json'
+            }).success(success).error(error);
+        }
         /*var jqXHR = $.ajax({
             url: resolveURL,
             data: null,
@@ -375,42 +389,10 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     
     this.resolveReddit = function(url, failure) {
         var router = this;
-        var resolveURL = url + '.json?limit=' + 25;
-        $.ajax({
-            url: resolveURL,
-            error: function() {
-                if (failure)
-                    failure();
-            },
-            timeout: 10000,
-            datatype: 'jsonp',
-            success: function(data, textStatus) {
-                if (textStatus != "success") {
-                    if (failure)
-                        failure();
-                    return;
-                }
-                
-                if (data.error == "404") {
-                    if (failure)
-                        failure();
-                    return;
-                }
-                
-                if ( !(data.kind && data.kind == 'Listing' && data.data && data.data.children) ) {
-                    if (failure) {
-                        failure();
-                        return;
-                    }
-                }
-                var item;
-                for (item in data.data.children) {
-                    var entry = data.data.children[item].data;
-                    var link = entry.url;
-                    router.addTrack(link);
-                }
-            }
-        });
+        var addNewTrack = function(mediaObject) {
+            router.playlistObject.addTracks(mediaObject);
+        };
+        this.processRedditLink(url, addNewTrack, [], false, failure);
     }
     
     this.resolveSoundCloud = function(url, failure, queue, mediaHandler, params) {

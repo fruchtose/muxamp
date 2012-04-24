@@ -78,7 +78,7 @@ $('#shuffle').click(function() {
 
 $('#adder-button').click(function(){
     var value = $('#adder-link').val();
-    router.addTracks(value);
+    router.addTrack(value);
     $('#adder-link').val("");
 });
 
