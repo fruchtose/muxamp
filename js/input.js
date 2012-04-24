@@ -120,10 +120,13 @@ $(document).ready(function() {
                             }
                             break;
                         case 'rdt':
+                            var link = 'http://www.reddit.com/';
                             if (keyValuePair.value) {
-                                var redditLink = 'http://www.reddit.com/r/' + keyValuePair.value;
-                                router.processRedditLink(redditLink, mediaHandler, [param], ajaxManager, failure);
+                                var linkSuffix = keyValuePair.value.toString().toLowerCase()
+                                if (linkSuffix != 'front')
+                                    link += 'r/' + keyValuePair.value;
                             }
+                            router.processRedditLink(link, mediaHandler, [param], ajaxManager, failure);
                             break;
                     }
                 }
