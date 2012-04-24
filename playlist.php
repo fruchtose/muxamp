@@ -100,7 +100,7 @@
                 <p>Muxamp wants to get out of your way. To use it, copy links into the the textbox next to the "Add Media Source" button. Here are the kinds of links you can add:</p>
                 
                 <ol>
-                    <li>Reddit subreddits</li> 
+                    <li>Reddit subreddits (to fetch media links from other sites)</li> 
                     <li>SoundCloud tracks</li>
                     <li>SoundCloud sets</li>
                     <li>YouTube videos</li>
