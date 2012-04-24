@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div id="footer">
-                    <div id="footer-content"><b>Unified Playlist</b> powered by <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>.
+                    <div id="footer-content"><b>Unified Playlist</b> powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>. <a id="instructions-button" href onclick="return false;">Instructions here</a>. <noscript>This playlist is written entirely in JavaScript, so if you don't enable it you won't see anything!</noscript>
                         <?php
                         $slogan = get_random_db_slogan();
 
@@ -91,6 +91,26 @@
                 </div>
             </div>
         </div>
+        <div id="instructions" class="modal hide">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal">&times;</button>
+                <h3>Instructions</h3>
+            </div>
+            <div class="modal-body">
+                <p>Unified Playlist wants to get out of your way. To use it, copy links into the the textbox next to the "Add Media Source" button. Here are the kinds of links you can add:</p>
+                
+                <ol>
+                    <li>Reddit subreddits</li> 
+                    <li>SoundCloud tracks</li>
+                    <li>SoundCloud sets</li>
+                    <li>YouTube videos</li>
+                </ol>
+                
+                <p><b>Double-click</b> tracks to play. <b>Drag and drop</b> tracks to move them.</p>
+                
+                <p><b>Copy and paste</b> the URL to share your playlist. This site won't track you!</p>
+            </div>
+        </div>
         <script src="js/swfobject.js" type="text/javascript"></script>
         <script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
         <script src="js/jquery.ajaxmanager.js" type="text/javascript"></script>
@@ -98,6 +118,7 @@
         <script src="js/jquery.layout-latest.min.js" type="text/javascript"></script>
         <script src="js/jQuery.tubeplayer.js" type="text/javascript"></script>
         <script src="js/jquery.blockUI.js" type="text/javascript"></script>
+        <script src="js/bootstrap.min.js" type="text/javascript"></script>
         <script src="js/soundmanager2-nodebug-jsmin.js" type="text/javascript"></script>
         <script src="js/jsclass.js" type="text/javascript"></script>
         <script src="js/config.js" type="text/javascript"></script>

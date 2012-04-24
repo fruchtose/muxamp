@@ -167,3 +167,9 @@ var secondsToString = function(duration) {
     str += seconds.toString();
     return str;
 };
+
+$("#instructions-button").click(function() {
+    $("#instructions").modal({
+        backdrop: true
+    })
+});

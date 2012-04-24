@@ -369,3 +369,12 @@ span.slogan {
     font-style: italic;
     z-index: inherit; 
 }
+.modal ol, ul {
+    margin: 6px 0 6px 26px;
+}
+.modal ol {
+    list-style-type: decimal;
+}
+.modal ul {
+    list-style-type: circle;
+}
