@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div id="footer">
-                    <div id="footer-content"><b>Muxamp</b> powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>. <a id="instructions-button" href onclick="return false;">Instructions here</a>. <noscript>This playlist is written entirely in JavaScript, so if you don't enable it you won't see anything!</noscript>
+                    <div id="footer-content"><b>Muxamp</b> is powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>. <a id="instructions-button" href onclick="return false;">Instructions here</a>. <noscript>This playlist is written entirely in JavaScript, so if you don't enable it you won't see anything!</noscript>
                         <?php
                         $slogan = get_random_db_slogan();
 
