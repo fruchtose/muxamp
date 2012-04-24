@@ -168,8 +168,8 @@ var secondsToString = function(duration) {
     return str;
 };
 
-$("#instructions-button").click(function() {
-    $("#instructions").modal({
+$("#about-button").click(function() {
+    $("#about").modal({
         backdrop: true
     })
 });

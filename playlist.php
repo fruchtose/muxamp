@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div id="footer">
-                    <div id="footer-content"><b>Muxamp</b> is powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. App by <a href="mailto:rfruchtose@gmail.com">Robert Fruchtman</a>. <a id="instructions-button" href onclick="return false;">Instructions here</a>. <noscript>This playlist is written entirely in JavaScript, so if you don't enable it you won't see anything!</noscript>
+                    <div id="footer-content"><a id="about-button" href onclick="return false;">About</a> <b>Muxamp</b>. <noscript>This playlist is written entirely in JavaScript, so if you don't enable it you won't see anything!</noscript>
                         <?php
                         $slogan = get_random_db_slogan();
 
@@ -91,12 +91,14 @@
                 </div>
             </div>
         </div>
-        <div id="instructions" class="modal hide">
+        <div id="about" class="modal hide">
             <div class="modal-header">
                 <button class="close" data-dismiss="modal">&times;</button>
-                <h3>Instructions</h3>
+                <h3>About</h3>
             </div>
             <div class="modal-body">
+                <p><b>Muxamp</b> is a unified playlist that lets you play media from SoundCloud and YouTube in the same playlist. The site is powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. Code is done by Robert Fruchtman.</p>
+                
                 <p>Muxamp wants to get out of your way. To use it, copy links into the the textbox next to the "Add Media Source" button. Here are the kinds of links you can add:</p>
                 
                 <ol>
