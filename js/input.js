@@ -97,6 +97,7 @@ $(document).ready(function() {
                     // The lists arre translated into a flat structure at playlist construction.
                     else mediaObjectHashTable[index].push(mediaObject);
                 }
+                var param;
                 for (param in urlParams) {
                     var keyValuePair = urlParams[param];
                     var failure = function() {
@@ -118,6 +119,12 @@ $(document).ready(function() {
                                 router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, [param], ajaxManager, failure);
                             }
                             break;
+                        case 'rdt':
+                            if (keyValuePair.value) {
+                                var redditLink = 'http://www.reddit.com/r/' + keyValuePair.value;
+                                router.processRedditLink(redditLink, mediaHandler, [param], ajaxManager, failure);
+                            }
+                            break;
                     }
                 }
                 // Checks every 100 milliseconds to see if AJAX manager is done
@@ -126,7 +133,7 @@ $(document).ready(function() {
                         window.clearInterval(interval);
                         $.manageAjax.destroy('pageload');
                         var flatList = hashTableToFlatList(mediaObjectHashTable);
-                        router.playlistObject.addTracks(flatList);
+                        router.playlistObject.addTracks(flatList, 0);
                         router.playlistObject.updateSettings({
                             updateURLOnAdd: true
                         });

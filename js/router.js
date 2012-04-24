@@ -11,6 +11,17 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         };
         var table = [];
         table.push({
+            site: 'Reddit',
+            test: function(url) {
+                return url.indexOf("reddit.com/r/") >= 0;
+            },
+            action: function(url) {
+                router.resolveReddit(url, function() {
+                    failure(url);
+                });
+            }
+        });
+        table.push({
             site: 'SoundCloud',
             test: function(url) {
                 return url.indexOf("soundcloud.com/") >= 0;
@@ -37,16 +48,19 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     
     this.routingTable = _buildRoutingTable();
     
-    this.addTracks = function(url) {
+    this.addTrack = function(url) {
         url = $.trim(url.toString());
         var entry;
+        var success = false;
         for (entry in this.routingTable) {
             var route = this.routingTable[entry];
             if (route.test(url)) {
                 route.action(url);
+                success = true;
                 break;
             }
         }
+        return success;
     };
     
     this.allocateNewTracks = function(count) {
@@ -55,6 +69,181 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     
     this.getNewTrackID = function() {
         return this.playlistObject.getNewTrackID();
+    };
+    
+    this.processRedditLink = function(url, mediaHandler, params, queue, failure) {
+        var router = this;
+        var resolveURL = url + ".json?limit=25&jsonp=?";
+        queue.add({
+           url: resolveURL,
+            data: null,
+            dataType: 'json',
+            error: function() {
+                if (failure)
+                    failure();
+            },
+            success: function(data, textStatus) {
+                if (textStatus != "success") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if (data.error == "404") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if ( !(data.kind && data.kind == 'Listing' && data.data && data.data.children) ) {
+                    if (failure) {
+                        failure();
+                        return;
+                    }
+                }
+                var item;
+                for (item in data.data.children) {
+                    var entry = data.data.children[item].data;
+                    var link = entry.url;
+                    if (link.indexOf('soundcloud.com/') >= 0) {
+                        router.resolveSoundCloud(link, failure, queue, mediaHandler, params);
+                    }
+                    else if(/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link)) {
+                        router.resolveYouTube(link, failure, queue, mediaHandler, params);
+                    }
+                }
+            }
+        });
+        /*var jqXHR = $.ajax({
+            url: resolveURL,
+            data: null,
+            dataType: 'json'
+        }).success(function(data, textStatus) {
+                if (textStatus != "success") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if (data.error == "404") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if ( !(data.kind && data.kind == 'Listing' && data.data && data.data.children) ) {
+                    if (failure) {
+                        failure();
+                        return;
+                    }
+                }
+                var item;
+                for (item in data.data.children) {
+                    var entry = data.data.children[item].data;
+                    var link = entry.url;
+                    if (link.indexOf('soundcloud.com/') >= 0) {
+                        router.resolveSoundCloud(link, failure, queue, mediaHandler, params);
+                    }
+                    else if(/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link)) {
+                        router.resolveYouTube(link, failure, queue, mediaHandler, params);
+                    }
+                }
+            }).error(function() {
+                if (failure)
+                    failure();
+            });
+            /*$.get(resolveURL, null, function(data, textStatus) {
+                if (textStatus != "success") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if (data.error == "404") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if ( !(data.kind && data.kind == 'Listing' && data.data && data.data.children) ) {
+                    if (failure) {
+                        failure();
+                        return;
+                    }
+                }
+                var item;
+                for (item in data.data.children) {
+                    var entry = data.data.children[item].data;
+                    var link = entry.url;
+                    var success = false;
+                    if (link.indexOf('soundcloud.com/') >= 0) {
+                        router.resolveSoundCloud(link, failure, queue, mediaHandler, params);
+                        success = true;
+                        break;
+                    }
+                    else if(/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link)) {
+                        router.resolveYouTube(link, failure, queue, mediaHandler, params);
+                        success = true;
+                        break;
+                    }
+                    if (!success) {
+                        if (failure) {
+                            failure();
+                        }
+                    }
+                }
+            }, 'json');
+        /*$.ajax({
+            url: resolveURL,
+            data: null,
+            error: function() {
+                if (failure)
+                    failure();
+            },
+            timeout: 10000,
+            datatype: 'json',
+            success: success: function(data, textStatus) {
+                if (textStatus != "success") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if (data.error == "404") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if ( !(data.kind && data.kind == 'Listing' && data.data && data.data.children) ) {
+                    if (failure) {
+                        failure();
+                        return;
+                    }
+                }
+                var item;
+                for (item in data.data.children) {
+                    var entry = data.data.children[item].data;
+                    var link = entry.url;
+                    var success = false;
+                    if (link.indexOf('soundcloud.com/') >= 0) {
+                        router.resolveSoundCloud(link, failure, queue, mediaHandler, params);
+                        success = true;
+                        break;
+                    }
+                    else if(/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link)) {
+                        router.resolveYouTube(link, failure, queue, mediaHandler, params);
+                        success = true;
+                        break;
+                    }
+                    if (!success) {
+                        if (failure) {
+                            failure();
+                        }
+                    }
+                }
+            }
+        });*/
     };
     
     this.processSoundCloudPlaylist = function(playlistID, mediaHandler, params, queue, failure) {
@@ -184,7 +373,47 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         return success;
     };
     
-    this.resolveSoundCloud = function(url, failure) {
+    this.resolveReddit = function(url, failure) {
+        var router = this;
+        var resolveURL = url + '.json?limit=' + 25;
+        $.ajax({
+            url: resolveURL,
+            error: function() {
+                if (failure)
+                    failure();
+            },
+            timeout: 10000,
+            datatype: 'jsonp',
+            success: function(data, textStatus) {
+                if (textStatus != "success") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if (data.error == "404") {
+                    if (failure)
+                        failure();
+                    return;
+                }
+                
+                if ( !(data.kind && data.kind == 'Listing' && data.data && data.data.children) ) {
+                    if (failure) {
+                        failure();
+                        return;
+                    }
+                }
+                var item;
+                for (item in data.data.children) {
+                    var entry = data.data.children[item].data;
+                    var link = entry.url;
+                    router.addTrack(link);
+                }
+            }
+        });
+    }
+    
+    this.resolveSoundCloud = function(url, failure, queue, mediaHandler, params) {
         var router = this;
         var resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
         $.ajax({
@@ -196,16 +425,28 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
             timeout: 10000,
             dataType: 'jsonp',
             success: function(data, textStatus) {
-                var addTrack = function(mediaObject) {
+                var addNewTrack = function(mediaObject) {
                     router.playlistObject.addTracks(mediaObject);
                 };
                 if (textStatus == "success") {
                     if (data.streamable === true) {
                         //Tracks have stream URL
                         if (data.stream_url) {
-                            router.processSoundCloudTrack(data, addTrack, [], false, failure);
+                            if (queue) {
+                                router.processSoundCloudTrack(data, mediaHandler, params, queue, failure);
+                            }
+                            else {
+                                router.processSoundCloudTrack(data, addNewTrack, [], false, failure);
+                            }
                         }
-                        else router.processSoundCloudPlaylist(data, addTrack, [], false, failure);
+                        else {
+                            if (queue) {
+                                router.processSoundCloudPlaylist(data, mediaHandler, params, queue, failure);
+                            }
+                            else {
+                                router.processSoundCloudPlaylist(data, addNewTrack, [], false, failure);
+                            }
+                        }
                     }
                 }
                 else if (failure)
@@ -214,20 +455,25 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         });
     };
     
-    this.resolveYouTube = function(url, failure) {
+    this.resolveYouTube = function(url, failure, queue, mediaHandler, params) {
         var beginningURL = "v=";
         var beginningURLLoc = url.indexOf(beginningURL);
         var beginningURLLength = beginningURL.length;
         var idSubstring = url.substring(beginningURLLoc + beginningURLLength);
         var match = idSubstring.match(/[\w\-]+/);
         var canBeSearched = false;
-        var addTrack = function(mediaObject) {
+        var addNewTrack = function(mediaObject) {
             router.playlistObject.addTracks(mediaObject);
         };
         if (match) {
             canBeSearched = true;
             var youtubeID = match[0];
-            this.processYouTubeVideoID(youtubeID, addTrack, [], false, failure);
+            if (queue) {
+                this.processYouTubeVideoID(youtubeID, mediaHandler, params, queue, failure);
+            }
+            else {
+                this.processYouTubeVideoID(youtubeID, addNewTrack, [], false, failure);
+            }
         }
         else if (failure)
             failure();
