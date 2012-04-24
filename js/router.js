@@ -4,33 +4,49 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     this.playlistObject = playlist != null ? playlist : new Playlist();
     this.youtubeKey = youtubeKey != null ? youtubeKey : "";
     
-    this.addTracks = function(url) {
-        url = jQuery.trim(url.toString());
+    var _buildRoutingTable = function() {
         var router = this;
-        
-        var failure = function() {
+        var failure = function(url) {
             alert("Unable to add track from specified URL " + url);
         };
-        var youtubeOrFailure = function() {
-            if (/youtube\.com\/watch\\?/.test(url) && /v=[\w\-]+/.test(url)) {
-                router.resolveYouTube(url, failure);
-            }
-            else failure();
-        };
-        
-        this.verifyURL(url, function(success) {
-            if (success) {
-                // First, try to get SoundCloud tracks;
-                // all SoundCloud URLs are guaranteed to have soundcloud.com in the URL, so 
-                // we only resolve a SoundCloud link if the address is present.
-                // If that fails, go to Bandcamp.
-                if (url.indexOf("soundcloud.com/") >= 0)
-                {
-                    router.resolveSoundCloud(url, youtubeOrFailure);
-                }
-                else youtubeOrFailure();
+        var table = [];
+        table.push({
+            site: 'SoundCloud',
+            test: function(url) {
+                return url.indexOf("soundcloud.com/") >= 0;
+            },
+            action: function(url) {
+                router.resolveSoundCloud(url, function() {
+                    failure(url);
+                });
             }
         });
+        table.push({
+            site: 'YouTube',
+            test: function(url) {
+                return /youtube\.com\/watch\\?/.test(url) && /v=[\w\-]+/.test(url);
+            },
+            action: function(url) {
+                router.resolveYouTube(url, function() {
+                    failure(url);
+                });
+            }
+        });
+        return table;
+    }
+    
+    this.routingTable = _buildRoutingTable();
+    
+    this.addTracks = function(url) {
+        url = $.trim(url.toString());
+        var entry;
+        for (entry in this.routingTable) {
+            var route = this.routingTable[entry];
+            if (route.test(url)) {
+                route.action(url);
+                break;
+            }
+        }
     };
     
     this.allocateNewTracks = function(count) {
