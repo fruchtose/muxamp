@@ -64,6 +64,11 @@ var SoundObject = new JS.Class(MediaObject, {
         }
     },
     
+    setVolume: function(intPercent) {
+        this.setMute(intPercent == 0);
+        this.sound.setVolume(intPercent);
+    },
+    
     stop: function() {
         return this.sound.stop();
     },
@@ -176,6 +181,13 @@ var YouTubeObject = new JS.Class(VideoObject, {
                 $("#video").tubeplayer('unmute');
             }
         });
+    },
+    
+    setVolume: function(intPercent) {
+        $('#video').tubeplayer('volume', intPercent);
+        if (intPercent == 0) {
+            this.setMute(true);
+        }
     },
    
     stop: function() {

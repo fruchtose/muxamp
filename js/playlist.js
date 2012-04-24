@@ -231,7 +231,7 @@ function Playlist(soundManager) {
             var media = this.list[this.currentTrack];
             if (media.type == 'audio') {
                 media.play({
-                    volume: playlist.currentVolumePercent,
+                    volume: (playlist.isMuted() ? 0 : playlist.currentVolumePercent),
                     onfinish: function() {
                         playlist.nextTrack(true);
                     },
@@ -267,15 +267,15 @@ function Playlist(soundManager) {
                         height: 256,
                         onStop: clearMediaInterval,
                         onPlayerUnstarted: function() {
-                            playlist.setVolume(playlist.currentVolumePercent);
+                            playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
                         },
                         onPlayerCued: function() {
-                            playlist.setVolume(playlist.currentVolumePercent);
+                            playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
                         },
                         onPlayerBuffering: clearMediaInterval,
                         onPlayerPaused: clearMediaInterval,
                         onPlayerPlaying: function() {
-                            playlist.setVolume(playlist.currentVolumePercent);
+                            playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
                             media.interval = window.setInterval(function() {
                                 var data = $("#video").tubeplayer('data');
                                 var percent =  (data.currentTime / data.duration) * 100;
@@ -383,28 +383,23 @@ function Playlist(soundManager) {
         if (!this.isEmpty()) {
             this.list[this.currentTrack].setMute(mute);
         }
+        if (!mute) {
+            this.setVolume(this.currentVolumePercent);
+        }
     }
     
     this.setVolume = function(intPercent) {
         intPercent = Math.round(intPercent);
         if (this.isPlaying() || this.isPaused()) {
             var media = this.list[this.currentTrack];
-            var setUnmute = intPercent == 0;
-            if (setUnmute) {
+            var setMute = intPercent == 0;
+            this.list[this.currentTrack].setVolume(intPercent);
+            if (setMute) {
                 intPercent = 50;
             }
-            if (media.type == 'audio') {
-                soundManager.setVolume(media.id, intPercent);
-            }
-            else if (media.type == 'video') {
-                if (media.siteName == 'YouTube') {
-                    $('#video').tubeplayer('volume', intPercent);
-                }
-            }
-            this.setMute(setUnmute);
         }
         this.currentVolumePercent = intPercent;
-        this.setVolumeSymbol(setUnmute ? 0 : intPercent);
+        this.setVolumeSymbol(setMute ? 0 : intPercent);
     }
     
     this.setVolumeSymbol = function(intPercent) {
@@ -474,7 +469,7 @@ function Playlist(soundManager) {
             var shouldUnmute = this.list[this.currentTrack].isMuted();
             this.list[this.currentTrack].toggleMute();
             if (shouldUnmute) {
-                this.setVolumeSymbol(this.currentVolumePercent);
+                this.setVolume(this.currentVolumePercent);
             }
             else {
                 this.setVolumeSymbol(0);
