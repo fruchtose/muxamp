@@ -7,6 +7,7 @@
         <title>Muxamp</title>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
         <link rel="stylesheet" type="text/css" href="css/playlist.css" />
+        <link rel="icon" type="image/png" href="img/favicon.ico" />
         <script type="text/javascript">
 
             var _gaq = _gaq || [];
