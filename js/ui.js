@@ -76,10 +76,14 @@ $('#shuffle').click(function() {
     playlist.shuffle();
 });
 
-$('#adder-button').click(function(){
+$('#adder-form').submit(function(e){
+    e.preventDefault();
     var value = $('#adder-link').val();
-    router.addTrack(value);
-    $('#adder-link').val("");
+    if (value) {
+        router.addTrack(value);
+        $('#adder-link').val("");
+    }
+    return false;
 });
 
 $(document).ready(function() {

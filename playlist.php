@@ -71,10 +71,10 @@
                             </div>
                         </div>
                         <div class="player-row">
-                            <form id="adder-form" class="form-inline">
+                            <form id="adder-form" class="form-inline" method="post">
                                 <div id="adder" class="input-append">
                                     <input type="text" id="adder-link" />
-                                    <button class="btn" id="adder-button" type="button">Add Media Source</button>
+                                    <input type="submit" class="btn" id="adder-button" type="button" value="Add Media Source" />
                                 </div>
                             </form>
                         </div>
