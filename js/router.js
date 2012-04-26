@@ -71,7 +71,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
                 this.addTrack('http://' + url);
             }
             else if (this.verifyURL('http://www.' + url)) {
-                his.addTrack('http://' + url);
+                this.addTrack('http://' + url);
             }
             else {
                 failure();
