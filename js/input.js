@@ -83,19 +83,17 @@ $(document).ready(function() {
                 router.playlistObject.updateSettings({
                     updateURLOnAdd: false
                 });
-                var ajaxManager = $.manageAjax.create('pageload', {
-                    cacheResponse: true,
-                    preventDoubleRequests: false,
-                    queue: true
+                var ajaxManager = $.batchajax.create('pageload', {
+                    expectRequests: true
                 });
                 var mediaObjectHashTable = [];
                 var mediaHandler = function(mediaObject, index) {
                     if (!mediaObjectHashTable[index]) {
-                        mediaObjectHashTable[index] = [mediaObject];
+                        mediaObjectHashTable[index] = [];
                     }
                     // Source playlists (SoundCloud, etc.) are lists at a given index in a hash table.
                     // The lists arre translated into a flat structure at playlist construction.
-                    else mediaObjectHashTable[index].push(mediaObject);
+                    mediaObjectHashTable[index].push(mediaObject);
                 }
                 $(document).bind('pageloadAjaxStop', function() {
                     var flatList = hashTableToFlatList(mediaObjectHashTable);
