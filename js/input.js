@@ -97,6 +97,16 @@ $(document).ready(function() {
                     // The lists arre translated into a flat structure at playlist construction.
                     else mediaObjectHashTable[index].push(mediaObject);
                 }
+                $(document).bind('pageloadAjaxStop', function() {
+                    var flatList = hashTableToFlatList(mediaObjectHashTable);
+                        router.playlistObject.addTracks(flatList, 0);
+                        router.playlistObject.updateSettings({
+                            updateURLOnAdd: true
+                        });
+                        $.unblockUI();
+                        $(this).unbind('pageloadAjaxStop');
+                        $.manageAjax.destroy('pageload');
+                });
                 var param;
                 for (param in urlParams) {
                     var keyValuePair = urlParams[param];
@@ -130,19 +140,6 @@ $(document).ready(function() {
                             break;
                     }
                 }
-                // Checks every 100 milliseconds to see if AJAX manager is done
-                var interval = window.setInterval(function() {
-                    if (!ajaxManager.queueSize() && !ajaxManager.size(true)) {
-                        window.clearInterval(interval);
-                        $.manageAjax.destroy('pageload');
-                        var flatList = hashTableToFlatList(mediaObjectHashTable);
-                        router.playlistObject.addTracks(flatList, 0);
-                        router.playlistObject.updateSettings({
-                            updateURLOnAdd: true
-                        });
-                        $.unblockUI();
-                    }
-                }, 100);
             }
         });
     }
