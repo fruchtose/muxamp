@@ -201,7 +201,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
                     router.allocateNewTracks(1);
                     var id = router.getNewTrackID();
                     var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, soundManager);
-                    mediaHandler && mediaHandler.apply(this, [trackObject].concat(params));
+                    mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']));
                     success = true;
                 }
                 else if (failure)
@@ -278,7 +278,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         var addNewTrack = function(mediaObject) {
             router.playlistObject.addTracks(mediaObject);
         };
-        this.processRedditLink(url, addNewTrack, [], false, failure);
+        this.processRedditLink(url, addNewTrack, {}, false, failure);
     }
     
     this.resolveSoundCloud = function(url, failure, queue, mediaHandler, params) {
@@ -304,7 +304,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
                                 router.processSoundCloudTrack(data, mediaHandler, params, queue, failure);
                             }
                             else {
-                                router.processSoundCloudTrack(data, addNewTrack, [], false, failure);
+                                router.processSoundCloudTrack(data, addNewTrack, {}, false, failure);
                             }
                         }
                         else {
@@ -312,7 +312,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
                                 router.processSoundCloudPlaylist(data, mediaHandler, params, queue, failure);
                             }
                             else {
-                                router.processSoundCloudPlaylist(data, addNewTrack, [], false, failure);
+                                router.processSoundCloudPlaylist(data, addNewTrack, {}, false, failure);
                             }
                         }
                     }
@@ -340,7 +340,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
                 this.processYouTubeVideoID(youtubeID, mediaHandler, params, queue, failure);
             }
             else {
-                this.processYouTubeVideoID(youtubeID, addNewTrack, [], false, failure);
+                this.processYouTubeVideoID(youtubeID, addNewTrack, {}, false, failure);
             }
         }
         else if (failure)

@@ -106,17 +106,17 @@ $(document).ready(function() {
                     switch(keyValuePair.key.toString().toLowerCase()) {
                         case 'ytv':
                             if (keyValuePair.value) {
-                                router.processYouTubeVideoID(keyValuePair.value, mediaHandler, [param], ajaxManager, failure);
+                                router.processYouTubeVideoID(keyValuePair.value, mediaHandler, {trackIndex: param}, ajaxManager, failure);
                             }
                             break;
                         case 'sct':
                             if (keyValuePair.value) {
-                                router.processSoundCloudTrack(keyValuePair.value, mediaHandler, [param], ajaxManager, failure);
+                                router.processSoundCloudTrack(keyValuePair.value, mediaHandler, {trackIndex: param}, ajaxManager, failure);
                             }
                             break;
                         case 'scp':
                             if (keyValuePair.value) {
-                                router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, [param], ajaxManager, failure);
+                                router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, {trackIndex: param}, ajaxManager, failure);
                             }
                             break;
                         case 'rdt':
@@ -126,7 +126,7 @@ $(document).ready(function() {
                                 if (linkSuffix != 'front')
                                     link += 'r/' + keyValuePair.value;
                             }
-                            router.processRedditLink(link, mediaHandler, [param], ajaxManager, failure);
+                            router.processRedditLink(link, mediaHandler, {trackIndex: param}, ajaxManager, failure);
                             break;
                     }
                 }
