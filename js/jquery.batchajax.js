@@ -1,16 +1,12 @@
 /*
- * ajax batch requirements
+ * ajax batch future ideas
  * options:
  *      batchTimeout: default amount of time for amount of time to expect, default 0
  *      executeOnBatchTimeout: bool, should batch request execute on timeout, default true
- *      expected: int, number of requests expected. if user desires, batch will execute when number of requests expected drops to 0. default 0
- *      expectRequests: bool, should system execute batch when number of requests reaches 0. default: false
  *      onBatchTimeout: function, executes when a timeout event occurs, default $.noop
  *      priroity: default priority for executed requests, default 10
  * function add(ajaxOptions, priority): options for an ajax request. decreases expectations by 1. lower priority requests are sent first
- * function execute: executes all ajax requests
  * function expectMore(count, timeout): expect count more requests. if they are not added within timeout period, timeout event occurs. Adding a new request resets the timeout. If timeout is 0 or less, timeout is ignored
- * function expectNone: expectations go to 0. batch executes if specified by user
  */
 (function($){
     "use strict";
@@ -39,7 +35,7 @@
     $.batchajax._batch = function(name, opts) {
         this.opts = $.extend({}, $.batchajax.defaults, opts);
         this.batch = [];
-        this.requests = [];
+        this.requests = {};
         this.inProgress = 0;
         this.name = name;
         this.expected = this.opts.expected;
@@ -200,12 +196,27 @@
             this.expectFewer(1);
         },
         execute: function() {
-            var i;
-            while (this.batch.length) {
-                var ajaxFn = this.batch.shift();
-                ajaxFn();
-            }
-            this.expected = 0;
+            var that = this;
+            (function() {
+                var currentQueue = that.batch.slice(0);
+                that.batch = [];
+                var dequeueFunction = function() {
+                    if (currentQueue.length) {
+                        var ajaxFn = currentQueue.shift();
+                        var id = ajaxFn();
+                        that.requests[id].always(function() {
+                            if (currentQueue.length) {
+                                dequeueFunction();
+                            }
+                        });
+                    }
+                },
+                limitingAmount = Math.min(currentQueue.length, (that.opts.queue ? that.opts.maxRequests : Infinity)), 
+                i;
+                for (i = 0; i < limitingAmount; i++) {
+                    dequeueFunction();
+                }
+            })();
             
             return true;
         },
@@ -214,7 +225,7 @@
                 count = parseInt(count);
                 if (count > 0) {
                     this.expected-= count;
-                    this.epected = Math.max(0, this.expected);
+                    this.expected = Math.max(0, this.expected);
                     if (this.expected === 0) {
                         this.execute();
                     }
@@ -253,6 +264,8 @@
         beforeCreate: $.noop,
         domCompleteTrigger: false,
         domSuccessTrigger: false,
+        queue: false,
+        maxRequests: 1,
         expected: 0,
         expectRequests: false
     };
