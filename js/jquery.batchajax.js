@@ -7,6 +7,20 @@
  *      priroity: default priority for executed requests, default 10
  * function add(ajaxOptions, priority): options for an ajax request. decreases expectations by 1. lower priority requests are sent first
  * function expectMore(count, timeout): expect count more requests. if they are not added within timeout period, timeout event occurs. Adding a new request resets the timeout. If timeout is 0 or less, timeout is ignored
+ * 
+ * BatchAjax
+ * @author Robert Fruchtman
+ * @version 0.2
+ * Copyright 2012 Robert Fruchtman
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
+ * Based on the Ajaxmanager project:
+ * project-site: http://plugins.jquery.com/project/AjaxManager
+ * repository: http://github.com/aFarkas/Ajaxmanager
+ * @author Alexander Farkas
+ * @version 3.12
+ * Copyright 2010, Alexander Farkas
+ * Dual licensed under the MIT or GPL Version 2 licenses.
  */
 (function($){
     "use strict";
