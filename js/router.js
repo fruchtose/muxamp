@@ -5,7 +5,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     this.youtubeKey = youtubeKey != null ? youtubeKey : "";
     this.lastRedditRequest = new Date(0);  
     
-    this._buildRoutingTable = function() {
+    var buildRoutingTable = function() {
         var router = this;
         var failure = function(url) {
             alert("Unable to add track from specified URL " + url);
@@ -47,7 +47,9 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         return table;
     }
     
-    this.routingTable = this._buildRoutingTable();
+    this.routingTable = (function() {
+        return buildRoutingTable();
+    })();
     
     this.addTrack = function(url) {
         var success = false;
@@ -120,7 +122,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
                 var link = element.data.url;
                 return (link.indexOf('soundcloud.com/') >= 0) || (/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link));
             });
-            queue.expectMore(entries.length);
+            queue.setAutoexecuteBatchSize(entries.length);
             for (item in entries) {
                 var entry = entries[item].data;
                 var link = entry.url;
@@ -321,6 +323,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     };
     
     this.resolveYouTube = function(url, failure, queue, mediaHandler, params) {
+        var router = this;
         var beginningURL = "v=";
         var beginningURLLoc = url.indexOf(beginningURL);
         var beginningURLLength = beginningURL.length;

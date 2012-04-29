@@ -83,8 +83,8 @@ $(document).ready(function() {
                 router.playlistObject.updateSettings({
                     updateURLOnAdd: false
                 });
-                var ajaxManager = $.batchajax.create('pageload', {
-                    expectRequests: true
+                var ajaxManager = $.ajaxBatch.create('pageload', {
+                    executeOnBatchSize: true
                 });
                 var mediaObjectHashTable = [];
                 var mediaHandler = function(mediaObject, index) {
