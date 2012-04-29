@@ -1,4 +1,10 @@
 function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
+    var defaults = {
+      expectationsMode: false  
+    };
+    
+    this.opts = $.extend({}, defaults);
+    this.expected = 0;
     this.soundManager = (typeof soundManager === 'object') ? soundManager : null;
     this.soundcloudConsumerKey = soundcloudConsumerKey != "" ? soundcloudConsumerKey : "";
     this.playlistObject = playlist != null ? playlist : new Playlist();
@@ -83,11 +89,42 @@ Router.prototype = {
         }
         return success;
     },
+    expectFewerRequests: function(count) {
+        if (this.opts.expectationsMode) {
+            count = parseInt(count);
+            if (count > 0) {
+                this.expected-= count;
+                this.epected = Math.max(0, this.expected);
+                if (this.expected === 0) {
+                    $.event.trigger('routerAjaxStop');
+                }
+                else if (this.expected < 0) {
+                    $.event.trigger('routerOverflow');
+                }
+            }
+        }
+        return this.expected;
+    },
+    expectMoreRequests: function(count) {
+        if (this.opts.expectationsMode) {
+            count = parseInt(count);
+            if (count > 0) {
+                this.expected += count;
+            }
+        }
+        return this.expected;
+    },
+    expectNoRequests: function() {
+        return this.expectFewer(this.expected);
+    },
     allocateNewTracks: function(count) {
         this.playlistObject.allocateNewIDs(count);
     },
     getNewTrackID: function() {
         return this.playlistObject.getNewTrackID();
+    },
+    getOption: function(option) {
+        return this.opts[option];
     },
     processRedditLink: function(url, mediaHandler, params, queue, failure) {
         var router = this;
@@ -121,7 +158,7 @@ Router.prototype = {
                 var link = element.data.url;
                 return (link.indexOf('soundcloud.com/') >= 0) || (/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link));
             });
-            queue.setAutoexecuteBatchSize(entries.length);
+            router.expectMoreRequests(entries.length);
             for (item in entries) {
                 var entry = entries[item].data;
                 var link = entry.url;
@@ -204,6 +241,9 @@ Router.prototype = {
             var options = {
                 url: resolveURL,
                 dataType: 'jsonp',
+                complete: function() {
+                    router.expectFewerRequests(1);
+                },
                 error: function(jqXHR, textStatus, errorThrown) {
                     if (failure)
                         failure();
@@ -217,12 +257,13 @@ Router.prototype = {
                 },
                 timeout: 10000
             };
-            if (queue) {
+            $.ajax(options);
+            /*if (queue) {
                 queue.add(options);
             }
             else {
                 $.ajax(options);
-            }
+            }*/
         }
         // If a data object is provided, the track data is fetched from it
         else addTrackData(trackID);
@@ -251,14 +292,18 @@ Router.prototype = {
             error: function() {
                 if (failure)
                     failure();
+            },
+            complete: function() {
+                router.expectFewerRequests(1);
             }
         };
-        if (queue) {
+        $.ajax(options);
+        /*if (queue) {
             queue.add(options);
         }
         else {
             $.ajax(options);
-        }
+        }*/
         return success;
     },
     resolveReddit: function(url, failure) {
@@ -273,6 +318,9 @@ Router.prototype = {
         var resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
         var ajaxOptions = {
             url: resolveURL,
+            complete: function() {
+                router.expectFewerRequests(1);
+            },
             error: function(){
                 if (failure)
                     failure();
@@ -308,12 +356,14 @@ Router.prototype = {
                     failure();
             }
         };
-        if (queue) {
+        $.ajax(ajaxOptions);
+        /*if (queue) {
             queue.add(ajaxOptions);
         }
         else {
             $.ajax(ajaxOptions);
-        }
+        }*/
+        
     },
     resolveYouTube: function(url, failure, queue, mediaHandler, params) {
         var router = this;
@@ -339,6 +389,9 @@ Router.prototype = {
         else if (failure)
             failure();
         return canBeSearched;
+    },
+    setOption: function(option, value) {
+        this.opts[option] = value;
     },
     verifyURL: function(url) {
         return /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url);

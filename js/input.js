@@ -83,9 +83,7 @@ $(document).ready(function() {
                 router.playlistObject.updateSettings({
                     updateURLOnAdd: false
                 });
-                var ajaxManager = $.ajaxBatch.create('pageload', {
-                    executeOnBatchSize: true
-                });
+                router.setOption('expectationsMode', true);
                 var mediaObjectHashTable = [];
                 var mediaHandler = function(mediaObject, index) {
                     if (!mediaObjectHashTable[index]) {
@@ -95,15 +93,15 @@ $(document).ready(function() {
                     // The lists arre translated into a flat structure at playlist construction.
                     mediaObjectHashTable[index].push(mediaObject);
                 }
-                $(document).bind('pageloadAjaxStop', function() {
+                $(document).bind('routerAjaxStop', function() {
                     var flatList = hashTableToFlatList(mediaObjectHashTable);
                         router.playlistObject.addTracks(flatList, 0);
                         router.playlistObject.updateSettings({
                             updateURLOnAdd: true
                         });
+                        router.setOption('expectationsMode', false);
+                        $(this).unbind('routerAjaxStop');
                         $.unblockUI();
-                        $(this).unbind('pageloadAjaxStop');
-                        $.manageAjax.destroy('pageload');
                 });
                 var param;
                 for (param in urlParams) {
