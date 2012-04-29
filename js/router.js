@@ -129,6 +129,9 @@ Router.prototype = {
     processRedditLink: function(url, mediaHandler, params, queue, failure) {
         var router = this;
         var resolveURL = url + ".json?limit=25&jsonp=?";
+        var complete = function() {
+          router.expectFewerRequests(1);  
+        };
         var error = function() {
             if (failure)
                 failure();
@@ -162,7 +165,7 @@ Router.prototype = {
             for (item in entries) {
                 var entry = entries[item].data;
                 var link = entry.url;
-                var newParams = {trackIndex: item};
+                var newParams = $.extend({}, params, {innerIndex: item});
                 if (link.indexOf('soundcloud.com/') >= 0) {
                     router.resolveSoundCloud(link, failure, queue, mediaHandler, newParams);
                 }
@@ -177,7 +180,7 @@ Router.prototype = {
             url: resolveURL,
             data: null,
             dataType: 'json'
-        }).success(success).error(error);
+        }).success(success).error(error).complete(complete);
     },
     processSoundCloudPlaylist: function(playlistID, mediaHandler, params, queue, failure) {
         var consumerKey = this.soundcloudConsumerKey;
@@ -228,7 +231,7 @@ Router.prototype = {
                     router.allocateNewTracks(1);
                     var id = router.getNewTrackID();
                     var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, soundManager);
-                    mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']));
+                    mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']).concat(params['innerIndex']));
                     success = true;
                 }
                 else if (failure)
@@ -286,7 +289,7 @@ Router.prototype = {
                 router.allocateNewTracks(1);
                 var id = router.getNewTrackID();
                 var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
-                mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']));
+                mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']).concat(params['innerIndex']));
                 success = true;
             },
             error: function() {

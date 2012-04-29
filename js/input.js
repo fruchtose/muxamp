@@ -59,9 +59,11 @@ var addHashParam = function(key, value) {
 
 var hashTableToFlatList = function(table) {
     var flatList = [];
+    var hash;
     for (hash in table) {
         var list = table[hash];
         if (list) {
+            var index;
             for (index in list) {
                 flatList.push(list[index]);
             }
@@ -88,13 +90,18 @@ $(document).ready(function() {
                     executeOnBatchSize: true
                 });
                 var mediaObjectHashTable = [];
-                var mediaHandler = function(mediaObject, index) {
+                var mediaHandler = function(mediaObject, index, innerIndex) {
                     if (!mediaObjectHashTable[index]) {
                         mediaObjectHashTable[index] = [];
                     }
                     // Source playlists (SoundCloud, etc.) are lists at a given index in a hash table.
                     // The lists arre translated into a flat structure at playlist construction.
-                    mediaObjectHashTable[index].push(mediaObject);
+                    if (!innerIndex) {
+                        mediaObjectHashTable[index].push(mediaObject);
+                    }
+                    else {
+                        mediaObjectHashTable[index][innerIndex] = mediaObject;
+                    }
                 }
                 $(document).bind('routerAjaxStop', function() {
                     var flatList = hashTableToFlatList(mediaObjectHashTable);
@@ -106,6 +113,7 @@ $(document).ready(function() {
                         $(this).unbind('routerAjaxStop');
                         $.unblockUI();
                 });
+                router.expectMoreRequests(urlParams.length);
                 var param;
                 for (param in urlParams) {
                     var keyValuePair = urlParams[param];
@@ -136,6 +144,9 @@ $(document).ready(function() {
                                     link += 'r/' + keyValuePair.value;
                             }
                             router.processRedditLink(link, mediaHandler, {trackIndex: param}, ajaxManager, failure);
+                            break;
+                        default:
+                            router.expectFewerRequests(1);
                             break;
                     }
                 }
