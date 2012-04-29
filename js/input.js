@@ -84,6 +84,9 @@ $(document).ready(function() {
                     updateURLOnAdd: false
                 });
                 router.setOption('expectationsMode', true);
+                var ajaxManager = $.ajaxBatch.create('pageload', {
+                    executeOnBatchSize: true
+                });
                 var mediaObjectHashTable = [];
                 var mediaHandler = function(mediaObject, index) {
                     if (!mediaObjectHashTable[index]) {
