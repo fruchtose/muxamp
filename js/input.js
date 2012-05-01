@@ -86,9 +86,6 @@ $(document).ready(function() {
                     updateURLOnAdd: false
                 });
                 router.setOption('expectationsMode', true);
-                var ajaxManager = $.ajaxBatch.create('pageload', {
-                    executeOnBatchSize: true
-                });
                 var mediaObjectHashTable = [];
                 var mediaHandler = function(mediaObject, index, innerIndex) {
                     if (!mediaObjectHashTable[index]) {
@@ -102,7 +99,7 @@ $(document).ready(function() {
                     else {
                         mediaObjectHashTable[index][innerIndex] = mediaObject;
                     }
-                }
+                };
                 $(document).bind('routerAjaxStop', function() {
                     var flatList = hashTableToFlatList(mediaObjectHashTable);
                         router.playlistObject.addTracks(flatList, 0);
@@ -120,20 +117,22 @@ $(document).ready(function() {
                     var failure = function() {
                         alert("The media ID " + keyValuePair.value + " could not be found.");
                     };
+                    var deferred = $.Deferred();
+                    var deferredPromise;
                     switch(keyValuePair.key.toString().toLowerCase()) {
                         case 'ytv':
                             if (keyValuePair.value) {
-                                router.processYouTubeVideoID(keyValuePair.value, mediaHandler, {trackIndex: param}, ajaxManager, failure);
+                                deferredPromise = router.processYouTubeVideoID(keyValuePair.value, mediaHandler, {trackIndex:param}, deferred, failure);
                             }
                             break;
                         case 'sct':
                             if (keyValuePair.value) {
-                                router.processSoundCloudTrack(keyValuePair.value, mediaHandler, {trackIndex: param}, ajaxManager, failure);
+                                deferredPromise = router.processSoundCloudTrack(keyValuePair.value, mediaHandler, {trackIndex: param}, deferred, failure);
                             }
                             break;
                         case 'scp':
                             if (keyValuePair.value) {
-                                router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, {trackIndex: param}, ajaxManager, failure);
+                                deferredPromise = router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, {trackIndex:param}, deferred, failure);
                             }
                             break;
                         case 'rdt':
@@ -143,12 +142,18 @@ $(document).ready(function() {
                                 if (linkSuffix != 'front')
                                     link += 'r/' + keyValuePair.value;
                             }
-                            router.processRedditLink(link, mediaHandler, {trackIndex: param}, ajaxManager, failure);
+                            deferredPromise = router.processRedditLink(link, mediaHandler, {trackIndex:param}, deferred, failure);
                             break;
                         default:
+                            deferred.reject({
+                                success: false,
+                                error: "Media source not found."
+                            });
+                            deferredPromise = deferred.promise();
                             router.expectFewerRequests(1);
                             break;
                     }
+                    router.addToActionQueue(deferredPromise);
                 }
             }
         });
