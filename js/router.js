@@ -44,6 +44,7 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     this.playlistObject = playlist != null ? playlist : new Playlist();
     this.youtubeKey = youtubeKey != null ? youtubeKey : "";
     this.lastRedditRequest = new Date(0);  
+    this.requestsInProgress = 0;
     
     this.buildRoutingTable = function() {
         var router = this;
@@ -137,7 +138,7 @@ Router.prototype = {
                     if (route.test(url)) {
                         var func = route.getAction(url);
                         if (func)
-                            this.addToActionQueue(func.call(this, url, failure, deferred, mediaHandler, {trackIndex: 0}), onActionQueueExection);
+                            this.addToActionQueue(func.call(this, url, failure, deferred, mediaHandler, {trackIndex: this.requestsInProgress++}), onActionQueueExection);
                         success = true;
                         break;
                     }
@@ -162,6 +163,7 @@ Router.prototype = {
         if (deferredData && deferredData.action) {
             deferredData.action();
         }
+        this.requestsInProgress--;
     },
     allocateNewTracks: function(count) {
         this.playlistObject.allocateNewIDs(count);
