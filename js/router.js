@@ -51,11 +51,11 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         table.push({
             site: 'Reddit',
             test: function(input) {
-                return (input instanceof String && input.indexOf("reddit.com/r/") >= 0) ||
+                return (typeof input == "string" && input.indexOf("reddit.com/r/") >= 0) ||
                     (input instanceof KeyValuePair && input.key == 'rdt');
             },
             getAction: function(input) {
-                if (input instanceof String){
+                if (typeof input == "string"){
                     return router.resolveReddit;
                 }
                 else if (input instanceof KeyValuePair) {
@@ -67,11 +67,11 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         table.push({
             site: 'SoundCloud',
             test: function(input) {
-                return (input instanceof String && input.indexOf("soundcloud.com/") >= 0) ||
+                return (typeof input == "string" && input.indexOf("soundcloud.com/") >= 0) ||
                     (input instanceof KeyValuePair && (input.key == 'sct' || input.key == 'scp'));
             },
             getAction: function(input) {
-                if (input instanceof String){
+                if (typeof input == "string"){
                     return router.resolveSoundCloud;
                 }
                 else if (input instanceof KeyValuePair) {
@@ -85,11 +85,11 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         table.push({
             site: 'YouTube',
             test: function(input) {
-                return (input instanceof String && /youtube\.com\/watch\\?/.test(input) && /v=[\w\-]+/.test(input)) ||
+                return (typeof input == "string" && /youtube\.com\/watch\\?/.test(input) && /v=[\w\-]+/.test(input)) ||
                     (input instanceof KeyValuePair && input.key == 'ytv');
             },
             getAction: function(input) {
-                if (input instanceof String){
+                if (typeof input == "string"){
                     return router.resolveYouTube;
                 }
                 else if (input instanceof KeyValuePair) {
@@ -119,38 +119,44 @@ Router.prototype = {
             }
         });
     },
-    addResource: function(url, onActionQueueExection) {
+    addResource: function(url, mediaHandler, onActionQueueExection) {
         onActionQueueExection = onActionQueueExection || $.noop;
         var success = false;
+        var deferred = $.Deferred();
         var failure = function() {
             alert("Unable to fetch content from " + url + ".");
         }
-        var isString = url instanceof String;
+        var isString = typeof url == "string";
         if (isString)
             url = $.trim(url.toString());
+        var isURL = this.verifyURL(url);
         if (url) {
             if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
                 for (var entry in this.routingTable) {
                     var route = this.routingTable[entry];
                     if (route.test(url)) {
-                        var func = route.getAction();
+                        var func = route.getAction(url);
                         if (func)
-                            this.addToActionQueue(func.call(this, url, failure, false, false, {trackIndex: 0}), onActionQueueExection);
+                            this.addToActionQueue(func.call(this, url, failure, deferred, mediaHandler, {trackIndex: 0}), onActionQueueExection);
                         success = true;
                         break;
                     }
                 }
             }
-            if (!success && isString) {
+            if (!success && isString && !isURL) {
                 if (this.verifyURL('http://' + url)) {
-                    success = this.addTrack('http://' + url);
+                    success = this.addResource('http://' + url);
                 }
                 else if (this.verifyURL('http://www.' + url)) {
-                    success = this.addTrack('http://' + url);
+                    success = this.addResource('http://' + url);
                 }
+                else deferred.reject({
+                    success: false,
+                    error: "The resource submitted could not be identified."
+                });
             }
         }
-        return success;
+        return deferred.promise();
     },
     executeActionQueueItem: function(deferredData) {
         if (deferredData && deferredData.action) {
@@ -522,7 +528,7 @@ Router.prototype = {
     // Diego Perini's URL regex
     // https://gist.github.com/729294
     verifyURL: function(url) {
-        return url instanceof String && /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i.test(url);
+        return typeof url == "string" && /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i.test(url);
     }
 };
 var router = new Router(playlist, soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");

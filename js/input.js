@@ -95,14 +95,26 @@ $(document).ready(function() {
                     console.log("x");
                 };
                 var mediaObjectCounter = 0;
+                var failure = function() {
+                    alert("The media ID " + keyValuePair.value + " could not be found.");
+                };
+                var completeLoad = function() {
+                    mediaObjectCounter++;
+                    if (mediaObjectCounter == urlParams.length) {
+                        var flatList = mediaObjectTable.getFlatTable();
+                        router.playlistObject.addTracks(flatList, 0);
+                        router.playlistObject.updateSettings({
+                            updateURLOnAdd: true
+                        });
+
+                        $.unblockUI();
+                    }
+                };
                 for (var param in urlParams) {
                     var keyValuePair = urlParams[param];
-                    var failure = function() {
-                        alert("The media ID " + keyValuePair.value + " could not be found.");
-                    };
-                    var deferred = $.Deferred();
-                    var deferredPromise;
-                    switch(keyValuePair.key.toString().toLowerCase()) {
+                    
+                    var deferredPromise = router.addResource(keyValuePair, mediaHandler, completeLoad);
+                    /*switch(keyValuePair.key.toString().toLowerCase()) {
                         case 'ytv':
                             if (keyValuePair.value) {
                                 deferredPromise = router.processYouTubeVideoID(keyValuePair, failure, deferred, mediaHandler, {trackIndex:param});
@@ -128,20 +140,8 @@ $(document).ready(function() {
                             });
                             deferredPromise = deferred.promise();
                             break;
-                    }
-                    var completeLoad = function() {
-                        mediaObjectCounter++;
-                        if (mediaObjectCounter == urlParams.length) {
-                            var flatList = mediaObjectTable.getFlatTable();
-                            router.playlistObject.addTracks(flatList, 0);
-                            router.playlistObject.updateSettings({
-                                updateURLOnAdd: true
-                            });
-
-                            $.unblockUI();
-                        }
-                    };
-                    router.addToActionQueue(deferredPromise, completeLoad);
+                    }*/
+                    //router.addToActionQueue(deferredPromise, completeLoad);
                 }
             }
         });
