@@ -1,4 +1,10 @@
-// Original code by Andy E of Stack Overflow
+function KeyValuePair(key, value) {
+    this.key = key;
+    this.value = value;
+}
+
+// 
+// // Original code by Andy E of Stack Overflow
 // http://stackoverflow.com/a/7676115/959934
 // Modified by me to allow multiple values to be associated with a single key
 function getURLParams(useOrderedList) {
@@ -26,9 +32,7 @@ function getURLParams(useOrderedList) {
         var key = d(e[1]);
         var value = d(e[2]);
         if (useOrderedList) {
-            var listItem = new Object();
-            listItem['value'] = value;
-            listItem['key'] = key;
+            var listItem = new KeyValuePair(key, value);
             orderedList.push(listItem);
         }
         else {
@@ -73,7 +77,7 @@ var hashTableToFlatList = function(table) {
 };
 
 $(document).ready(function() {
-    var urlParams = getURLParams(true);
+    /*var urlParams = getURLParams(true);
     $.ajaxSetup({
         async: false
     });
@@ -147,5 +151,5 @@ $(document).ready(function() {
                 }
             }
         });
-    }
+    }*/
 });

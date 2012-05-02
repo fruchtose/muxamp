@@ -50,24 +50,53 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         var table = [];
         table.push({
             site: 'Reddit',
-            test: function(url) {
-                return url.indexOf("reddit.com/r/") >= 0;
+            test: function(input) {
+                return (input instanceof String && input.indexOf("reddit.com/r/") >= 0) ||
+                    (input instanceof KeyValuePair && input.key == 'rdt');
             },
-            action: router.resolveReddit
+            getAction: function(input) {
+                if (input instanceof String){
+                    return router.resolveReddit;
+                }
+                else if (input instanceof KeyValuePair) {
+                    return router.processRedditLink;
+                }
+                else return null;
+            }
         });
         table.push({
             site: 'SoundCloud',
-            test: function(url) {
-                return url.indexOf("soundcloud.com/") >= 0;
+            test: function(input) {
+                return (input instanceof String && input.indexOf("soundcloud.com/") >= 0) ||
+                    (input instanceof KeyValuePair && (input.key == 'sct' || input.key == 'scp'));
             },
-            action: router.resolveSoundCloud
+            getAction: function(input) {
+                if (input instanceof String){
+                    return router.resolveSoundCloud;
+                }
+                else if (input instanceof KeyValuePair) {
+                    if (input.key == 'scp')
+                        return router.processSoundCloudPlaylist;
+                    else return router.processSoundCloudTrack;
+                }
+                else return null;
+            }
         });
         table.push({
             site: 'YouTube',
-            test: function(url) {
-                return /youtube\.com\/watch\\?/.test(url) && /v=[\w\-]+/.test(url);
+            test: function(input) {
+                return (input instanceof String && /youtube\.com\/watch\\?/.test(input) && /v=[\w\-]+/.test(input)) ||
+                    (input instanceof KeyValuePair && input.key == 'ytv');
             },
-            action: router.resolveYouTube
+            getAction: function(input) {
+                if (input instanceof String){
+                    return router.resolveYouTube;
+                }
+                else if (input instanceof KeyValuePair) {
+                    return router.processYouTubeVideoID;
+                }
+                else return null;
+            }
         });
         return table;
     }
@@ -90,25 +119,29 @@ Router.prototype = {
             }
         });
     },
-    addTrack: function(url) {
+    addResource: function(url, onActionQueueExection) {
+        onActionQueueExection = onActionQueueExection || $.noop;
         var success = false;
         var failure = function() {
             alert("Unable to fetch content from " + url + ".");
         }
-        url = $.trim(url.toString());
-        if (url.length) {
-            if (this.verifyURL(url)) {
-                var entry;
-                for (entry in this.routingTable) {
+        var isString = url instanceof String;
+        if (isString)
+            url = $.trim(url.toString());
+        if (url) {
+            if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
+                for (var entry in this.routingTable) {
                     var route = this.routingTable[entry];
                     if (route.test(url)) {
-                        this.addToActionQueue(route.action.call(this, url, failure));
+                        var func = route.getAction();
+                        if (func)
+                            this.addToActionQueue(func.call(this, url, failure), onActionQueueExection);
                         success = true;
                         break;
                     }
                 }
             }
-            if (!success) {
+            if (!success && isString) {
                 if (this.verifyURL('http://' + url)) {
                     success = this.addTrack('http://' + url);
                 }
@@ -364,13 +397,19 @@ Router.prototype = {
             $.ajax(options);
         }*/
     },
-    resolveReddit: function(url, failure) {
+    resolveReddit: function(url, failure, deferred, mediaHandler, params) {
         var router = this;
         var addNewTrack = function(mediaObject) {
             router.playlistObject.addTracks(mediaObject);
         };
-        var deferred = $.Deferred();
-        this.processRedditLink(url, addNewTrack, {}, deferred, failure);
+        if (!deferred)
+            deferred = $.Deferred();
+        if (!mediaHandler) {
+            mediaHandler = addNewTrack;
+        }
+        if (!params)
+            params = {};
+        this.processRedditLink(url, mediaHandler, params, deferred, failure);
         return deferred.promise();
     },
     resolveSoundCloud: function(url, failure, deferred, mediaHandler, params) {
@@ -465,7 +504,7 @@ Router.prototype = {
     // Diego Perini's URL regex
     // https://gist.github.com/729294
     verifyURL: function(url) {
-        return /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i.test(url);
+        return url instanceof String && /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i.test(url);
     }
 };
 var router = new Router(playlist, soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");
