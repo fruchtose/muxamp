@@ -85,14 +85,12 @@ $(document).ready(function() {
                 router.playlistObject.updateSettings({
                     updateURLOnAdd: false
                 });
-                router.setOption('expectationsMode', true);
                 var mediaObjectTable = new MultilevelTable();
                 var mediaHandler = function(item, index, innerIndex) {
                     mediaObjectTable.addItem(item, index, innerIndex);
                     console.log("x");
                 };
                 var mediaObjectCounter = 0;
-                router.expectMoreRequests(urlParams.length);
                 for (var param in urlParams) {
                     var keyValuePair = urlParams[param];
                     var failure = function() {
@@ -131,7 +129,6 @@ $(document).ready(function() {
                                 error: "Media source not found."
                             });
                             deferredPromise = deferred.promise();
-                            router.expectFewerRequests(1);
                             break;
                     }
                     var completeLoad = function() {
@@ -142,7 +139,6 @@ $(document).ready(function() {
                             router.playlistObject.updateSettings({
                                 updateURLOnAdd: true
                             });
-                            router.setOption('expectationsMode', false);
 
                             $.unblockUI();
                         }

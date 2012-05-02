@@ -34,13 +34,11 @@ MultilevelTable.prototype = {
 };
 
 function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
-    var defaults = {
-      expectationsMode: false  
+    var defaults = { 
     };
     
     this.opts = $.extend({}, defaults);
     this.actionQueue = [];
-    this.expected = 0;
     this.soundManager = (typeof soundManager === 'object') ? soundManager : null;
     this.soundcloudConsumerKey = soundcloudConsumerKey != "" ? soundcloudConsumerKey : "";
     this.playlistObject = playlist != null ? playlist : new Playlist();
@@ -126,34 +124,6 @@ Router.prototype = {
             deferredData.action();
         }
     },
-    expectFewerRequests: function(count) {
-        if (this.opts.expectationsMode) {
-            count = parseInt(count);
-            if (count > 0) {
-                this.expected-= count;
-                this.epected = Math.max(0, this.expected);
-                if (this.expected === 0) {
-                    $.event.trigger('routerAjaxStop');
-                }
-                else if (this.expected < 0) {
-                    $.event.trigger('routerOverflow');
-                }
-            }
-        }
-        return this.expected;
-    },
-    expectMoreRequests: function(count) {
-        if (this.opts.expectationsMode) {
-            count = parseInt(count);
-            if (count > 0) {
-                this.expected += count;
-            }
-        }
-        return this.expected;
-    },
-    expectNoRequests: function() {
-        return this.expectFewer(this.expected);
-    },
     allocateNewTracks: function(count) {
         this.playlistObject.allocateNewIDs(count);
     },
@@ -169,9 +139,6 @@ Router.prototype = {
         var deferredReject = {
             success: false,
             error: "SoundCloud track could not be used."
-        };
-        var complete = function() {
-          router.expectFewerRequests(1);  
         };
         var error = function() {
             deferred.reject(deferredReject);
@@ -209,7 +176,6 @@ Router.prototype = {
                     }
                 }
             };
-            router.expectMoreRequests(entries.length);
             $.each(entries, function(index, element) {
                 var deferredAction = $.Deferred();
                 var entry = element.data;
@@ -238,7 +204,7 @@ Router.prototype = {
             url: resolveURL,
             data: null,
             dataType: 'json'
-        }).success(success).error(error).complete(complete);
+        }).success(success).error(error);
         return deferred.promise();
     },
     processSoundCloudPlaylist: function(playlistID, mediaHandler, params, deferred, failure) {
@@ -335,9 +301,6 @@ Router.prototype = {
             var options = {
                 url: resolveURL,
                 dataType: 'jsonp',
-                complete: function() {
-                    router.expectFewerRequests(1);
-                },
                 error: errorFunction,
                 success: function(data, textStatus) {
                     if (textStatus == "success") {
@@ -390,9 +353,6 @@ Router.prototype = {
                 });
                 if (failure)
                     failure();
-            },
-            complete: function() {
-                router.expectFewerRequests(1);
             }
         };
         $.ajax(options);
@@ -429,9 +389,6 @@ Router.prototype = {
         }
         var ajaxOptions = {
             url: resolveURL,
-            complete: function() {
-                router.expectFewerRequests(1);
-            },
             error: function(){
                 if (failure)
                     failure();
