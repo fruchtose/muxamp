@@ -80,7 +80,7 @@ Playlist.prototype = {
         var addedDuration = 0;
         this.list = this.list.concat(mediaObjects);
         this._addPlaylistDOMRows(mediaObjects);
-        for (i in mediaObjects) {
+        for (var i in mediaObjects) {
             var mediaObject = mediaObjects[i];
             addedDuration += mediaObject.getDuration()
         }
@@ -90,10 +90,10 @@ Playlist.prototype = {
                 newHash = mediaObjects[0].siteCode + '=' + mediaObjects[0].siteMediaID;
                 slicedList = mediaObjects.slice(1);
             }
-            for (i in slicedList) {
-                newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
+            for (var j in slicedList) {
+                newHash += '&' + slicedList[j].siteCode + '=' + slicedList[j].siteMediaID;
             }
-            if (this.list.length > 0) {
+            if (this.list.length > 1) {
                 newHash = '&' + newHash;
             }
             // Making sure user cannot create huuuuuuuge URL by default
@@ -297,7 +297,7 @@ Playlist.prototype = {
             newHash = this.list[0].siteCode + '=' + this.list[0].siteMediaID;
             slicedList = this.list.slice(1);
         }
-        for (i in slicedList) {
+        for (var i in slicedList) {
             newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
         }
         // Making sure user cannot create huuuuuuuge URL by default

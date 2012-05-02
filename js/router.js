@@ -86,8 +86,9 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
         table.push({
             site: 'YouTube',
             test: function(input) {
-                return (typeof input == "string" && /youtube\.com\/watch\\?/.test(input) && /v=[\w\-]+/.test(input)) ||
-                    (input instanceof KeyValuePair && input.key == 'ytv');
+                return (typeof input == "string" && (/youtube\.com\/watch\\?/.test(input) && /v=[\w\-]+/.test(input)) || 
+                    /youtu.be\/[\w\-]+/.test(input)) 
+                    || (input instanceof KeyValuePair && input.key == 'ytv');
             },
             getAction: function(input) {
                 if (typeof input == "string"){
@@ -494,11 +495,21 @@ Router.prototype = {
     },
     resolveYouTube: function(url, failure, deferred, mediaHandler, params) {
         var router = this;
-        var beginningURL = "v=";
-        var beginningURLLoc = url.indexOf(beginningURL);
-        var beginningURLLength = beginningURL.length;
-        var idSubstring = url.substring(beginningURLLoc + beginningURLLength);
-        var match = idSubstring.match(/[\w\-]+/);
+        var match, beginningURL, beginningURLLoc, beginningURLLength, idSubstring;
+        if (url.indexOf("youtube.com") > -1) {
+            beginningURL = "v=";
+            beginningURLLoc = url.indexOf(beginningURL);
+            beginningURLLength = beginningURL.length;
+            idSubstring = url.substring(beginningURLLoc + beginningURLLength);
+            match = idSubstring.match(/[\w\-]+/);
+        }
+        else if (url.indexOf("youtu.be") > -1) {
+            beginningURL = "youtu.be/";
+            beginningURLLoc = url.indexOf(beginningURL);
+            beginningURLLength = beginningURL.length;
+            idSubstring = url.substring(beginningURLLoc + beginningURLLength);
+            match = idSubstring.match(/[\w\-]+/);
+        }
         var addNewTrack = function(mediaObject) {
             router.playlistObject.addTracks(mediaObject);
         };

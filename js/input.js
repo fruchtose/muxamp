@@ -76,74 +76,41 @@ var hashTableToFlatList = function(table) {
     return flatList;
 };
 
-$(document).ready(function() {
+var loadFunction = function() {
     var urlParams = getURLParams(true);
-    $.ajaxSetup({
-        async: false
-    });
-    if (urlParams) {
-        soundManager.onready(function(status) {
-            var inputCount = urlParams.length;
-            if (inputCount) {
-                $.blockUI();
-                router.playlistObject.updateSettings({
-                    updateURLOnAdd: false
-                });
-                var mediaObjectTable = new MultilevelTable();
-                var mediaHandler = function(item, index, innerIndex) {
-                    mediaObjectTable.addItem(item, index, innerIndex);
-                    console.log("x");
-                };
-                var mediaObjectCounter = 0;
-                var failure = function() {
-                    alert("The media ID " + keyValuePair.value + " could not be found.");
-                };
-                var completeLoad = function() {
-                    mediaObjectCounter++;
-                    if (mediaObjectCounter == urlParams.length) {
-                        var flatList = mediaObjectTable.getFlatTable();
-                        router.playlistObject.addTracks(flatList, 0);
-                        router.playlistObject.updateSettings({
-                            updateURLOnAdd: true
-                        });
-
-                        $.unblockUI();
-                    }
-                };
-                for (var param in urlParams) {
-                    var keyValuePair = urlParams[param];
-                    
-                    var deferredPromise = router.addResource(keyValuePair, mediaHandler, completeLoad);
-                    /*switch(keyValuePair.key.toString().toLowerCase()) {
-                        case 'ytv':
-                            if (keyValuePair.value) {
-                                deferredPromise = router.processYouTubeVideoID(keyValuePair, failure, deferred, mediaHandler, {trackIndex:param});
-                            }
-                            break;
-                        case 'sct':
-                            if (keyValuePair.value) {
-                                deferredPromise = router.processSoundCloudTrack(keyValuePair, failure, deferred, mediaHandler, {trackIndex: param});
-                            }
-                            break;
-                        case 'scp':
-                            if (keyValuePair.value) {
-                                deferredPromise = router.processSoundCloudPlaylist(keyValuePair, failure, deferred, mediaHandler, {trackIndex:param});
-                            }
-                            break;
-                        case 'rdt':
-                            deferredPromise = router.processRedditLink(keyValuePair, failure, deferred, mediaHandler, {trackIndex:param});
-                            break;
-                        default:
-                            deferred.reject({
-                                success: false,
-                                error: "Media source not found."
-                            });
-                            deferredPromise = deferred.promise();
-                            break;
-                    }*/
-                    //router.addToActionQueue(deferredPromise, completeLoad);
-                }
-            }
+    var inputCount = urlParams.length;
+    if (inputCount) {
+        router.playlistObject.updateSettings({
+            updateURLOnAdd: false
         });
+        var mediaObjectTable = new MultilevelTable();
+        var mediaHandler = function(item, index, innerIndex) {
+            mediaObjectTable.addItem(item, index, innerIndex);
+        };
+        var mediaObjectCounter = 0;
+        var completeLoad = function() {
+            mediaObjectCounter++;
+            if (mediaObjectCounter == urlParams.length) {
+                var flatList = mediaObjectTable.getFlatTable();
+                router.playlistObject.addTracks(flatList, 0);
+                router.playlistObject.updateSettings({
+                    updateURLOnAdd: true
+                });
+
+                $.unblockUI();
+            }
+        };
+        for (var param in urlParams) {
+            var keyValuePair = urlParams[param];
+            router.addResource(keyValuePair, mediaHandler, completeLoad);
+        }
     }
+    else {
+        $.unblockUI();
+    }
+};
+
+$(document).ready(function() {
+    $.blockUI();
+    soundManager.onready(loadFunction);
 });
