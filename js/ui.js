@@ -80,7 +80,9 @@ $('#adder-form').submit(function(e){
     e.preventDefault();
     var value = $('#adder-link').val();
     if (value) {
-        router.addTrack(value);
+        router.addResource(value, function(mediaObject) {
+            router.playlistObject.addTracks(mediaObject);
+        });
         $('#adder-link').val("");
     }
     return false;
