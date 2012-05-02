@@ -121,7 +121,7 @@ Router.prototype = {
             }
         });
     },
-    addResource: function(url, mediaHandler, onActionQueueExection) {
+    addResource: function(url, mediaHandler, onActionQueueExection, excludedSites) {
         onActionQueueExection = onActionQueueExection || $.noop;
         var success = false;
         var deferred = $.Deferred();
@@ -134,15 +134,10 @@ Router.prototype = {
         var isURL = this.verifyURL(url);
         if (url) {
             if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
-                for (var entry in this.routingTable) {
-                    var route = this.routingTable[entry];
-                    if (route.test(url)) {
-                        var func = route.getAction(url);
-                        if (func)
-                            this.addToActionQueue(func.call(this, url, failure, deferred, mediaHandler, {trackIndex: this.requestsInProgress++}), onActionQueueExection);
-                        success = true;
-                        break;
-                    }
+                var func = this.testResource(url, excludedSites);
+                if (func) {
+                    this.addToActionQueue(func.call(this, url, failure, deferred, mediaHandler, {trackIndex: this.requestsInProgress++}), onActionQueueExection);
+                    success = true;
                 }
             }
             if (!success && isString && !isURL) {
@@ -214,7 +209,7 @@ Router.prototype = {
             
             var entries = $.grep(data.data.children, function(element) {
                 var link = element.data.url;
-                return (link.indexOf('soundcloud.com/') >= 0) || (/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link));
+                return router.testResource(link, ["Reddit"]) != null;
             });
             var actionCounter = 0;
             var actionTable = new MultilevelTable();
@@ -232,12 +227,8 @@ Router.prototype = {
                 var entry = element.data;
                 var link = entry.url;
                 var newParams = $.extend({}, params, {innerIndex: index});
-                if (link.indexOf('soundcloud.com/') >= 0) {
-                    router.resolveSoundCloud(link, failure, deferredAction, mediaHandler, newParams);
-                }
-                else if(/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link)) {
-                    router.resolveYouTube(link, failure, deferredAction, mediaHandler, newParams);
-                }
+                var action = router.testResource(link, ["Reddit"]);
+                action.call(router, link, failure, deferredAction, mediaHandler, newParams);
                 deferredAction.always(function(data) {
                     if (data && data.hasOwnProperty('action') && data.hasOwnProperty('trackIndex') && data.hasOwnProperty('innerIndex')) {
                         actionTable.addItem(data['action'], data['trackIndex'], data['innerIndex']);
@@ -386,11 +377,20 @@ Router.prototype = {
         if (youtubeID instanceof KeyValuePair) {
             youtubeID = youtubeID.value;
         }
+        var deferredReject = {
+            success: false,
+            error: "SoundCloud track could not be used."
+        };
+        var errorFunction = function() {
+            deferred.reject(deferredReject);
+            if (failure)
+                failure();
+        }
         var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json&callback=?';
         var options = {
             url: youtubeAPI,
             dataType: 'json',
-            timeout: 10000,
+            timeout: 5000,
             success: function(response) {
                 var entry = response.entry;
                 var authorObj = entry.author[0];
@@ -406,14 +406,7 @@ Router.prototype = {
                     }
                 }));
             },
-            error: function() {
-                deferred.reject({
-                    success: false,
-                    error: "Unable to contact YouTube."
-                });
-                if (failure)
-                    failure();
-            }
+            error: errorFunction
         };
         $.ajax(options);
         return deferred.promise();
@@ -453,13 +446,19 @@ Router.prototype = {
         if (!params) {
             params = {};
         }
+        var deferredReject = {
+            success: false,
+            error: "SoundCloud track could not be used."
+        };
+        var errorFunction = function() {
+            deferred.reject(deferredReject);
+            if (failure)
+                failure();
+        }
         var ajaxOptions = {
             url: resolveURL,
-            error: function(){
-                if (failure)
-                    failure();
-            },
-            timeout: 10000,
+            error: errorFunction,
+            timeout: 5000,
             dataType: 'json',
             success: function(data, textStatus) {
                 if (textStatus == "success") {
@@ -474,12 +473,7 @@ Router.prototype = {
                     }
                 }
                 else {
-                    deferred.reject({
-                        success: false,
-                        error: "Unable to resolve Soundcloud URL."
-                    });
-                    if (failure)
-                        failure();
+                    errorFunction();
                 }
             }
         };
@@ -537,6 +531,33 @@ Router.prototype = {
     },
     setOption: function(option, value) {
         this.opts[option] = value;
+    },
+    testResource: function(input, exclusions) {
+        if (exclusions != null && exclusions != undefined && Object.prototype.toString.apply(exclusions) !== '[object Array]') {
+            exclusions = [exclusions];
+        }
+        var result = null;
+        for (var entry in this.routingTable) {
+            var route = this.routingTable[entry];
+            var skip = false;
+            if (Object.prototype.toString.apply(exclusions) === '[object Array]') {
+                for (var index in exclusions) {
+                    var exclusion = exclusions[index];
+                    if (route.site.toString().indexOf(exclusion) > -1) {
+                        skip = true;
+                    }
+                }
+            }
+            if (skip)
+                continue;
+            if (route.test(input)) {
+                var func = route.getAction(input);
+                if (func)
+                    result = func;
+                break;
+            }
+        }
+        return result;
     },
     // Diego Perini's URL regex
     // https://gist.github.com/729294

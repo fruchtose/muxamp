@@ -3,6 +3,10 @@ function KeyValuePair(key, value) {
     this.value = value;
 }
 
+KeyValuePair.prototype.toString = function() {
+    return "(" + this.key.toString() + "=" + this.value.toString() + ")";
+}
+
 // 
 // // Original code by Andy E of Stack Overflow
 // http://stackoverflow.com/a/7676115/959934
