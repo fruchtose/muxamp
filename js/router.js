@@ -1,3 +1,38 @@
+function MultilevelTable() {
+    this.dirty = false;
+    this.table = [];
+    this.flat = [];
+}
+
+MultilevelTable.prototype = {
+    addItem: function(item, index, innerIndex) {
+        if (!this.table[index]) {
+            this.table[index] = [];
+        }
+        // Source playlists (SoundCloud, etc.) are lists at a given index in a hash table.
+        // The lists arre translated into a flat structure at playlist construction.
+        if (undefined == innerIndex) {
+            this.table[index].push(item);
+        }
+        else {
+            if (!this.table[index][innerIndex])
+                this.table[index][innerIndex] = [];
+            this.table[index][innerIndex].push(item);
+        }
+        this.dirty = true;
+    },
+    getFlatTable: function() {
+        if (this.dirty) {
+            this.flat = hashTableToFlatList(this.table);
+            this.dirty = false;
+        }
+        return this.flat;
+    },
+    getTable: function() {
+        return this.table;
+    }
+};
+
 function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     var defaults = {
       expectationsMode: false  
@@ -43,14 +78,17 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
 }
 
 Router.prototype = {
-    addToActionQueue: function(deferredPlaylistAction) {
+    addToActionQueue: function(deferredPlaylistAction, onQueueExecution) {
         this.actionQueue.push(deferredPlaylistAction);
         
         var router = this;
-        deferredPlaylistAction.done(function() {
+        return deferredPlaylistAction.always(function() {
             var nextAction = router.actionQueue.shift();
             if (nextAction) {
-                nextAction.done(router.executeActionQueueItem);
+                nextAction.always(router.executeActionQueueItem);
+                if (onQueueExecution) {
+                    nextAction.always(onQueueExecution);
+                }
             }
         });
     },
@@ -160,58 +198,39 @@ Router.prototype = {
                 var link = element.data.url;
                 return (link.indexOf('soundcloud.com/') >= 0) || (/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link));
             });
-            router.expectMoreRequests(entries.length);
+            var actionCounter = 0;
+            var actionTable = new MultilevelTable();
             var resolveData = {
-                entryCount: entries.length,
                 action: function() {
-                    var actionRef = this;
-                    var actionTable = [];
-                    var actionCounter = 0;
-                    var actionHandler = function(func, index, innerIndex) {
-                        if (undefined == actionTable[index]) {
-                            actionTable[index] = [];
-                        }
-                        // Source playlists (SoundCloud, etc.) are lists at a given index in a hash table.
-                        // The lists arre translated into a flat structure at playlist construction.
-                        if (undefined == innerIndex) {
-                            actionTable[index].push(func);
-                        }
-                        else {
-                            actionTable[index][innerIndex] = func;
-                        }
-                    };
-                    
-                    $.each(entries, function(index, element) {
-                        var deferredAction = $.Deferred();
-                        var entry = element.data;
-                        var link = entry.url;
-                        var newParams = $.extend({}, params, {innerIndex: index});
-                        if (link.indexOf('soundcloud.com/') >= 0) {
-                            router.resolveSoundCloud(link, failure, deferredAction, mediaHandler, newParams);
-                        }
-                        else if(/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link)) {
-                            router.resolveYouTube(link, failure, deferredAction, mediaHandler, newParams);
-                        }
-                        deferredAction.done(function(data) {
-                            if (data && data.hasOwnProperty('action') && data.hasOwnProperty('trackIndex') && data.hasOwnProperty('innerIndex')) {
-                                actionHandler(data['action'], data['trackIndex'], data['innerIndex']);
-                            }
-                            if (data['innerIndex'] == undefined) {
-                                alert("lol");
-                            }
-                            actionCounter++;
-                            if (actionCounter == actionRef.entryCount) {
-                                var actions = hashTableToFlatList(actionTable);
-                                for (var item in actions) {
-                                    var func = actions[item];
-                                    func();
-                                }
-                            }
-                        });
-                    });
+                    var actions = actionTable.getFlatTable();
+                    for (var item in actions) {
+                        var func = actions[item];
+                        func();
+                    }
                 }
             };
-            deferred.resolve(resolveData);
+            router.expectMoreRequests(entries.length);
+            $.each(entries, function(index, element) {
+                var deferredAction = $.Deferred();
+                var entry = element.data;
+                var link = entry.url;
+                var newParams = $.extend({}, params, {innerIndex: index});
+                if (link.indexOf('soundcloud.com/') >= 0) {
+                    router.resolveSoundCloud(link, failure, deferredAction, mediaHandler, newParams);
+                }
+                else if(/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link)) {
+                    router.resolveYouTube(link, failure, deferredAction, mediaHandler, newParams);
+                }
+                deferredAction.always(function(data) {
+                    if (data && data.hasOwnProperty('action') && data.hasOwnProperty('trackIndex') && data.hasOwnProperty('innerIndex')) {
+                        actionTable.addItem(data['action'], data['trackIndex'], data['innerIndex']);
+                    }
+                    actionCounter++;
+                    if (actionCounter == entries.length) {
+                        deferred.resolve(resolveData);
+                    }
+                });
+            });
         };
         while (new Date() - router.lastRedditRequest < 2000) {}
         router.lastRedditRequest = new Date();
@@ -243,7 +262,7 @@ Router.prototype = {
                             $.each(data.tracks, function(index, track) {
                                 var deferredAction = $.Deferred();
                                 router.processSoundCloudTrack(track, mediaHandler, params, deferredAction, failure);
-                                deferredAction.done(function(data){
+                                deferredAction.always(function(data){
                                     if (data && data.action) {
                                         data.action();
                                     }

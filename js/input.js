@@ -86,35 +86,14 @@ $(document).ready(function() {
                     updateURLOnAdd: false
                 });
                 router.setOption('expectationsMode', true);
-                var mediaObjectHashTable = [];
-                var mediaHandler = function(mediaObject, index, innerIndex) {
-                    if (!mediaObjectHashTable[index]) {
-                        mediaObjectHashTable[index] = [];
-                    }
-                    // Source playlists (SoundCloud, etc.) are lists at a given index in a hash table.
-                    // The lists arre translated into a flat structure at playlist construction.
-                    if (undefined != innerIndex) {
-                        mediaObjectHashTable[index].push(mediaObject);
-                    }
-                    else {
-                        if (!mediaObjectHashTable[index][innerIndex])
-                            mediaObjectHashTable[index][innerIndex] = [];
-                        mediaObjectHashTable[index][innerIndex].push(mediaObject);
-                    }
+                var mediaObjectTable = new MultilevelTable();
+                var mediaHandler = function(item, index, innerIndex) {
+                    mediaObjectTable.addItem(item, index, innerIndex);
+                    console.log("x");
                 };
-                $(document).bind('routerAjaxStop', function() {
-                    var flatList = hashTableToFlatList(mediaObjectHashTable);
-                        router.playlistObject.addTracks(flatList, 0);
-                        router.playlistObject.updateSettings({
-                            updateURLOnAdd: true
-                        });
-                        router.setOption('expectationsMode', false);
-                        $(this).unbind('routerAjaxStop');
-                        $.unblockUI();
-                });
+                var mediaObjectCounter = 0;
                 router.expectMoreRequests(urlParams.length);
-                var param;
-                for (param in urlParams) {
+                for (var param in urlParams) {
                     var keyValuePair = urlParams[param];
                     var failure = function() {
                         alert("The media ID " + keyValuePair.value + " could not be found.");
@@ -155,7 +134,20 @@ $(document).ready(function() {
                             router.expectFewerRequests(1);
                             break;
                     }
-                    router.addToActionQueue(deferredPromise);
+                    var completeLoad = function() {
+                        mediaObjectCounter++;
+                        if (mediaObjectCounter == urlParams.length) {
+                            var flatList = mediaObjectTable.getFlatTable();
+                            router.playlistObject.addTracks(flatList, 0);
+                            router.playlistObject.updateSettings({
+                                updateURLOnAdd: true
+                            });
+                            router.setOption('expectationsMode', false);
+
+                            $.unblockUI();
+                        }
+                    };
+                    router.addToActionQueue(deferredPromise, completeLoad);
                 }
             }
         });
