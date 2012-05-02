@@ -77,7 +77,7 @@ var hashTableToFlatList = function(table) {
 };
 
 $(document).ready(function() {
-    /*var urlParams = getURLParams(true);
+    var urlParams = getURLParams(true);
     $.ajaxSetup({
         async: false
     });
@@ -105,27 +105,21 @@ $(document).ready(function() {
                     switch(keyValuePair.key.toString().toLowerCase()) {
                         case 'ytv':
                             if (keyValuePair.value) {
-                                deferredPromise = router.processYouTubeVideoID(keyValuePair.value, mediaHandler, {trackIndex:param}, deferred, failure);
+                                deferredPromise = router.processYouTubeVideoID(keyValuePair, failure, deferred, mediaHandler, {trackIndex:param});
                             }
                             break;
                         case 'sct':
                             if (keyValuePair.value) {
-                                deferredPromise = router.processSoundCloudTrack(keyValuePair.value, mediaHandler, {trackIndex: param}, deferred, failure);
+                                deferredPromise = router.processSoundCloudTrack(keyValuePair, failure, deferred, mediaHandler, {trackIndex: param});
                             }
                             break;
                         case 'scp':
                             if (keyValuePair.value) {
-                                deferredPromise = router.processSoundCloudPlaylist(keyValuePair.value, mediaHandler, {trackIndex:param}, deferred, failure);
+                                deferredPromise = router.processSoundCloudPlaylist(keyValuePair, failure, deferred, mediaHandler, {trackIndex:param});
                             }
                             break;
                         case 'rdt':
-                            var link = 'http://www.reddit.com/';
-                            if (keyValuePair.value) {
-                                var linkSuffix = keyValuePair.value.toString().toLowerCase()
-                                if (linkSuffix != 'front')
-                                    link += 'r/' + keyValuePair.value;
-                            }
-                            deferredPromise = router.processRedditLink(link, mediaHandler, {trackIndex:param}, deferred, failure);
+                            deferredPromise = router.processRedditLink(keyValuePair, failure, deferred, mediaHandler, {trackIndex:param});
                             break;
                         default:
                             deferred.reject({
@@ -151,5 +145,5 @@ $(document).ready(function() {
                 }
             }
         });
-    }*/
+    }
 });

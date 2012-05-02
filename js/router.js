@@ -135,7 +135,7 @@ Router.prototype = {
                     if (route.test(url)) {
                         var func = route.getAction();
                         if (func)
-                            this.addToActionQueue(func.call(this, url, failure), onActionQueueExection);
+                            this.addToActionQueue(func.call(this, url, failure, false, false, {trackIndex: 0}), onActionQueueExection);
                         success = true;
                         break;
                     }
@@ -166,8 +166,17 @@ Router.prototype = {
     getOption: function(option) {
         return this.opts[option];
     },
-    processRedditLink: function(url, mediaHandler, params, deferred, failure) {
+    processRedditLink: function(url, failure, deferred, mediaHandler, params) {
         var router = this;
+        if (url instanceof KeyValuePair) {
+            var link = 'http://www.reddit.com/';
+            if (url.value) {
+                var linkSuffix = url.value.toString().toLowerCase()
+                if (linkSuffix != 'front')
+                    link += 'r/' + url.value;
+            }
+            url = link;
+        }
         var resolveURL = url + ".json?limit=25&jsonp=?";
         var deferredReject = {
             success: false,
@@ -240,9 +249,12 @@ Router.prototype = {
         }).success(success).error(error);
         return deferred.promise();
     },
-    processSoundCloudPlaylist: function(playlistID, mediaHandler, params, deferred, failure) {
+    processSoundCloudPlaylist: function(playlistID, failure, deferred, mediaHandler, params) {
         var consumerKey = this.soundcloudConsumerKey;
         var router = this;
+        if (playlistID instanceof KeyValuePair) {
+            playlistID = playlistID.value;
+        }
         var deferredReject = {
             success: false,
             error: "SoundCloud track could not be used."
@@ -260,7 +272,7 @@ Router.prototype = {
                         if (data.tracks && data.tracks.length > 0) {
                             $.each(data.tracks, function(index, track) {
                                 var deferredAction = $.Deferred();
-                                router.processSoundCloudTrack(track, mediaHandler, params, deferredAction, failure);
+                                router.processSoundCloudTrack(track, failure, deferredAction, mediaHandler, params);
                                 deferredAction.always(function(data){
                                     if (data && data.action) {
                                         data.action();
@@ -281,7 +293,7 @@ Router.prototype = {
             var options = {
                 url: resolveURL,
                 error: errorFunction,
-                dataType: 'jsonp',
+                dataType: 'json',
                 success: function(data, textStatus) {
                     if (textStatus == "success") {
                         addPlaylistData(data);
@@ -298,9 +310,12 @@ Router.prototype = {
         else addPlaylistData(playlistID);
         return deferred.promise();
     },
-    processSoundCloudTrack: function(trackID, mediaHandler, params, deferred, failure) {
+    processSoundCloudTrack: function(trackID, failure, deferred, mediaHandler, params) {
         var consumerKey = this.soundcloudConsumerKey;
         var router = this;
+        if (trackID instanceof KeyValuePair) {
+            trackID = trackID.value;
+        }
         var deferredReject = {
             success: false,
             error: "SoundCloud track could not be used."
@@ -333,7 +348,7 @@ Router.prototype = {
             var resolveURL = 'http://api.soundcloud.com/tracks/' + trackID + ".json?consumer_key=" + consumerKey + '&callback=?';
             var options = {
                 url: resolveURL,
-                dataType: 'jsonp',
+                dataType: 'json',
                 error: errorFunction,
                 success: function(data, textStatus) {
                     if (textStatus == "success") {
@@ -357,12 +372,15 @@ Router.prototype = {
         else addTrackData(trackID);
         return deferred.promise();
     },
-    processYouTubeVideoID: function(youtubeID, mediaHandler, params, deferred, failure) {
+    processYouTubeVideoID: function(youtubeID, failure, deferred, mediaHandler, params) {
         var router = this;
-        var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json';
+        if (youtubeID instanceof KeyValuePair) {
+            youtubeID = youtubeID.value;
+        }
+        var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json&callback=?';
         var options = {
             url: youtubeAPI,
-            dataType: 'jsonp',
+            dataType: 'json',
             timeout: 10000,
             success: function(response) {
                 var entry = response.entry;
@@ -409,7 +427,7 @@ Router.prototype = {
         }
         if (!params)
             params = {};
-        this.processRedditLink(url, mediaHandler, params, deferred, failure);
+        this.processRedditLink(url, failure, deferred, mediaHandler, params);
         return deferred.promise();
     },
     resolveSoundCloud: function(url, failure, deferred, mediaHandler, params) {
@@ -433,16 +451,16 @@ Router.prototype = {
                     failure();
             },
             timeout: 10000,
-            dataType: 'jsonp',
+            dataType: 'json',
             success: function(data, textStatus) {
                 if (textStatus == "success") {
                     if (data.streamable === true) {
                         //Tracks have stream URL
                         if (data.stream_url) {
-                            router.processSoundCloudTrack(data, mediaHandler, params, deferred, failure);
+                            router.processSoundCloudTrack(data, failure, deferred, mediaHandler, params);
                         }
                         else {
-                            router.processSoundCloudPlaylist(data, mediaHandler, params, deferred, failure);
+                            router.processSoundCloudPlaylist(data, failure, deferred, mediaHandler, params);
                         }
                     }
                 }
@@ -486,7 +504,7 @@ Router.prototype = {
             if (!params) {
                 params = {};
             }
-            this.processYouTubeVideoID(youtubeID, mediaHandler, params, deferred, failure);
+            this.processYouTubeVideoID(youtubeID, failure, deferred, mediaHandler, params);
         }
         else {
             if (failure)
