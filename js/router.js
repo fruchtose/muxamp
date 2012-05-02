@@ -161,8 +161,26 @@ Router.prototype = {
                 return (link.indexOf('soundcloud.com/') >= 0) || (/youtube\.com\/watch\\?/.test(link) && /v=[\w\-]+/.test(link));
             });
             router.expectMoreRequests(entries.length);
-            deferred.resolve({
+            var resolveData = {
+                entryCount: entries.length,
                 action: function() {
+                    var actionRef = this;
+                    var actionTable = [];
+                    var actionCounter = 0;
+                    var actionHandler = function(func, index, innerIndex) {
+                        if (undefined == actionTable[index]) {
+                            actionTable[index] = [];
+                        }
+                        // Source playlists (SoundCloud, etc.) are lists at a given index in a hash table.
+                        // The lists arre translated into a flat structure at playlist construction.
+                        if (undefined == innerIndex) {
+                            actionTable[index].push(func);
+                        }
+                        else {
+                            actionTable[index][innerIndex] = func;
+                        }
+                    };
+                    
                     $.each(entries, function(index, element) {
                         var deferredAction = $.Deferred();
                         var entry = element.data;
@@ -175,13 +193,25 @@ Router.prototype = {
                             router.resolveYouTube(link, failure, deferredAction, mediaHandler, newParams);
                         }
                         deferredAction.done(function(data) {
-                            if (data && data.action) {
-                                data.action();
+                            if (data && data.hasOwnProperty('action') && data.hasOwnProperty('trackIndex') && data.hasOwnProperty('innerIndex')) {
+                                actionHandler(data['action'], data['trackIndex'], data['innerIndex']);
                             }
-                        }).promise();
+                            if (data['innerIndex'] == undefined) {
+                                alert("lol");
+                            }
+                            actionCounter++;
+                            if (actionCounter == actionRef.entryCount) {
+                                var actions = hashTableToFlatList(actionTable);
+                                for (var item in actions) {
+                                    var func = actions[item];
+                                    func();
+                                }
+                            }
+                        });
                     });
                 }
-            });
+            };
+            deferred.resolve(resolveData);
         };
         while (new Date() - router.lastRedditRequest < 2000) {}
         router.lastRedditRequest = new Date();
@@ -207,13 +237,13 @@ Router.prototype = {
         var addPlaylistData = function(data) {
             if (data.streamable === true) {
                 //Tracks have stream URL
-                deferred.resolve({
+                deferred.resolve($.extend({}, params, {
                     action: function() {
                         if (data.tracks && data.tracks.length > 0) {
                             $.each(data.tracks, function(index, track) {
-                                var action = $.Deferred();
-                                router.processSoundCloudTrack(track, mediaHandler, params, action, failure);
-                                action.done(function(data){
+                                var deferredAction = $.Deferred();
+                                router.processSoundCloudTrack(track, mediaHandler, params, deferredAction, failure);
+                                deferredAction.done(function(data){
                                     if (data && data.action) {
                                         data.action();
                                     }
@@ -221,7 +251,7 @@ Router.prototype = {
                             });
                         }
                     }
-                });
+                }));
             }
             else {
                 errorFunction();
@@ -266,14 +296,14 @@ Router.prototype = {
             if (data.streamable === true) {
                 //Tracks have stream URL
                 if (data.stream_url) {
-                    router.allocateNewTracks(1);
-                    var id = router.getNewTrackID();
-                    var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, soundManager);
-                    deferred.resolve({
+                    deferred.resolve($.extend({}, params, {
                         action: function() {
+                            router.allocateNewTracks(1);
+                            var id = router.getNewTrackID();
+                            var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, soundManager);
                             mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']).concat(params['innerIndex']));
                         }
-                    });
+                    }));
                 }
                 else {
                     errorFunction();
@@ -325,14 +355,14 @@ Router.prototype = {
                 var author = authorObj.name.$t;
                 var title = entry.title.$t;
                 var duration = parseInt(entry.media$group.yt$duration.seconds);
-                router.allocateNewTracks(1);
-                var id = router.getNewTrackID();
-                var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
-                deferred.resolve({
+                deferred.resolve($.extend({}, params, {
                     action: function() {
+                        router.allocateNewTracks(1);
+                        var id = router.getNewTrackID();
+                        var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
                         mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']).concat(params['innerIndex']));
                     }
-                });
+                }));
             },
             error: function() {
                 deferred.reject({

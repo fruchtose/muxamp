@@ -62,12 +62,12 @@ var hashTableToFlatList = function(table) {
     var hash;
     for (hash in table) {
         var list = table[hash];
-        if (list) {
-            var index;
-            for (index in list) {
-                flatList.push(list[index]);
-            }
+        if (list && Object.prototype.toString.apply(list) === '[object Array]') {
+            list = hashTableToFlatList(list);
         }
+        if (Object.prototype.toString.apply(list) === '[object Array]')
+            flatList = flatList.concat(list);
+        else flatList.push(list);
     }
     return flatList;
 };
@@ -93,11 +93,13 @@ $(document).ready(function() {
                     }
                     // Source playlists (SoundCloud, etc.) are lists at a given index in a hash table.
                     // The lists arre translated into a flat structure at playlist construction.
-                    if (!innerIndex) {
+                    if (undefined != innerIndex) {
                         mediaObjectHashTable[index].push(mediaObject);
                     }
                     else {
-                        mediaObjectHashTable[index][innerIndex] = mediaObject;
+                        if (!mediaObjectHashTable[index][innerIndex])
+                            mediaObjectHashTable[index][innerIndex] = [];
+                        mediaObjectHashTable[index][innerIndex].push(mediaObject);
                     }
                 };
                 $(document).bind('routerAjaxStop', function() {
