@@ -489,28 +489,27 @@ Router.prototype = {
     },
     resolveYouTube: function(url, failure, deferred, mediaHandler, params) {
         var router = this;
-        var match, beginningURL, beginningURLLoc, beginningURLLength, idSubstring;
+        var youtubeID, beginningURL, beginningURLLoc, beginningURLLength, idSubstring;
         if (url.indexOf("youtube.com") > -1) {
             beginningURL = "v=";
             beginningURLLoc = url.indexOf(beginningURL);
             beginningURLLength = beginningURL.length;
             idSubstring = url.substring(beginningURLLoc + beginningURLLength);
-            match = idSubstring.match(/[\w\-]+/);
+            youtubeID = /[\w\-]+/.exec(idSubstring);
         }
         else if (url.indexOf("youtu.be") > -1) {
             beginningURL = "youtu.be/";
             beginningURLLoc = url.indexOf(beginningURL);
             beginningURLLength = beginningURL.length;
             idSubstring = url.substring(beginningURLLoc + beginningURLLength);
-            match = idSubstring.match(/[\w\-]+/);
+            youtubeID = /[\w\-]+/.exec(idSubstring);
         }
         var addNewTrack = function(mediaObject) {
             router.playlistObject.addTracks(mediaObject);
         };
         if (!deferred)
             deferred = $.Deferred();
-        if (match) {
-            var youtubeID = match[0];
+        if (youtubeID) {
             if (!mediaHandler) {
                 mediaHandler = addNewTrack;
             }
@@ -533,14 +532,14 @@ Router.prototype = {
         this.opts[option] = value;
     },
     testResource: function(input, exclusions) {
-        if (exclusions != null && exclusions != undefined && Object.prototype.toString.apply(exclusions) !== '[object Array]') {
+        if (exclusions != null && exclusions != undefined && !$.isArray(exclusions)) {
             exclusions = [exclusions];
         }
         var result = null;
         for (var entry in this.routingTable) {
             var route = this.routingTable[entry];
             var skip = false;
-            if (Object.prototype.toString.apply(exclusions) === '[object Array]') {
+            if ($.isArray(exclusions)) {
                 for (var index in exclusions) {
                     var exclusion = exclusions[index];
                     if (route.site.toString().indexOf(exclusion) > -1) {

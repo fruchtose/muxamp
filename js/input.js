@@ -70,11 +70,12 @@ var hashTableToFlatList = function(table) {
     var hash;
     for (hash in table) {
         var list = table[hash];
-        if (list && Object.prototype.toString.apply(list) === '[object Array]') {
+        if (list && $.isArray(list)) {
             list = hashTableToFlatList(list);
         }
-        if (Object.prototype.toString.apply(list) === '[object Array]')
+        if ($.isArray(list)) {
             flatList = flatList.concat(list);
+        }
         else flatList.push(list);
     }
     return flatList;
