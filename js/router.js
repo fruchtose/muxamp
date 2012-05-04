@@ -222,13 +222,17 @@ Router.prototype = {
                     }
                 }
             };
+            console.log(entries.length);
             $.each(entries, function(index, element) {
                 var deferredAction = $.Deferred();
                 var entry = element.data;
                 var link = entry.url;
                 var newParams = $.extend({}, params, {innerIndex: index});
+                if (index == 9) {
+                    index = 8 + 1 + 2 - 2;
+                }
                 var action = router.testResource(link, ["Reddit"]);
-                action.call(router, link, failure, deferredAction, mediaHandler, newParams);
+                action.call(router, link, false, deferredAction, mediaHandler, newParams);
                 deferredAction.always(function(data) {
                     if (data && data.hasOwnProperty('action') && data.hasOwnProperty('trackIndex') && data.hasOwnProperty('innerIndex')) {
                         actionTable.addItem(data['action'], data['trackIndex'], data['innerIndex']);
@@ -237,6 +241,7 @@ Router.prototype = {
                     if (actionCounter == entries.length) {
                         deferred.resolve(resolveData);
                     }
+                    console.log(data.trackIndex + ", " + data.innerIndex);
                 });
             });
         };
@@ -462,6 +467,10 @@ Router.prototype = {
             dataType: 'json',
             success: function(data, textStatus) {
                 if (textStatus == "success") {
+                    if ( !(data.kind == "track" || data.kind == "playlist") ) {
+                        errorFunction();
+                        return;
+                    }
                     if (data.streamable === true) {
                         //Tracks have stream URL
                         if (data.stream_url) {
