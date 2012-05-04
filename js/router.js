@@ -182,10 +182,10 @@ Router.prototype = {
             url = link;
         }
         var resolveURL = url + ".json?limit=25&jsonp=?";
-        var deferredReject = {
+        var deferredReject = $.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
-        };
+        });
         var error = function() {
             deferred.reject(deferredReject);
             if (failure)
@@ -228,9 +228,6 @@ Router.prototype = {
                 var entry = element.data;
                 var link = entry.url;
                 var newParams = $.extend({}, params, {innerIndex: index});
-                if (index == 9) {
-                    index = 8 + 1 + 2 - 2;
-                }
                 var action = router.testResource(link, ["Reddit"]);
                 action.call(router, link, false, deferredAction, mediaHandler, newParams);
                 deferredAction.always(function(data) {
@@ -260,10 +257,10 @@ Router.prototype = {
         if (playlistID instanceof KeyValuePair) {
             playlistID = playlistID.value;
         }
-        var deferredReject = {
+        var deferredReject = $.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
-        };
+        });
         var errorFunction = function() {
             deferred.reject(deferredReject);
             if (failure)
@@ -321,10 +318,10 @@ Router.prototype = {
         if (trackID instanceof KeyValuePair) {
             trackID = trackID.value;
         }
-        var deferredReject = {
+        var deferredReject = $.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
-        };
+        });
         var errorFunction = function() {
             deferred.reject(deferredReject);
             if (failure)
@@ -382,10 +379,10 @@ Router.prototype = {
         if (youtubeID instanceof KeyValuePair) {
             youtubeID = youtubeID.value;
         }
-        var deferredReject = {
+        var deferredReject = $.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
-        };
+        });
         var errorFunction = function() {
             deferred.reject(deferredReject);
             if (failure)
@@ -451,10 +448,10 @@ Router.prototype = {
         if (!params) {
             params = {};
         }
-        var deferredReject = {
+        var deferredReject = $.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
-        };
+        });
         var errorFunction = function() {
             deferred.reject(deferredReject);
             if (failure)
@@ -471,14 +468,17 @@ Router.prototype = {
                         errorFunction();
                         return;
                     }
-                    if (data.streamable === true) {
-                        //Tracks have stream URL
-                        if (data.stream_url) {
-                            router.processSoundCloudTrack(data, failure, deferred, mediaHandler, params);
-                        }
-                        else {
-                            router.processSoundCloudPlaylist(data, failure, deferred, mediaHandler, params);
-                        }
+                    if (data.streamable != true) {
+                        errorFunction();
+                        return;
+                    }
+                    
+                    //Tracks have stream URL
+                    if (data.stream_url) {
+                        router.processSoundCloudTrack(data, failure, deferred, mediaHandler, params);
+                    }
+                    else {
+                        router.processSoundCloudPlaylist(data, failure, deferred, mediaHandler, params);
                     }
                 }
                 else {
@@ -530,10 +530,10 @@ Router.prototype = {
         else {
             if (failure)
                 failure();
-            deferred.reject({
+            deferred.reject($.extend({}, params, {
                 success: false,
                 error: "YouTube video was not present in URL."
-            });
+            }));
         }
         return deferred.promise();
     },
