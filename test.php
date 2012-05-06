@@ -132,8 +132,8 @@
         <script src="js/jsclass.js" type="text/javascript"></script>
         <script src="js/config.js" type="text/javascript"></script>
         <script src="js/player.js" type="text/javascript"></script>
-        <script src="js/playlist.js" type="text/javascript"></script>
         <script src="js/router.js" type="text/javascript"></script>
+        <script src="js/playlist.js" type="text/javascript"></script>
         <script src="js/input.js" type="text/javascript"></script>
         <script src="js/ui.js" type="text/javascript"></script>
         <script src="js/qunit.js" type="text/javascript"></script>

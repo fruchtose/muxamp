@@ -1,4 +1,4 @@
-var body, east; var bodyLayoutOptions = {
+var body, east;var bodyLayoutOptions = {
     center: {
         minSize: 810,
         paneSelector: "#main"
@@ -80,9 +80,7 @@ $('#adder-form').submit(function(e){
     e.preventDefault();
     var value = $('#adder-link').val();
     if (value) {
-        router.addResource(value, function(mediaObject) {
-            router.playlistObject.addTracks(mediaObject);
-        });
+        playlist.addResource(value);
         $('#adder-link').val("");
     }
     return false;

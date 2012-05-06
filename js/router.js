@@ -33,7 +33,7 @@ MultilevelTable.prototype = {
     }
 };
 
-function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
+function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
     var defaults = { 
     };
     
@@ -41,8 +41,8 @@ function Router (playlist, soundManager, soundcloudConsumerKey, youtubeKey) {
     this.actionQueue = [];
     this.soundManager = (typeof soundManager === 'object') ? soundManager : null;
     this.soundcloudConsumerKey = soundcloudConsumerKey != "" ? soundcloudConsumerKey : "";
-    this.playlistObject = playlist != null ? playlist : new Playlist();
     this.youtubeKey = youtubeKey != null ? youtubeKey : "";
+    this.nextNewID = 1;
     this.lastRedditRequest = new Date(0);  
     this.requestsInProgress = 0;
     
@@ -171,11 +171,8 @@ Router.prototype = {
         this.requestsInProgress--;
         return deferredData;
     },
-    allocateNewTracks: function(count) {
-        this.playlistObject.allocateNewIDs(count);
-    },
     getNewTrackID: function() {
-        return this.playlistObject.getNewTrackID();
+        return this.nextNewID++;
     },
     getOption: function(option) {
         return this.opts[option];
@@ -196,12 +193,7 @@ Router.prototype = {
             success: false,
             error: "SoundCloud track could not be used."
         });
-        var addNewTrack = function(mediaObject) {
-            return router.playlistObject.addTracks(mediaObject);
-        };
-        if (!mediaHandler) {
-            mediaHandler = addNewTrack;
-        }
+        mediaHandler = mediaHandler || $.noop;
         var error = function() {
             deferred.reject(deferredReject);
             if (failure)
@@ -280,12 +272,7 @@ Router.prototype = {
             if (failure)
                 failure();
         }
-        var addNewTrack = function(mediaObject) {
-            return router.playlistObject.addTracks(mediaObject);
-        };
-        if (!mediaHandler) {
-            mediaHandler = addNewTrack;
-        }
+        mediaHandler = mediaHandler || $.noop;
         var addPlaylistData = function(data) {
             if (data.streamable === true) {
                 //Tracks have stream URL
@@ -347,21 +334,15 @@ Router.prototype = {
             if (failure)
                 failure();
         }
-        var addNewTrack = function(mediaObject) {
-            return router.playlistObject.addTracks(mediaObject);
-        };
-        if (!mediaHandler) {
-            mediaHandler = addNewTrack;
-        }
+        mediaHandler = mediaHandler || $.noop;
         var addTrackData = function(data) {
             if (data.streamable === true) {
                 //Tracks have stream URL
                 if (data.stream_url) {
                     deferred.resolve($.extend({}, params, {
                         action: function() {
-                            router.allocateNewTracks(1);
                             var id = router.getNewTrackID();
-                            var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, soundManager);
+                            var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, router.soundManager);
                             mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']).concat(params['innerIndex']));
                         }
                     }));
@@ -427,7 +408,6 @@ Router.prototype = {
                 var duration = parseInt(entry.media$group.yt$duration.seconds);
                 deferred.resolve($.extend({}, params, {
                     action: function() {
-                        router.allocateNewTracks(1);
                         var id = router.getNewTrackID();
                         var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
                         mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']).concat(params['innerIndex']));
@@ -447,14 +427,9 @@ Router.prototype = {
     },
     resolveReddit: function(url, failure, deferred, mediaHandler, params) {
         var router = this;
-        var addNewTrack = function(mediaObject) {
-            router.playlistObject.addTracks(mediaObject);
-        };
         if (!deferred)
             deferred = $.Deferred();
-        if (!mediaHandler) {
-            mediaHandler = addNewTrack;
-        }
+        mediaHandler = mediaHandler || $.noop;
         if (!params)
             params = {};
         this.processRedditLink(url, failure, deferred, mediaHandler, params);
@@ -465,12 +440,7 @@ Router.prototype = {
         var resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
         if (!deferred)
             deferred = $.Deferred();
-        var addNewTrack = function(mediaObject) {
-            router.playlistObject.addTracks(mediaObject);
-        };
-        if (!mediaHandler) {
-            mediaHandler = addNewTrack;
-        }
+        mediaHandler = mediaHandler || $.noop;
         if (!params) {
             params = {};
         }
@@ -523,7 +493,6 @@ Router.prototype = {
         
     },
     resolveYouTube: function(url, failure, deferred, mediaHandler, params) {
-        var router = this;
         var youtubeID, beginningURL, beginningURLLoc, beginningURLLength, idSubstring;
         if (url.indexOf("youtube.com") > -1) {
             beginningURL = "v=";
@@ -539,15 +508,10 @@ Router.prototype = {
             idSubstring = url.substring(beginningURLLoc + beginningURLLength);
             youtubeID = /[\w\-]+/.exec(idSubstring);
         }
-        var addNewTrack = function(mediaObject) {
-            return router.playlistObject.addTracks(mediaObject);
-        };
+        mediaHandler = mediaHandler || $.noop;
         if (!deferred)
             deferred = $.Deferred();
         if (youtubeID) {
-            if (!mediaHandler) {
-                mediaHandler = addNewTrack;
-            }
             if (!params) {
                 params = {};
             }
@@ -599,4 +563,4 @@ Router.prototype = {
         return typeof url == "string" && /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i.test(url);
     }
 };
-var router = new Router(playlist, soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");
+var router = new Router(soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");

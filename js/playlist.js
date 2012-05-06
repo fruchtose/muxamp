@@ -19,13 +19,12 @@ var PlaylistDOMInformation = function() {
     this.removalHyperlink = "a.remove";
 };
 
-function Playlist(soundManager) {
+function Playlist(router, soundManager) {
     this.currentTrack = 0;
     this.currentVolumePercent = 50; // Start at 50% so users can increase/decrease volume if they want to
     this.list = [];
-    this.nextNewID = 0;
-    this.newTrackIDs = [];
     this.playlistDOM = new PlaylistDOMInformation();
+    this.router = router;
     this.soundManager = soundManager;
     this.totalDuration = 0; // Duration in seconds
     this.settings = {
@@ -73,6 +72,17 @@ Playlist.prototype = {
         var left = '<div class ="left">' + remove + links + '</div>';
         return left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     },
+    addResource: function(url) {
+        var playlist = this;
+        var deferred = $.Deferred();
+        this.router.addResource(url, function(mediaObjects) {
+            playlist.addTracks(mediaObjects);
+            deferred.resolve();
+        }).fail(function(deferredData) {
+            deferred.reject(deferredData);
+        });
+        return deferred.promise();
+    },
     addTracks: function(mediaObjects, currentTrack) {
         if ( !(mediaObjects instanceof Array) ) {
             mediaObjects = [mediaObjects];
@@ -114,18 +124,6 @@ Playlist.prototype = {
         this.totalDuration += addedDuration;
         $('#playlist-duration').text(secondsToString(this.totalDuration));
         $(this.playlistDOM.parentTable).sortable('refresh');
-    },
-    allocateNewIDs: function(count) {
-        var firstNewID = this.nextNewID;
-        this.nextNewID += count;
-        for (i = 0; i < count; i++) {
-            this.newTrackIDs.push(firstNewID + i);
-        }
-    },
-    getNewTrackID: function() {
-        var newID = this.newTrackIDs.splice(0, 1);
-        newID = ($.isArray(newID) ? newID[0] : newID).toString();
-        return newID;
     },
     getVolume: function() {
         return this.currentVolumePercent;
@@ -466,7 +464,7 @@ Playlist.prototype = {
         }
     }
 }
-var playlist = new Playlist(soundManager);
+var playlist = new Playlist(router, soundManager);
 $(document).ready(function() {
     var startPos;
     $(playlist.playlistDOM.parentTable).sortable({

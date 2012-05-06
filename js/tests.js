@@ -129,8 +129,8 @@ $(document).ready(function() {
     
     module("Routing");
     
-    asyncTest("Successful routing to playlist", function() {
-        var expected = 3;
+    asyncTest("Add tracks to playlist", function() {
+        var expected = 5;
         var counter = 0;
         expect(expected);
         var handler = function(additional) {
@@ -139,19 +139,19 @@ $(document).ready(function() {
                 start();
             }
         };
-        router.addResource("http://soundcloud.com/herewave/electric-wrecker").always(function(resolvedData) {
+        playlist.addResource("http://soundcloud.com/herewave/electric-wrecker").always(function(resolvedData) {
             equal(this.state(), "resolved", "Router should be able to route a streamable SoundCloud track.");
-            //equal(playlist.list[0].permalink, "http://soundcloud.com/herewave/electric-wrecker", "The first added track in the playlist is the first track in the playlist.");
-            handler(1);
+            equal(playlist.list[0].permalink, "http://soundcloud.com/herewave/electric-wrecker", "The first added track in the playlist is the first track in the playlist.");
+            handler(2);
         });
-        router.addResource("http://soundcloud.com/foofighters/sets/wasting-light/").always(function(resolvedData) {
+        playlist.addResource("http://soundcloud.com/foofighters/sets/wasting-light/").always(function(resolvedData) {
             equal(this.state(), "resolved", "Router should be able to route a streamable SoundCloud playlist.");
             handler(1);
         });
-        router.addResource("http://www.youtube.com/watch?v=X9QtdiRJYro").always(function(resolvedData) {
+        playlist.addResource("http://www.youtube.com/watch?v=X9QtdiRJYro").always(function(resolvedData) {
             equal(this.state(), "resolved", "Router should be able to route a streamable YouTube video.");
-            //equal(playlist.list[11].permalink, "http://www.youtube.com/watch?v=X9QtdiRJYro", "The YouTube track is added to the playlist in order.");
-            handler(1);
+            equal(playlist.list[12].permalink, "http://www.youtube.com/watch?v=X9QtdiRJYro", "The YouTube track is added to the playlist in order.");
+            handler(2);
         });
     });
 });
