@@ -88,30 +88,16 @@ var loadFunction = function() {
         playlist.updateSettings({
             updateURLOnAdd: false
         });
-        var mediaObjectTable = new MultilevelTable();
-        var mediaHandler = function(item, index, innerIndex) {
-            mediaObjectTable.addItem(item, index, innerIndex);
-        };
-        var mediaObjectCounter = 0;
-        var completeLoad = function(deferred) {
-            mediaObjectCounter++;
-            if (mediaObjectCounter == urlParams.length) {
-                var flatList = mediaObjectTable.getFlatTable();
-                playlist.addTracks(flatList, 0);
-                playlist.updateSettings({
-                    updateURLOnAdd: true
-                });
-
-                $.unblockUI();
-                if (deferred) {
-                    deferred.resolve();
-                }
-            }
-        };
+        var inputResources = [];
         for (var param in urlParams) {
             var keyValuePair = urlParams[param];
-            playlist.addResource(keyValuePair, mediaHandler, completeLoad);
+            inputResources.push(keyValuePair);
         }
+        playlist.addResourceAndWaitUntilLoaded(inputResources).always(function() {
+            playlist.updateSettings({
+                updateURLOnAdd: true
+            });
+        });
     }
     else {
         $.unblockUI();

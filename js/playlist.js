@@ -72,20 +72,45 @@ Playlist.prototype = {
         var left = '<div class ="left">' + remove + links + '</div>';
         return left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     },
-    addResource: function(url, mediaHandler, onComplete) {
+    addResource: function(url) {
         var playlist = this;
         var deferred = $.Deferred();
-        mediaHandler = mediaHandler || function(mediaObjects) {
+        this.router.addResource(url, function(mediaObjects) {
             playlist.addTracks(mediaObjects);
             return deferred.resolve();
-        };
-        var afterComplete = (!onComplete) ? $.noop : function() {
-            return onComplete(deferred);
-        };
-        this.router.addResource(url, mediaHandler, afterComplete).fail(function(deferredData) {
+        }).fail(function(deferredData) {
             deferred.reject(deferredData);
         });
         return deferred.promise();
+    },
+    addResourceAndWaitUntilLoaded: function(urls) {
+        var playlist = this;
+        var deferred = $.Deferred();
+        if (!$.isArray(urls)) {
+            urls = [urls];
+        }
+        var mediaObjectTable = new MultilevelTable();
+        var mediaHandler = function(item, index, innerIndex) {
+            mediaObjectTable.addItem(item, index, innerIndex);
+        };
+        var mediaObjectCounter = 0;
+        var completeLoad = function(deferred) {
+            mediaObjectCounter++;
+            if (mediaObjectCounter == urls.length) {
+                var flatList = mediaObjectTable.getFlatTable();
+                playlist.addTracks(flatList);
+
+                $.unblockUI();
+                deferred.resolve();
+            }
+        };
+        $.blockUI();
+        for (var url in urls) {
+            this.router.addResource(urls[url], mediaHandler, function() {
+                completeLoad(deferred);
+            });
+        }
+        return deferred.promose();
     },
     addTracks: function(mediaObjects, currentTrack) {
         if ( !(mediaObjects instanceof Array) ) {

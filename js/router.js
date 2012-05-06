@@ -143,7 +143,6 @@ Router.prototype = {
             if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
                 var func = this.testResource(url, excludedSites);
                 if (func) {
-                    console.log(this.requestsInProgress);
                     this.addToActionQueue(func.call(this, url, failure, deferred, mediaHandler, {trackIndex: this.requestsInProgress++}), onActionQueueExection);
                     success = true;
                 }
@@ -164,7 +163,6 @@ Router.prototype = {
         return deferred.promise();
     },
     executeActionQueueItem: function(deferredData) {
-        console.log(deferredData.trackIndex);
         if (deferredData && deferredData.action) {
             deferredData.action();
         }
@@ -217,7 +215,7 @@ Router.prototype = {
             
             var entries = $.grep(data.data.children, function(element) {
                 var link = element.data.url;
-                return router.testResource(link, ["Reddit"]) != null;
+                return $.isFunction(router.testResource(link, ["Reddit"]));
             });
             var actionCounter = 0;
             var actionTable = new MultilevelTable();
@@ -426,7 +424,6 @@ Router.prototype = {
         }*/
     },
     resolveReddit: function(url, failure, deferred, mediaHandler, params) {
-        var router = this;
         if (!deferred)
             deferred = $.Deferred();
         mediaHandler = mediaHandler || $.noop;
