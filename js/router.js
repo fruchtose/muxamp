@@ -110,6 +110,12 @@ Router.prototype = {
     addToActionQueue: function(deferredPlaylistAction, onQueueExecution) {
         this.actionQueue.push(deferredPlaylistAction);
         
+        if (this.requestsInProgress == 1) {
+            deferredPlaylistAction = this.addQueueProcessingToAction(deferredPlaylistAction, onQueueExecution);
+        }
+        return deferredPlaylistAction;
+    },
+    addQueueProcessingToAction: function(deferredPlaylistAction, onQueueExecution) {
         var router = this;
         return deferredPlaylistAction.always(function() {
             var nextAction = router.actionQueue.shift();
@@ -118,6 +124,7 @@ Router.prototype = {
                 if (onQueueExecution) {
                     nextAction.always(onQueueExecution);
                 }
+                router.addQueueProcessingToAction(nextAction, onQueueExecution);
             }
         });
     },
@@ -136,6 +143,7 @@ Router.prototype = {
             if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
                 var func = this.testResource(url, excludedSites);
                 if (func) {
+                    console.log(this.requestsInProgress);
                     this.addToActionQueue(func.call(this, url, failure, deferred, mediaHandler, {trackIndex: this.requestsInProgress++}), onActionQueueExection);
                     success = true;
                 }
@@ -156,10 +164,12 @@ Router.prototype = {
         return deferred.promise();
     },
     executeActionQueueItem: function(deferredData) {
+        console.log(deferredData.trackIndex);
         if (deferredData && deferredData.action) {
             deferredData.action();
         }
         this.requestsInProgress--;
+        return deferredData;
     },
     allocateNewTracks: function(count) {
         this.playlistObject.allocateNewIDs(count);
@@ -213,7 +223,7 @@ Router.prototype = {
             });
             var actionCounter = 0;
             var actionTable = new MultilevelTable();
-            var resolveData = {
+            var resolveData = $.extend({}, params, {
                 action: function() {
                     var actions = actionTable.getFlatTable();
                     for (var item in actions) {
@@ -221,8 +231,7 @@ Router.prototype = {
                         func();
                     }
                 }
-            };
-            console.log(entries.length);
+            });
             $.each(entries, function(index, element) {
                 var deferredAction = $.Deferred();
                 var entry = element.data;
@@ -238,7 +247,6 @@ Router.prototype = {
                     if (actionCounter == entries.length) {
                         deferred.resolve(resolveData);
                     }
-                    console.log(data.trackIndex + ", " + data.innerIndex);
                 });
             });
         };
