@@ -72,13 +72,17 @@ Playlist.prototype = {
         var left = '<div class ="left">' + remove + links + '</div>';
         return left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     },
-    addResource: function(url) {
+    addResource: function(url, mediaHandler, onComplete) {
         var playlist = this;
         var deferred = $.Deferred();
-        this.router.addResource(url, function(mediaObjects) {
+        mediaHandler = mediaHandler || function(mediaObjects) {
             playlist.addTracks(mediaObjects);
-            deferred.resolve();
-        }).fail(function(deferredData) {
+            return deferred.resolve();
+        };
+        var afterComplete = (!onComplete) ? $.noop : function() {
+            return onComplete(deferred);
+        };
+        this.router.addResource(url, mediaHandler, afterComplete).fail(function(deferredData) {
             deferred.reject(deferredData);
         });
         return deferred.promise();

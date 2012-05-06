@@ -85,7 +85,7 @@ var loadFunction = function() {
     var urlParams = getURLParams(true);
     var inputCount = urlParams.length;
     if (inputCount) {
-        router.playlistObject.updateSettings({
+        playlist.updateSettings({
             updateURLOnAdd: false
         });
         var mediaObjectTable = new MultilevelTable();
@@ -93,21 +93,24 @@ var loadFunction = function() {
             mediaObjectTable.addItem(item, index, innerIndex);
         };
         var mediaObjectCounter = 0;
-        var completeLoad = function() {
+        var completeLoad = function(deferred) {
             mediaObjectCounter++;
             if (mediaObjectCounter == urlParams.length) {
                 var flatList = mediaObjectTable.getFlatTable();
-                router.playlistObject.addTracks(flatList, 0);
-                router.playlistObject.updateSettings({
+                playlist.addTracks(flatList, 0);
+                playlist.updateSettings({
                     updateURLOnAdd: true
                 });
 
                 $.unblockUI();
+                if (deferred) {
+                    deferred.resolve();
+                }
             }
         };
         for (var param in urlParams) {
             var keyValuePair = urlParams[param];
-            router.addResource(keyValuePair, mediaHandler, completeLoad);
+            playlist.addResource(keyValuePair, mediaHandler, completeLoad);
         }
     }
     else {
