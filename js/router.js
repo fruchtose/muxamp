@@ -196,6 +196,12 @@ Router.prototype = {
             success: false,
             error: "SoundCloud track could not be used."
         });
+        var addNewTrack = function(mediaObject) {
+            return router.playlistObject.addTracks(mediaObject);
+        };
+        if (!mediaHandler) {
+            mediaHandler = addNewTrack;
+        }
         var error = function() {
             deferred.reject(deferredReject);
             if (failure)
@@ -274,6 +280,12 @@ Router.prototype = {
             if (failure)
                 failure();
         }
+        var addNewTrack = function(mediaObject) {
+            return router.playlistObject.addTracks(mediaObject);
+        };
+        if (!mediaHandler) {
+            mediaHandler = addNewTrack;
+        }
         var addPlaylistData = function(data) {
             if (data.streamable === true) {
                 //Tracks have stream URL
@@ -334,6 +346,12 @@ Router.prototype = {
             deferred.reject(deferredReject);
             if (failure)
                 failure();
+        }
+        var addNewTrack = function(mediaObject) {
+            return router.playlistObject.addTracks(mediaObject);
+        };
+        if (!mediaHandler) {
+            mediaHandler = addNewTrack;
         }
         var addTrackData = function(data) {
             if (data.streamable === true) {
@@ -522,7 +540,7 @@ Router.prototype = {
             youtubeID = /[\w\-]+/.exec(idSubstring);
         }
         var addNewTrack = function(mediaObject) {
-            router.playlistObject.addTracks(mediaObject);
+            return router.playlistObject.addTracks(mediaObject);
         };
         if (!deferred)
             deferred = $.Deferred();
