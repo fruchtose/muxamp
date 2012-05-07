@@ -1,3 +1,7 @@
+QUnit.moduleDone = function(settings) {
+    playlist.clear();
+};
+
 $(document).ready(function() {
     
     playlist.updateSettings({
@@ -130,7 +134,7 @@ $(document).ready(function() {
     module("Routing");
     
     asyncTest("Add tracks to playlist", function() {
-        var expected = 5;
+        var expected = 6;
         var counter = 0;
         expect(expected);
         var handler = function(additional) {
@@ -152,6 +156,10 @@ $(document).ready(function() {
             equal(this.state(), "resolved", "Router should be able to route a streamable YouTube video.");
             equal(playlist.list[12].permalink, "http://www.youtube.com/watch?v=X9QtdiRJYro", "The YouTube track is added to the playlist in order.");
             handler(2);
+        });
+        playlist.addResource("http://reddit.com/r/music").always(function(resolvedData) {
+            equal(this.state(), "resolved", "Router should be able to route a subreddit.");
+            handler(1);
         });
     });
 });

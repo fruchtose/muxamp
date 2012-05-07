@@ -154,6 +154,11 @@ Playlist.prototype = {
         $('#playlist-duration').text(secondsToString(this.totalDuration));
         $(this.playlistDOM.parentTable).sortable('refresh');
     },
+    clear: function() {
+        while (this.list.length) {
+            this.removeTrack(this.list.length - 1);
+        }
+    },
     getVolume: function() {
         return this.currentVolumePercent;
     },
