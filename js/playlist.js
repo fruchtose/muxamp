@@ -93,24 +93,10 @@ Playlist.prototype = {
         var mediaHandler = function(item, index, innerIndex) {
             mediaObjectTable.addItem(item, index, innerIndex);
         };
-        var counter = function() {
-            var mediaObjectCounter = 0;
-            var id = Math.random();
-            console.log(id);
-            var newFunc = function() {
-                mediaObjectCounter++;
-                console.log(id);
-                if (mediaObjectCounter == urls.length) {
-                }
-            };
-            newFunc.id = id;
-            return newFunc;
-        };
-        var completeLoad = counter();
         var actionArray = [];
         $.blockUI();
         for (var url in urls) {
-            actionArray.push(this.router.addResource(urls[url], mediaHandler, completeLoad));
+            actionArray.push(this.router.addResource(urls[url], mediaHandler));
         }
         $.whenAll.apply(null, actionArray).always(function(resolved) {
             var flatList = mediaObjectTable.getFlatTable();

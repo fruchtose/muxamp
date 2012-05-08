@@ -108,20 +108,17 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
 
 Router.prototype = {
     addToActionQueue: function(deferredPlaylistAction) {
+        var router = this;
         this.actionQueue.push(deferredPlaylistAction);
         var executeImmediatelyOnResolve = this.requestsInProgress == 1;
-        return this.addQueueProcessingToAction(deferredPlaylistAction, executeImmediatelyOnResolve);
-    },
-    addQueueProcessingToAction: function(deferredPlaylistAction, executeImmediatelyOnResolve) {
-        var router = this;
         if (executeImmediatelyOnResolve) {
             deferredPlaylistAction.always(function() {
                 router.executeActionQueueItems();
             });
-        }return deferredPlaylistAction;
+        }
+        return deferredPlaylistAction;
     },
-    addResource: function(url, mediaHandler, onActionQueueExection, excludedSites) {
-        onActionQueueExection = onActionQueueExection || $.noop;
+    addResource: function(url, mediaHandler, excludedSites) {
         var success = false;
         var deferred = $.Deferred();
         var failure = function() {
@@ -129,7 +126,6 @@ Router.prototype = {
         }
         var deferredAction = $.Deferred();
         var postAction = function(resolveData) {
-            onActionQueueExection(resolveData);
             deferredAction.resolve(resolveData);
         };
         var isString = typeof url == "string";
@@ -140,7 +136,7 @@ Router.prototype = {
             if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
                 var func = this.testResource(url, excludedSites);
                 if (func) {
-                    this.addToActionQueue(func.call(this, url, failure, deferred, postAction, mediaHandler, {trackIndex: this.requestsInProgress++}), onActionQueueExection);
+                    this.addToActionQueue(func.call(this, url, failure, deferred, postAction, mediaHandler, {trackIndex: this.requestsInProgress++}));
                     success = true;
                 }
             }
