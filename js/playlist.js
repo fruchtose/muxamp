@@ -101,21 +101,24 @@ Playlist.prototype = {
                 mediaObjectCounter++;
                 console.log(id);
                 if (mediaObjectCounter == urls.length) {
-                    var flatList = mediaObjectTable.getFlatTable();
-                    playlist.addTracks(flatList);
-
-                    $.unblockUI();
-                    deferred.resolve();
                 }
             };
             newFunc.id = id;
             return newFunc;
         };
         var completeLoad = counter();
+        var actionArray = [];
         $.blockUI();
         for (var url in urls) {
-            this.router.addResource(urls[url], mediaHandler, completeLoad);
+            actionArray.push(this.router.addResource(urls[url], mediaHandler, completeLoad));
         }
+        $.whenAll.apply(null, actionArray).always(function(resolved) {
+            var flatList = mediaObjectTable.getFlatTable();
+            playlist.addTracks(flatList);
+
+            $.unblockUI();
+            deferred.resolve();
+        });
         return deferred.promise();
     },
     addTracks: function(mediaObjects, currentTrack) {
