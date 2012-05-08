@@ -1,5 +1,5 @@
 function MultilevelTable() {
-    this.dirty = false;
+    this.dirty = true;
     this.table = [];
     this.flat = [];
 }
@@ -107,26 +107,18 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
 }
 
 Router.prototype = {
-    addToActionQueue: function(deferredPlaylistAction, onQueueExecution) {
+    addToActionQueue: function(deferredPlaylistAction) {
         this.actionQueue.push(deferredPlaylistAction);
-        
-        if (this.requestsInProgress == 1) {
-            deferredPlaylistAction = this.addQueueProcessingToAction(deferredPlaylistAction, onQueueExecution);
-        }
-        return deferredPlaylistAction;
+        var executeImmediatelyOnResolve = this.requestsInProgress == 1;
+        return this.addQueueProcessingToAction(deferredPlaylistAction, executeImmediatelyOnResolve);
     },
-    addQueueProcessingToAction: function(deferredPlaylistAction, onQueueExecution) {
+    addQueueProcessingToAction: function(deferredPlaylistAction, executeImmediatelyOnResolve) {
         var router = this;
-        return deferredPlaylistAction.always(function() {
-            var nextAction = router.actionQueue.shift();
-            if (nextAction) {
-                nextAction.always(router.executeActionQueueItem);
-                if (onQueueExecution) {
-                    nextAction.always(onQueueExecution);
-                }
-                router.addQueueProcessingToAction(nextAction, onQueueExecution);
-            }
-        });
+        if (executeImmediatelyOnResolve) {
+            deferredPlaylistAction.always(function() {
+                router.executeActionQueueItems();
+            });
+        }return deferredPlaylistAction;
     },
     addResource: function(url, mediaHandler, onActionQueueExection, excludedSites) {
         onActionQueueExection = onActionQueueExection || $.noop;
@@ -135,6 +127,11 @@ Router.prototype = {
         var failure = function() {
             alert("Unable to fetch content from " + url + ".");
         }
+        var deferredAction = $.Deferred();
+        var postAction = function(resolveData) {
+            onActionQueueExection(resolveData);
+            deferredAction.resolve(resolveData);
+        };
         var isString = typeof url == "string";
         if (isString)
             url = $.trim(url.toString());
@@ -143,7 +140,7 @@ Router.prototype = {
             if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
                 var func = this.testResource(url, excludedSites);
                 if (func) {
-                    this.addToActionQueue(func.call(this, url, failure, deferred, mediaHandler, {trackIndex: this.requestsInProgress++}), onActionQueueExection);
+                    this.addToActionQueue(func.call(this, url, failure, deferred, postAction, mediaHandler, {trackIndex: this.requestsInProgress++}), onActionQueueExection);
                     success = true;
                 }
             }
@@ -154,20 +151,37 @@ Router.prototype = {
                 else if (this.verifyURL('http://www.' + url)) {
                     success = this.addResource('http://' + url);
                 }
-                else deferred.reject({
-                    success: false,
-                    error: "The resource submitted could not be identified."
-                });
+                else {
+                    deferred.reject({
+                        success: false,
+                        error: "The resource submitted could not be identified."
+                    });
+                    deferredAction.reject({
+                        success: false,
+                        error: "The resource submitted could not be identified."
+                    });
+                }
             }
         }
-        return deferred.promise();
+        deferred.promise();
+        return deferredAction.promise();
     },
-    executeActionQueueItem: function(deferredData) {
-        if (deferredData && deferredData.action) {
-            deferredData.action();
+    executeActionQueueItems: function() {
+        var router = this;
+        var deferredData = this.actionQueue.shift();
+        if (deferredData) {
+            deferredData.always(function(resolveData) {
+                if (resolveData.action) {
+                    resolveData.action();
+                }
+                if (resolveData.postAction) {
+                    resolveData.postAction();
+                }
+                router.requestsInProgress = Math.max(0, router.requestsInProgress - 1);
+                router.executeActionQueueItems();
+            });
         }
-        this.requestsInProgress--;
-        return deferredData;
+        return (!!deferredData);
     },
     getNewTrackID: function() {
         return this.nextNewID++;
@@ -175,7 +189,7 @@ Router.prototype = {
     getOption: function(option) {
         return this.opts[option];
     },
-    processRedditLink: function(url, failure, deferred, mediaHandler, params) {
+    processRedditLink: function(url, failure, deferred, postAction, mediaHandler, params) {
         var router = this;
         if (url instanceof KeyValuePair) {
             var link = 'http://www.reddit.com/';
@@ -192,6 +206,7 @@ Router.prototype = {
             error: "SoundCloud track could not be used."
         });
         mediaHandler = mediaHandler || $.noop;
+        postAction = postAction || $.noop;
         var error = function() {
             deferred.reject(deferredReject);
             if (failure)
@@ -226,6 +241,9 @@ Router.prototype = {
                         var func = actions[item];
                         func();
                     }
+                },
+                postAction: function() {
+                    postAction.apply(this, arguments);
                 }
             });
             $.each(entries, function(index, element) {
@@ -234,7 +252,7 @@ Router.prototype = {
                 var link = entry.url;
                 var newParams = $.extend({}, params, {innerIndex: index});
                 var action = router.testResource(link, ["Reddit"]);
-                action.call(router, link, false, deferredAction, mediaHandler, newParams);
+                action.call(router, link, false, deferredAction, postAction, mediaHandler, newParams);
                 deferredAction.always(function(data) {
                     if (data && data.hasOwnProperty('action') && data.hasOwnProperty('trackIndex') && data.hasOwnProperty('innerIndex')) {
                         actionTable.addItem(data['action'], data['trackIndex'], data['innerIndex']);
@@ -255,7 +273,7 @@ Router.prototype = {
         }).success(success).error(error);
         return deferred.promise();
     },
-    processSoundCloudPlaylist: function(playlistID, failure, deferred, mediaHandler, params) {
+    processSoundCloudPlaylist: function(playlistID, failure, deferred, postAction, mediaHandler, params) {
         var consumerKey = this.soundcloudConsumerKey;
         var router = this;
         if (playlistID instanceof KeyValuePair) {
@@ -271,6 +289,7 @@ Router.prototype = {
                 failure();
         }
         mediaHandler = mediaHandler || $.noop;
+        postAction = postAction || $.noop;
         var addPlaylistData = function(data) {
             if (data.streamable === true) {
                 //Tracks have stream URL
@@ -279,7 +298,7 @@ Router.prototype = {
                         if (data.tracks && data.tracks.length > 0) {
                             $.each(data.tracks, function(index, track) {
                                 var deferredAction = $.Deferred();
-                                router.processSoundCloudTrack(track, failure, deferredAction, mediaHandler, params);
+                                router.processSoundCloudTrack(track, failure, deferredAction, postAction, mediaHandler, params);
                                 deferredAction.always(function(data){
                                     if (data && data.action) {
                                         data.action();
@@ -287,6 +306,9 @@ Router.prototype = {
                                 }).promise();
                             });
                         }
+                    },
+                    postAction: function() {
+                        postAction.apply(this, arguments);
                     }
                 }));
             }
@@ -317,7 +339,7 @@ Router.prototype = {
         else addPlaylistData(playlistID);
         return deferred.promise();
     },
-    processSoundCloudTrack: function(trackID, failure, deferred, mediaHandler, params) {
+    processSoundCloudTrack: function(trackID, failure, deferred, postAction, mediaHandler, params) {
         var consumerKey = this.soundcloudConsumerKey;
         var router = this;
         if (trackID instanceof KeyValuePair) {
@@ -333,6 +355,7 @@ Router.prototype = {
                 failure();
         }
         mediaHandler = mediaHandler || $.noop;
+        postAction = postAction || $.noop;
         var addTrackData = function(data) {
             if (data.streamable === true) {
                 //Tracks have stream URL
@@ -342,6 +365,9 @@ Router.prototype = {
                             var id = router.getNewTrackID();
                             var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, router.soundManager);
                             mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']).concat(params['innerIndex']));
+                        },
+                        postAction: function() {
+                            postAction.apply(this, arguments);
                         }
                     }));
                 }
@@ -379,7 +405,7 @@ Router.prototype = {
         else addTrackData(trackID);
         return deferred.promise();
     },
-    processYouTubeVideoID: function(youtubeID, failure, deferred, mediaHandler, params) {
+    processYouTubeVideoID: function(youtubeID, failure, deferred, postAction, mediaHandler, params) {
         var router = this;
         if (youtubeID instanceof KeyValuePair) {
             youtubeID = youtubeID.value;
@@ -393,6 +419,8 @@ Router.prototype = {
             if (failure)
                 failure();
         }
+        mediaHandler = mediaHandler || $.noop;
+        postAction = postAction || $.noop;
         var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json&callback=?';
         var options = {
             url: youtubeAPI,
@@ -409,6 +437,9 @@ Router.prototype = {
                         var id = router.getNewTrackID();
                         var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
                         mediaHandler && mediaHandler.apply(this, [trackObject].concat(params['trackIndex']).concat(params['innerIndex']));
+                    },
+                    postAction: function() {
+                        postAction.apply(this, arguments);
                     }
                 }));
             },
@@ -423,16 +454,16 @@ Router.prototype = {
             $.ajax(options);
         }*/
     },
-    resolveReddit: function(url, failure, deferred, mediaHandler, params) {
+    resolveReddit: function(url, failure, deferred, postAction, mediaHandler, params) {
         if (!deferred)
             deferred = $.Deferred();
         mediaHandler = mediaHandler || $.noop;
         if (!params)
             params = {};
-        this.processRedditLink(url, failure, deferred, mediaHandler, params);
+        this.processRedditLink(url, failure, deferred, postAction, mediaHandler, params);
         return deferred.promise();
     },
-    resolveSoundCloud: function(url, failure, deferred, mediaHandler, params) {
+    resolveSoundCloud: function(url, failure, deferred, postAction, mediaHandler, params) {
         var router = this;
         var resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
         if (!deferred)
@@ -468,10 +499,10 @@ Router.prototype = {
                     
                     //Tracks have stream URL
                     if (data.stream_url) {
-                        router.processSoundCloudTrack(data, failure, deferred, mediaHandler, params);
+                        router.processSoundCloudTrack(data, failure, deferred, postAction, mediaHandler, params);
                     }
                     else {
-                        router.processSoundCloudPlaylist(data, failure, deferred, mediaHandler, params);
+                        router.processSoundCloudPlaylist(data, failure, deferred, postAction, mediaHandler, params);
                     }
                 }
                 else {
@@ -489,7 +520,7 @@ Router.prototype = {
         }*/
         
     },
-    resolveYouTube: function(url, failure, deferred, mediaHandler, params) {
+    resolveYouTube: function(url, failure, deferred, postAction, mediaHandler, params) {
         var youtubeID, beginningURL, beginningURLLoc, beginningURLLength, idSubstring;
         if (url.indexOf("youtube.com") > -1) {
             beginningURL = "v=";
@@ -512,7 +543,7 @@ Router.prototype = {
             if (!params) {
                 params = {};
             }
-            this.processYouTubeVideoID(youtubeID, failure, deferred, mediaHandler, params);
+            this.processYouTubeVideoID(youtubeID, failure, deferred, postAction, mediaHandler, params);
         }
         else {
             if (failure)

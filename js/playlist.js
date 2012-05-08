@@ -93,24 +93,30 @@ Playlist.prototype = {
         var mediaHandler = function(item, index, innerIndex) {
             mediaObjectTable.addItem(item, index, innerIndex);
         };
-        var mediaObjectCounter = 0;
-        var completeLoad = function(deferred) {
-            mediaObjectCounter++;
-            if (mediaObjectCounter == urls.length) {
-                var flatList = mediaObjectTable.getFlatTable();
-                playlist.addTracks(flatList);
+        var counter = function() {
+            var mediaObjectCounter = 0;
+            var id = Math.random();
+            console.log(id);
+            var newFunc = function() {
+                mediaObjectCounter++;
+                console.log(id);
+                if (mediaObjectCounter == urls.length) {
+                    var flatList = mediaObjectTable.getFlatTable();
+                    playlist.addTracks(flatList);
 
-                $.unblockUI();
-                deferred.resolve();
-            }
+                    $.unblockUI();
+                    deferred.resolve();
+                }
+            };
+            newFunc.id = id;
+            return newFunc;
         };
+        var completeLoad = counter();
         $.blockUI();
         for (var url in urls) {
-            this.router.addResource(urls[url], mediaHandler, function() {
-                completeLoad(deferred);
-            });
+            this.router.addResource(urls[url], mediaHandler, completeLoad);
         }
-        return deferred.promose();
+        return deferred.promise();
     },
     addTracks: function(mediaObjects, currentTrack) {
         if ( !(mediaObjects instanceof Array) ) {
