@@ -179,25 +179,20 @@ $(document).ready(function() {
             equal(this.state(), "resolved", "Router should be able to route a streamable SoundCloud track.");
             equal(playlist.list[0].permalink, "http://soundcloud.com/herewave/electric-wrecker", "The first added track in the playlist is the first track in the playlist.");
             handler(2);
+        });
+        playlist.addResourceAndWaitUntilLoaded("http://soundcloud.com/foofighters/sets/wasting-light/").always(function(resolvedData) {
             console.log("x");
-        }).always(function() {
-            console.log("z");
-            playlist.addResourceAndWaitUntilLoaded("http://soundcloud.com/foofighters/sets/wasting-light/").always(function(resolvedData) {
-                console.log("x");
-                equal(this.state(), "resolved", "Router should be able to route a streamable SoundCloud playlist.");
-                handler(1);
-            }).always(function() {
-                playlist.addResourceAndWaitUntilLoaded("http://www.youtube.com/watch?v=X9QtdiRJYro").always(function(resolvedData) {
-                    equal(this.state(), "resolved", "Router should be able to route a streamable YouTube video.");
-                    equal(playlist.list[12].permalink, "http://www.youtube.com/watch?v=X9QtdiRJYro", "The YouTube track is added to the playlist in order.");
-                    handler(2);
-                }).always(function() {
-                    playlist.addResourceAndWaitUntilLoaded("http://reddit.com/r/music").always(function(resolvedData) {
-                    equal(this.state(), "resolved", "Router should be able to route a subreddit.");
-                    handler(1);
-            });
-                });
-            });
+            equal(this.state(), "resolved", "Router should be able to route a streamable SoundCloud playlist.");
+            handler(1);
+        });
+        playlist.addResourceAndWaitUntilLoaded("http://www.youtube.com/watch?v=X9QtdiRJYro").always(function(resolvedData) {
+            equal(this.state(), "resolved", "Router should be able to route a streamable YouTube video.");
+            equal(playlist.list[12].permalink, "http://www.youtube.com/watch?v=X9QtdiRJYro", "The YouTube track is added to the playlist in order.");
+            handler(2);
+        });
+        playlist.addResourceAndWaitUntilLoaded("http://reddit.com/r/music").always(function(resolvedData) {
+            equal(this.state(), "resolved", "Router should be able to route a subreddit.");
+            handler(1);
         });
     });
 });
