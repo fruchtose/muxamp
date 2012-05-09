@@ -36,7 +36,7 @@ $(document).ready(function() {
         var index = 0;
         expect(3);
         var deferred = $.Deferred();
-        router.resolveReddit("http://reddit.com/r/music", false, deferred, false, false, {
+        router.resolveReddit("http://reddit.com/r/music", false, deferred, {
             trackIndex: index
         }).always(function(resultsData){
             equal(this.state(), "resolved", "The Reddit link should be resolved.");
@@ -61,7 +61,7 @@ $(document).ready(function() {
         (function() {
             var index = 0;
             var deferred = $.Deferred();
-            router.resolveSoundCloud("http://soundcloud.com/herewave/electric-wrecker", false, deferred, false, false, {
+            router.resolveSoundCloud("http://soundcloud.com/herewave/electric-wrecker", false, deferred, {
                 trackIndex: index
             }).always(function(resultsData) {
                 equal(this.state(), "resolved", "The song should be resolved.");
@@ -74,7 +74,7 @@ $(document).ready(function() {
         (function() {
             var index = 0;
             var deferred = $.Deferred();
-            router.resolveSoundCloud("http://soundcloud.com/foofighters/sets/wasting-light/", false, deferred, false, false, {
+            router.resolveSoundCloud("http://soundcloud.com/foofighters/sets/wasting-light/", false, deferred, {
                 trackIndex: index
             }).always(function(resultsData){
                 equal(this.state(), "resolved", "The playlist should be resolved.");
@@ -87,7 +87,7 @@ $(document).ready(function() {
         (function() {
             var index = 0;
             var deferred = $.Deferred();
-            router.resolveSoundCloud("http://soundcloud.com/foofighters", false, deferred, false, false, {
+            router.resolveSoundCloud("http://soundcloud.com/foofighters", false, deferred, {
                 trackIndex: index
             }).always(function(resultsData){
                 equal(this.state(), "rejected", "No track or playlist in this URL, should be rejected.");
@@ -104,7 +104,7 @@ $(document).ready(function() {
         (function() {
             var index = 0;
             var deferred = $.Deferred();
-            router.resolveYouTube("http://www.youtube.com/watch?v=X9QtdiRJYro", false, deferred, false, false, {
+            router.resolveYouTube("http://www.youtube.com/watch?v=X9QtdiRJYro", false, deferred, {
                 trackIndex: index
             }).always(function(resultsData) {
                 equal(this.state(), "resolved", "The video should be resolved.");
@@ -120,7 +120,7 @@ $(document).ready(function() {
         (function() {
             var index = 0;
             var deferred = $.Deferred();
-            router.resolveYouTube("http://www.youtube.com/watch?v=0", false, deferred, false, false, {
+            router.resolveYouTube("http://www.youtube.com/watch?v=0", false, deferred, {
                 trackIndex: index
             }).always(function(resultsData){
                 equal(this.state(), "rejected", "The video should not be resolved.");
