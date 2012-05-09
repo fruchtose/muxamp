@@ -89,9 +89,8 @@ Playlist.prototype = {
         if (!$.isArray(urls)) {
             urls = [urls];
         }
-        var mediaObjectTable = new MultilevelTable();
-        var mediaHandler = function(item, index, innerIndex) {
-            mediaObjectTable.addItem(item, index, innerIndex);
+        var mediaHandler = function(mediaObjects) {
+            playlist.addTracks(mediaObjects);
         };
         var actionArray = [];
         $.blockUI();
@@ -99,9 +98,6 @@ Playlist.prototype = {
             actionArray.push(this.router.addResource(urls[url], mediaHandler));
         }
         $.whenAll.apply(null, actionArray).always(function(resolved) {
-            var flatList = mediaObjectTable.getFlatTable();
-            playlist.addTracks(flatList);
-
             $.unblockUI();
             deferred.resolve();
         });
