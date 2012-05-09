@@ -181,7 +181,6 @@ $(document).ready(function() {
             handler(2);
         });
         playlist.addResourceAndWaitUntilLoaded("http://soundcloud.com/foofighters/sets/wasting-light/").always(function(resolvedData) {
-            console.log("x");
             equal(this.state(), "resolved", "Router should be able to route a streamable SoundCloud playlist.");
             handler(1);
         });
