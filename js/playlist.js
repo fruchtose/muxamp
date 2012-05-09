@@ -146,8 +146,19 @@ Playlist.prototype = {
         $(this.playlistDOM.parentTable).sortable('refresh');
     },
     clear: function() {
-        while (this.list.length) {
-            this.removeTrack(this.list.length - 1);
+        if (!this.isEmpty()) {
+            var wasPlaying = this.isPlaying() && index == this.currentTrack;
+            if (wasPlaying){
+                this.stop();
+            }
+            this.list = [];
+            $(this.playlistDOM.allRowsInTable).remove();
+            this.refreshWindowLocationHash();
+            this.setCurrentTrack(0);
+            this.setPlayButton(this.isEmpty());
+            $('#track-count').text(this.list.length.toString());
+            this.totalDuration = 0;
+            $('#playlist-duration').text(secondsToString(this.totalDuration));
         }
     },
     getVolume: function() {
