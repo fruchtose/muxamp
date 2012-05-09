@@ -1,3 +1,5 @@
+var redditDef;
+
 QUnit.moduleDone = function(settings) {
     playlist.clear();
 };
@@ -38,7 +40,7 @@ $(document).ready(function() {
             trackIndex: index
         }).always(function(resultsData){
             equal(this.state(), "resolved", "The Reddit link should be resolved.");
-            equal($.isFunction(resultsData.action), true, "The resolver should return an action to execute after resolution.");
+            equal($.isArray(resultsData.tracks), true, "The resolver should return media objects.");
             equal(resultsData.trackIndex, index, "The data returned by the resolver should include the same track index as the input.");
             start();
         });
@@ -63,7 +65,7 @@ $(document).ready(function() {
                 trackIndex: index
             }).always(function(resultsData) {
                 equal(this.state(), "resolved", "The song should be resolved.");
-                equal($.isFunction(resultsData.action), true, "The resolver should return an action to execute after resolution.");
+                equal($.isArray(resultsData.tracks), true, "The resolver should return media objects.");
                 equal(resultsData.trackIndex, index, "The data returned by the resolver should include the same track index as the input.");
                 checkForStart(3);
             });
@@ -76,7 +78,7 @@ $(document).ready(function() {
                 trackIndex: index
             }).always(function(resultsData){
                 equal(this.state(), "resolved", "The playlist should be resolved.");
-                equal($.isFunction(resultsData.action), true, "The resolver should return an action to execute after resolution.");
+                equal($.isArray(resultsData.tracks), true, "The resolver should return media objects.");
                 equal(resultsData.trackIndex, index, "The data returned by the resolver should include the same track index as the input.");
                 checkForStart(3);
             });
@@ -106,7 +108,7 @@ $(document).ready(function() {
                 trackIndex: index
             }).always(function(resultsData) {
                 equal(this.state(), "resolved", "The video should be resolved.");
-                equal($.isFunction(resultsData.action), true, "The resolver should return an action to execute after resolution.");
+                equal($.isArray(resultsData.tracks), true, "The resolver should return media objects.");
                 equal(resultsData.trackIndex, index, "The data returned by the resolver should include the same track index as the input.");
                 counter+= 3;
                 if (counter == expected) {
@@ -157,7 +159,7 @@ $(document).ready(function() {
             equal(playlist.list[12].permalink, "http://www.youtube.com/watch?v=X9QtdiRJYro", "The YouTube track is added to the playlist in order.");
             handler(2);
         });
-        playlist.addResource("http://reddit.com/r/music").always(function(resolvedData) {
+        redditDef = playlist.addResource("http://reddit.com/r/music").always(function(resolvedData) {
             equal(this.state(), "resolved", "Router should be able to route a subreddit.");
             handler(1);
         });

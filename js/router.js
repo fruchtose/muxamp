@@ -107,9 +107,13 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
 }
 
 Router.prototype = {
-    addToActionQueue: function(deferredPlaylistAction) {
+    addToActionQueue: function(deferredPlaylistAction, mediaHandler, deferredFinish) {
         var router = this;
-        this.actionQueue.push(deferredPlaylistAction);
+        this.actionQueue.push({
+            action: deferredPlaylistAction,
+            mediaHandler: mediaHandler,
+            finish: deferredFinish
+        });
         var executeImmediatelyOnResolve = this.requestsInProgress == 1;
         if (executeImmediatelyOnResolve) {
             deferredPlaylistAction.always(function() {
@@ -125,9 +129,7 @@ Router.prototype = {
             alert("Unable to fetch content from " + url + ".");
         }
         var deferredAction = $.Deferred();
-        var postAction = function(resolveData) {
-            deferredAction.resolve(resolveData);
-        };
+        var postAction = $.noop;
         var isString = typeof url == "string";
         if (isString)
             url = $.trim(url.toString());
@@ -136,7 +138,7 @@ Router.prototype = {
             if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
                 var func = this.testResource(url, excludedSites);
                 if (func) {
-                    this.addToActionQueue(func.call(this, url, failure, deferred, postAction, mediaHandler, {trackIndex: this.requestsInProgress++}));
+                    this.addToActionQueue(func.call(this, url, failure, deferred, postAction, mediaHandler, {trackIndex: this.requestsInProgress++}), mediaHandler, deferredAction);
                     success = true;
                 }
             }
@@ -164,20 +166,18 @@ Router.prototype = {
     },
     executeActionQueueItems: function() {
         var router = this;
-        var deferredData = this.actionQueue.shift();
-        if (deferredData) {
-            deferredData.always(function(resolveData) {
-                if (resolveData.action) {
-                    resolveData.action();
-                }
-                if (resolveData.postAction) {
-                    resolveData.postAction();
+        var deferredAction = this.actionQueue.shift();
+        if (deferredAction) {
+            deferredAction.action.always(function(resolveData) {
+                if (deferredAction.mediaHandler) {
+                    deferredAction.mediaHandler(resolveData.tracks);
                 }
                 router.requestsInProgress = Math.max(0, router.requestsInProgress - 1);
+                deferredAction.finish.resolve();
                 router.executeActionQueueItems();
             });
         }
-        return (!!deferredData);
+        return (!!deferredAction);
     },
     getNewTrackID: function() {
         return this.nextNewID++;
@@ -228,7 +228,40 @@ Router.prototype = {
                 var link = element.data.url;
                 return $.isFunction(router.testResource(link, ["Reddit"]));
             });
-            var actionCounter = 0;
+            var multiLevelTracks = new MultilevelTable();
+            var deferredArray = [];
+            for (var index in entries) {
+                var element = entries[index];
+                var deferredAction = $.Deferred();
+                var entry = element.data;
+                var link = entry.url;
+                var newParams = $.extend({}, params, {innerIndex: index});
+                var action = router.testResource(link, ["Reddit"]);
+                action.call(router, link, false, deferredAction, postAction, mediaHandler, newParams);
+                deferredArray[index] = deferredAction;
+                deferredAction.promise().always(function(trackData) {
+                    if (trackData && trackData.hasOwnProperty('tracks')) {
+                        multiLevelTracks.addItem(trackData['tracks'], trackData['trackIndex'], trackData['innerIndex']);
+                    }
+                });
+                /*deferredAction.always(function(data) {
+                    if (data && data.hasOwnProperty('tracks') && data.hasOwnProperty('trackIndex') && data.hasOwnProperty('innerIndex')) {
+                        actionTable.addItem(data['tracks'], data['trackIndex'], data['innerIndex']);
+                    }
+                    actionCounter++;
+                    if (actionCounter == entries.length) {
+                        deferred.resolve(resolveData);
+                    }
+                });*/
+            }
+            var tracks = [];
+            $.whenAll.apply(null, deferredArray).always(function() {
+                tracks = multiLevelTracks.getFlatTable();
+                deferred.resolve($.extend({}, params, {
+                    tracks: tracks
+                }));
+            });
+            /*var actionCounter = 0;
             var actionTable = new MultilevelTable();
             var resolveData = $.extend({}, params, {
                 action: function() {
@@ -258,7 +291,7 @@ Router.prototype = {
                         deferred.resolve(resolveData);
                     }
                 });
-            });
+            });*/
         };
         while (new Date() - router.lastRedditRequest < 2000) {}
         router.lastRedditRequest = new Date();
@@ -288,15 +321,43 @@ Router.prototype = {
         postAction = postAction || $.noop;
         var addPlaylistData = function(data) {
             if (data.streamable === true) {
+                var multilevelTracks = new MultilevelTable();
+                var tracksDeferred = [], tracks = [];
+                if (data.tracks && data.tracks.length > 0) {
+                    for (var index in data.tracks) {
+                        var track = data.tracks[index];
+                        var deferredAction = $.Deferred();
+                        router.processSoundCloudTrack(track, failure, deferredAction, postAction, mediaHandler, params);
+                        tracksDeferred.push(deferredAction);
+                        deferredAction.promise().always(function(trackData) {
+                            multilevelTracks.addItem(trackData.tracks, index);
+                        });
+                    }
+                    $.whenAll.apply(null, tracksDeferred).always(function() {
+                        tracks = multilevelTracks.getFlatTable();
+                        deferred.resolve($.extend({}, params, {
+                            tracks: tracks
+                        }));
+                    });
+                        /*$.each(data.tracks, function(index, track) {
+                            var deferredAction = $.Deferred();
+                            router.processSoundCloudTrack(track, failure, deferredAction, postAction, mediaHandler, params);
+                            deferredAction.always(function(data){
+                                if (data && data.tracks) {
+                                    data.action();
+                                }
+                            }).promise();
+                        });*/
+                }
                 //Tracks have stream URL
-                deferred.resolve($.extend({}, params, {
+                /*deferred.resolve($.extend({}, params, {
                     action: function() {
                         if (data.tracks && data.tracks.length > 0) {
                             $.each(data.tracks, function(index, track) {
                                 var deferredAction = $.Deferred();
                                 router.processSoundCloudTrack(track, failure, deferredAction, postAction, mediaHandler, params);
                                 deferredAction.always(function(data){
-                                    if (data && data.action) {
+                                    if (data && data.tracks) {
                                         data.action();
                                     }
                                 }).promise();
@@ -306,7 +367,7 @@ Router.prototype = {
                     postAction: function() {
                         postAction.apply(this, arguments);
                     }
-                }));
+                }));*/
             }
             else {
                 errorFunction();
@@ -356,7 +417,12 @@ Router.prototype = {
             if (data.streamable === true) {
                 //Tracks have stream URL
                 if (data.stream_url) {
+                    var id = router.getNewTrackID();
+                    var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, router.soundManager);
                     deferred.resolve($.extend({}, params, {
+                        tracks: [trackObject]
+                    }));
+                    /*deferred.resolve($.extend({}, params, {
                         action: function() {
                             var id = router.getNewTrackID();
                             var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, router.soundManager);
@@ -365,7 +431,7 @@ Router.prototype = {
                         postAction: function() {
                             postAction.apply(this, arguments);
                         }
-                    }));
+                    }));*/
                 }
                 else {
                     errorFunction();
@@ -428,7 +494,12 @@ Router.prototype = {
                 var author = authorObj.name.$t;
                 var title = entry.title.$t;
                 var duration = parseInt(entry.media$group.yt$duration.seconds);
+                var id = router.getNewTrackID();
+                var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
                 deferred.resolve($.extend({}, params, {
+                    tracks: [trackObject]
+                }));
+                /*deferred.resolve($.extend({}, params, {
                     action: function() {
                         var id = router.getNewTrackID();
                         var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
@@ -437,7 +508,7 @@ Router.prototype = {
                     postAction: function() {
                         postAction.apply(this, arguments);
                     }
-                }));
+                }));*/
             },
             error: errorFunction
         };
