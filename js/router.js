@@ -4,6 +4,8 @@ function MultilevelTable() {
     this.flat = [];
 }
 
+var proxyURL = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'proxy.php';
+
 MultilevelTable.prototype = {
     addItem: function(item, index, innerIndex) {
         if (!this.table[index]) {
@@ -53,7 +55,7 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
             site: 'Reddit',
             test: function(input) {
                 return (typeof input == "string" && input.indexOf("reddit.com/r/") >= 0) ||
-                    (input instanceof KeyValuePair && input.key == 'rdt');
+                (input instanceof KeyValuePair && input.key == 'rdt');
             },
             getAction: function(input) {
                 if (typeof input == "string"){
@@ -68,8 +70,8 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
         table.push({
             site: 'SoundCloud',
             test: function(input) {
-                return (typeof input == "string" && input.indexOf("soundcloud.com/") >= 0) ||
-                    (input instanceof KeyValuePair && (input.key == 'sct' || input.key == 'scp'));
+                return (typeof input == "string" && (input.indexOf("soundcloud.com/") >= 0 || input.indexOf("http://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F") === 0)) ||
+                (input instanceof KeyValuePair && (input.key == 'sct' || input.key == 'scp'));
             },
             getAction: function(input) {
                 if (typeof input == "string"){
@@ -86,9 +88,9 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
         table.push({
             site: 'YouTube',
             test: function(input) {
-                return (typeof input == "string" && (/youtube\.com\/watch\\?/.test(input) && /v=[\w\-]+/.test(input)) || 
-                    /youtu.be\/[\w\-]+/.test(input)) 
-                    || (input instanceof KeyValuePair && input.key == 'ytv');
+                return (typeof input == "string" && ((/youtube\.com\/watch\\?/.test(input) && /v=[\w\-]+/.test(input)) || 
+                    /youtu.be\/[\w\-]+/.test(input) || /http:\/\/www.youtube\.com\/embed\/[\w\-]+\?/.test(input))) 
+                || (input instanceof KeyValuePair && input.key == 'ytv');
             },
             getAction: function(input) {
                 if (typeof input == "string"){
@@ -96,6 +98,18 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
                 }
                 else if (input instanceof KeyValuePair) {
                     return router.processYouTubeVideoID;
+                }
+                else return null;
+            }
+        });
+        table.push({
+            site: 'Internet',
+            test: function(input) {
+                return router.testResource(input, ['Internet']) === null;
+            },
+            getAction: function(input) {
+                if (typeof input == "string") {
+                    return router.resolveInternetLink;
                 }
                 else return null;
             }
@@ -137,7 +151,9 @@ Router.prototype = {
             if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
                 var func = this.testResource(url, excludedSites);
                 if (func) {
-                    this.addToActionQueue(func.call(this, url, failure, deferred, {trackIndex: this.requestsInProgress++}), mediaHandler, deferredAction);
+                    this.addToActionQueue(func.call(this, url, failure, deferred, {
+                        trackIndex: this.requestsInProgress++
+                    }), mediaHandler, deferredAction);
                     success = true;
                 }
             }
@@ -183,6 +199,63 @@ Router.prototype = {
     },
     getOption: function(option) {
         return this.opts[option];
+    },
+    processInternetLink: function(url, failure, deferred, params) {
+        var router = this;
+        var deferredReject = $.extend({}, params, {
+            success: false,
+            error: "SoundCloud track could not be used."
+        });
+        var errorFunction = function() {
+            deferred.reject(deferredReject);
+            if (failure)
+                failure();
+        }
+        var resolveURL = proxyURL + '?url=' + url;
+        var options = {
+            url: resolveURL,
+            dataType: 'html',
+            timeout: 5000,
+            success: function(response) {
+                // Captures links
+                var html = $(response), index;
+                var actions =  $.grep(html.find('iframe').map(function(index, element) {
+                    var func = router.testResource($(element).attr('src'), ['Internet']);
+                    if (func != null) {
+                        return {
+                            action: func,
+                            url: $(element).attr('src')
+                        }
+                    }
+                    else return null;
+                }), function(element) {
+                    return (element);
+                });
+                var multiLevelTracks = new MultilevelTable();
+                var deferredActions = [];
+                for (index in actions) {
+                    var action = actions[index];
+                    var deferredAction = $.Deferred();
+                    action.action.call(router, action.url, false, deferredAction, {
+                        trackIndex: index
+                    });
+                    deferredActions.push(deferredAction.always(function(trackData) {
+                        if (trackData && trackData.hasOwnProperty('tracks') && trackData.hasOwnProperty('trackIndex')) {
+                            multiLevelTracks.addItem(trackData.tracks, trackData.trackIndex);
+                        }
+                    }));
+                }
+                
+                $.whenAll.apply(null, deferredActions).always(function() {
+                    var tracks = multiLevelTracks.getFlatTable();
+                    deferred.resolve($.extend({}, params, {
+                        tracks: tracks
+                    }));
+                });
+            },
+            error: errorFunction
+        };
+        $.ajax(options);
     },
     processRedditLink: function(url, failure, deferred, params) {
         var router = this;
@@ -232,13 +305,15 @@ Router.prototype = {
                 var deferredAction = $.Deferred();
                 var entry = element.data;
                 var link = entry.url;
-                var newParams = $.extend({}, params, {innerIndex: index});
+                var newParams = {
+                    trackIndex: index
+                };
                 var action = router.testResource(link, ["Reddit"]);
                 action.call(router, link, false, deferredAction, newParams);
                 deferredArray[index] = deferredAction;
                 deferredAction.promise().always(function(trackData) {
                     if (trackData && trackData.hasOwnProperty('tracks')) {
-                        multiLevelTracks.addItem(trackData['tracks'], trackData['trackIndex'], trackData['innerIndex']);
+                        multiLevelTracks.addItem(trackData['tracks'], trackData['trackIndex']);
                     }
                 });
             }
@@ -371,7 +446,7 @@ Router.prototype = {
                 timeout: 10000
             };
             $.ajax(options);
-            /*if (queue) {
+        /*if (queue) {
                 queue.add(options);
             }
             else {
@@ -418,6 +493,14 @@ Router.prototype = {
         $.ajax(options);
         return deferred.promise();
     },
+    resolveInternetLink: function(url, failure, deferred, params) {
+        if (!deferred)
+            deferred = $.Deferred();
+        if (!params)
+            params = {};
+        this.processInternetLink(url, failure, deferred, params);
+        return deferred.promise();
+    },
     resolveReddit: function(url, failure, deferred, params) {
         if (!deferred)
             deferred = $.Deferred();
@@ -427,8 +510,15 @@ Router.prototype = {
         return deferred.promise();
     },
     resolveSoundCloud: function(url, failure, deferred, params) {
-        var router = this;
-        var resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
+        var router = this, resolveURL, playerLocator = "http://w.soundcloud.com/player/?url=";
+        if (url.indexOf(playerLocator) === 0) {
+            var urlParams = getURLParams(url.substring(url.indexOf("?") + 1));
+            var decodedURL = decodeURIComponent(urlParams['url'][0]);
+            resolveURL = decodedURL + ".json?consumer_key=" + this.soundcloudConsumerKey + '&callback=?';
+        }
+        else {
+            resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
+        }
         if (!deferred)
             deferred = $.Deferred();
         if (!params) {
@@ -474,7 +564,7 @@ Router.prototype = {
         };
         $.ajax(ajaxOptions);
         return deferred.promise();
-        /*if (queue) {
+    /*if (queue) {
             queue.add(ajaxOptions);
         }
         else {
@@ -484,7 +574,14 @@ Router.prototype = {
     },
     resolveYouTube: function(url, failure, deferred, params) {
         var youtubeID, beginningURL, beginningURLLoc, beginningURLLength, idSubstring;
-        if (url.indexOf("youtube.com") > -1) {
+        if (/http:\/\/www.youtube\.com\/embed\/[\w\-]+\?/.test(url)) {
+            beginningURL = "/embed/";
+            beginningURLLoc = url.indexOf(beginningURL);
+            beginningURLLength = beginningURL.length;
+            idSubstring = url.substring(beginningURLLoc + beginningURLLength);
+            youtubeID = /[\w\-]+/.exec(idSubstring);
+        }
+        else if (url.indexOf("youtube.com") > -1) {
             beginningURL = "v=";
             beginningURLLoc = url.indexOf(beginningURL);
             beginningURLLength = beginningURL.length;
@@ -539,9 +636,10 @@ Router.prototype = {
                 continue;
             if (route.test(input)) {
                 var func = route.getAction(input);
-                if (func)
+                if (func) {
                     result = func;
-                break;
+                    break;
+                }
             }
         }
         return result;

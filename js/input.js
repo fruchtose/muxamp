@@ -11,7 +11,7 @@ KeyValuePair.prototype.toString = function() {
 // // Original code by Andy E of Stack Overflow
 // http://stackoverflow.com/a/7676115/959934
 // Modified by me to allow multiple values to be associated with a single key
-function getURLParams(useOrderedList) {
+function getURLParams(source, useOrderedList) {
     var urlParams = {};
     var orderedList = [];
     var e,
@@ -27,7 +27,7 @@ function getURLParams(useOrderedList) {
             return spaced;
         }
     },
-    q = window.location.hash;
+    q = source;
     if (q.charAt(0) == '#') {
         q = q.substring(1);
     }
@@ -82,7 +82,7 @@ var hashTableToFlatList = function(table) {
 };
 
 var loadFunction = function() {
-    var urlParams = getURLParams(true);
+    var urlParams = getURLParams(window.location.hash, true);
     var inputCount = urlParams.length;
     if (inputCount) {
         playlist.updateSettings({
