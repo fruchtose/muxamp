@@ -44,7 +44,11 @@ var SoundObject = new JS.Class(MediaObject, {
     },
     
     isPlaying: function() {
-        return this.sound.playState == 1;
+        return this.sound.playState === 1;
+    },
+    
+    isStopped: function() {
+        return this.sound.playState === 0;
     },
     
     play: function(options) {
@@ -102,6 +106,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
     initialize: function(id, youtubeID, uploader, title, duration) {
         var permalink = 'http://www.youtube.com/watch?v=' + youtubeID;
         this.callSuper("YouTube", permalink, permalink, id, youtubeID, 'ytv', "img/youtube.png", uploader, title, duration);
+        this.playState = 0;
     },
    
     destruct: function() {
@@ -130,26 +135,34 @@ var YouTubeObject = new JS.Class(VideoObject, {
    
     isPaused: function() {
         var paused = false;
-        try {
-            paused = $("#video").tubeplayer('isPaused');
-        }
-        catch(e) {
+        if (this.playState) {
+            try {
+                paused = $("#video").tubeplayer('isPaused');
+            }
+            catch(e) {
+            }
         }
         return paused;
     },
    
     isPlaying: function() {
-        var playing;
-        try {
-            playing = $("#video").tubeplayer('isPlaying');
-        }
-        catch(e) {
-            playing = false;
+        var playing = false;
+        if (this.playState) {
+            try {
+                playing = $("#video").tubeplayer('isPlaying');
+            }
+            catch(e) {
+            }
         }
         return playing;
     },
+    
+    isStopped: function() {
+        return this.playSTate === 0 || ! this.isPlaying();
+    },
    
     play: function(options) {
+        var video = this;
         $(document).ready(function() {
             if (options) {
                 $("#video").tubeplayer(options);
@@ -157,6 +170,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
             else {
                 $("#video").tubeplayer();
             }
+            video.playState = 1;
         });
     },
     
@@ -191,9 +205,11 @@ var YouTubeObject = new JS.Class(VideoObject, {
     },
    
     stop: function() {
+        var video = this;
         $(document).ready(function() {
             $("#video").tubeplayer('pause');
             $("#video").tubeplayer('seek', 0);
+            video.playState = 0;
         });
     },
    

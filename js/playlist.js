@@ -72,14 +72,20 @@ Playlist.prototype = {
         var left = '<div class ="left">' + remove + links + '</div>';
         return left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     },
-    addResource: function(url) {
+    addResource: function(urls) {
         var playlist = this;
         var deferred = $.Deferred();
-        this.router.addResource(url, function(mediaObjects) {
-            playlist.addTracks(mediaObjects);
-            return deferred.resolve();
-        }).fail(function(deferredData) {
-            deferred.reject(deferredData);
+        if (!$.isArray(urls)) {
+            urls = [urls];
+        }
+        var actionArray = [];
+        for (var url in urls) {
+            actionArray.push(this.router.addResource(urls[url], function(mediaObjects) {
+                playlist.addTracks(mediaObjects);
+            }));
+        }
+        $.whenAll.apply(null, actionArray).always(function(resolved) {
+            deferred.resolve();
         });
         return deferred.promise();
     },
@@ -147,9 +153,10 @@ Playlist.prototype = {
     },
     clear: function() {
         if (!this.isEmpty()) {
-            var wasPlaying = this.isPlaying() && index == this.currentTrack;
-            if (wasPlaying){
-                this.stop();
+            this.stop();
+            var media = this.list[this.currentTrack];
+            if (media.type == "video") {
+                clearVideo();
             }
             this.list = [];
             $(this.playlistDOM.allRowsInTable).remove();
@@ -215,6 +222,9 @@ Playlist.prototype = {
         if (!this.isEmpty()) {
             status = this.list[this.currentTrack].isPlaying() || this.list[this.currentTrack].isPaused();
         }
+        console.log(this.list[this.currentTrack]);
+        console.log(this.list[this.currentTrack].isPlaying());
+        console.log(this.list[this.currentTrack].isPaused());
         return status;
     },
     moveTrack: function(originalIndex, newIndex) {
@@ -296,9 +306,11 @@ Playlist.prototype = {
                             playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
                             media.interval = window.setInterval(function() {
                                 var data = $("#video").tubeplayer('data');
-                                var percent =  (data.currentTime / data.duration) * 100;
-                                timeElapsed.text(secondsToString(data.currentTime));
-                                updateTimebar(percent);
+                                if (data) {
+                                    var percent =  (data.currentTime / data.duration) * 100;
+                                    timeElapsed.text(secondsToString(data.currentTime));
+                                    updateTimebar(percent);
+                                }
                             }, 334);
                         },
                         onPlayerEnded: function() {
@@ -465,10 +477,13 @@ Playlist.prototype = {
         }
     },
     stop: function () {
-        this.list[this.currentTrack].stop();
-        timebar.width(0);
-        $('#time-elapsed').text('0:00');
-        this.setPlayButton(true);
+        if (!this.isEmpty()) {
+            this.list[this.currentTrack].stop();
+            var media = this.list[this.currentTrack];
+            timebar.width(0);
+            $('#time-elapsed').text('0:00');
+            this.setPlayButton(true);
+        }
     },
     toggleMute: function() {
         if (!this.isEmpty()) {
