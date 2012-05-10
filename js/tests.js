@@ -1,5 +1,3 @@
-var redditDef;
-
 QUnit.moduleDone = function(settings) {
     playlist.clear();
 };
@@ -165,7 +163,7 @@ $(document).ready(function() {
         });
     });
     
-    asyncTest("Adding tracks to playlist and blocking UI", function() {
+    asyncTest("Adding tracks to playlist and blocking UI (single items)", function() {
         var expected = 6;
         var counter = 0;
         expect(expected);
@@ -192,6 +190,25 @@ $(document).ready(function() {
         playlist.addResourceAndWaitUntilLoaded("http://reddit.com/r/music").always(function(resolvedData) {
             equal(this.state(), "resolved", "Router should be able to route a subreddit.");
             handler(1);
+        });
+    });
+    
+    asyncTest("Adding tracks to playlist and blocking UI (multiple items)", function() {
+        var expected = 3;
+        var counter = 0;
+        expect(expected);
+        var handler = function(additional) {
+            counter += additional;
+            if (counter == expected) {
+                start();
+            }
+        };
+        
+        playlist.addResourceAndWaitUntilLoaded(["http://www.youtube.com/watch?v=X9QtdiRJYro", "http://soundcloud.com/herewave/electric-wrecker"]).always(function(resolvedData) {
+            equal(this.state(), "resolved", "Router should be able to route multiple items and blcok the UI.");
+            equal(playlist.list[playlist.list.length - 2].permalink, "http://www.youtube.com/watch?v=X9QtdiRJYro", "The YouTube track is added to the playlist in order.");
+            equal(playlist.list[playlist.list.length - 1].permalink, "http://soundcloud.com/herewave/electric-wrecker", "The Soundcloud track is added to the playlist in order.");
+            handler(3);
         });
     });
 });
