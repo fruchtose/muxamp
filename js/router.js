@@ -4,8 +4,6 @@ function MultilevelTable() {
     this.flat = [];
 }
 
-var proxyURL = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'proxy.php';
-
 MultilevelTable.prototype = {
     addItem: function(item, index, innerIndex) {
         if (!this.table[index]) {
@@ -211,25 +209,23 @@ Router.prototype = {
             if (failure)
                 failure();
         }
-        var resolveURL = proxyURL + '?url=' + url;
+        var proxyURL = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'proxy.php';
+        var resolveURL = proxyURL + "?url=" + url;
         var options = {
             url: resolveURL,
-            dataType: 'html',
+            dataType: 'json',
             timeout: 5000,
             success: function(response) {
-                // Captures links
-                var html = $(response), index;
-                var actions =  $.grep(html.find('iframe').map(function(index, element) {
-                    var func = router.testResource($(element).attr('src'), ['Internet']);
+                var links = response.results;
+                var actions =  $.map(links, function(element) {
+                    var func = router.testResource(element, ['Internet']);
                     if (func != null) {
                         return {
                             action: func,
-                            url: $(element).attr('src')
+                            url: element
                         }
                     }
                     else return null;
-                }), function(element) {
-                    return (element);
                 });
                 var multiLevelTracks = new MultilevelTable();
                 var deferredActions = [];
@@ -620,20 +616,19 @@ Router.prototype = {
         if (exclusions != null && exclusions != undefined && !$.isArray(exclusions)) {
             exclusions = [exclusions];
         }
-        var result = null;
-        for (var entry in this.routingTable) {
-            var route = this.routingTable[entry];
-            var skip = false;
-            if ($.isArray(exclusions)) {
-                for (var index in exclusions) {
-                    var exclusion = exclusions[index];
-                    if (route.site.toString().indexOf(exclusion) > -1) {
-                        skip = true;
-                    }
+        var result = null, possibleRoutes = [], i, j;
+        if (exclusions) {
+            for (i in this.routingTable) {
+                if (exclusions.indexOf(this.routingTable[i].site) == -1) {
+                    possibleRoutes.push(this.routingTable[i]);
                 }
             }
-            if (skip)
-                continue;
+        }
+        else {
+            possibleRoutes = this.routingTable;
+        }
+        for (var entry in possibleRoutes) {
+            var route = possibleRoutes[entry];
             if (route.test(input)) {
                 var func = route.getAction(input);
                 if (func) {

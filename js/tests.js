@@ -43,6 +43,20 @@ var initTests = function() {
 var loadMediaTests = function() {
     module("Loading media");
     
+    test("Resolving an Internet link", function() {
+        var index = 0, deferred = $.Deferred();
+        expect(3);
+        stop();
+        router.resolveInternetLink("http://barrygruff.wordpress.com/2012/05/10/raglans-digging-holes/", false, deferred, {
+            trackIndex: index
+        }).always(function(resultsData){
+            equal(this.state(), "resolved", "The Internet link should be resolved.");
+            equal($.isArray(resultsData.tracks), true, "The resolver should return media objects.");
+            equal(resultsData.trackIndex, index, "The data returned by the resolver should include the same track index as the input.");
+            start();
+        });
+    });
+    
     test("Resolving a Reddit link", function() {
         var index = 0, deferred = $.Deferred();
         expect(3);
@@ -211,7 +225,7 @@ var playlistInteractionTests = function() {
     });
     
     test("Playing and pausing", function() {
-        expect(3);
+        expect(5);
         stop();
         mediaAdded.always(function(resolvedData) {
             playlist.play();
@@ -221,14 +235,22 @@ var playlistInteractionTests = function() {
                 playlist.togglePause();
                 setTimeout(function() {
                     equal(playlist.isPaused(), true, "The playlist can be paused.");
-                    start();
+                    playlist.togglePause();
+                    setTimeout(function() {
+                        equal(playlist.isPlaying(), true, "The playlist can be played again.");
+                        playlist.togglePause();
+                        setTimeout(function() {
+                            equal(playlist.isPaused(), true, "The playlist can be paused again.");
+                            start();
+                        }, 500);
+                    }, 500);
                 }, 500);
             }, 5000);
         });
     });
     
     test("Playing and stopping", function() {
-        expect(3);
+        expect(5);
         stop();
         mediaAdded.always(function() {
             playlist.play();
@@ -238,7 +260,15 @@ var playlistInteractionTests = function() {
                 playlist.stop();
                 setTimeout(function() {
                     equal(playlist.isPlaying(), false, "The playlist can be stopped.");
-                    start();
+                    playlist.play();
+                    setTimeout(function() {
+                        equal(playlist.isPlaying(), true, "The playlist can be played again.");
+                        playlist.stop();
+                        setTimeout(function() {
+                            equal(playlist.isPlaying(), false, "The playlist can be stopped again.");
+                            start();
+                        }, 500);
+                    }, 500);
                 }, 500);
             }, 5000);
         });

@@ -129,7 +129,7 @@ Playlist.prototype = {
             for (var j in slicedList) {
                 newHash += '&' + slicedList[j].siteCode + '=' + slicedList[j].siteMediaID;
             }
-            if (this.list.length > 1) {
+            if (this.list.length - mediaObjects.length > 0) {
                 newHash = '&' + newHash;
             }
             // Making sure user cannot create huuuuuuuge URL by default
@@ -222,9 +222,6 @@ Playlist.prototype = {
         if (!this.isEmpty()) {
             status = this.list[this.currentTrack].isPlaying() || this.list[this.currentTrack].isPaused();
         }
-        console.log(this.list[this.currentTrack]);
-        console.log(this.list[this.currentTrack].isPlaying());
-        console.log(this.list[this.currentTrack].isPaused());
         return status;
     },
     moveTrack: function(originalIndex, newIndex) {
@@ -415,7 +412,7 @@ Playlist.prototype = {
         if (this.isPlaying() || this.isPaused()) {
             var media = this.list[this.currentTrack];
             var setMute = intPercent == 0;
-            this.list[this.currentTrack].setVolume(intPercent);
+            media.setVolume(intPercent);
             if (setMute) {
                 intPercent = 50;
             }
@@ -479,7 +476,6 @@ Playlist.prototype = {
     stop: function () {
         if (!this.isEmpty()) {
             this.list[this.currentTrack].stop();
-            var media = this.list[this.currentTrack];
             timebar.width(0);
             $('#time-elapsed').text('0:00');
             this.setPlayButton(true);

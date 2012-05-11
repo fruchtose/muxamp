@@ -163,15 +163,21 @@ var YouTubeObject = new JS.Class(VideoObject, {
    
     play: function(options) {
         var video = this;
-        $(document).ready(function() {
-            if (options) {
-                $("#video").tubeplayer(options);
-            }
-            else {
-                $("#video").tubeplayer();
-            }
+        if ( $("#video").tubeplayer('isPaused')) {
+            $("#video").tubeplayer('play');
             video.playState = 1;
-        });
+        }
+        else {
+            $(document).ready(function() {
+                if (options) {
+                    $("#video").tubeplayer(options);
+                }
+                else {
+                    $("#video").tubeplayer();
+                }
+                video.playState = 1;
+            });
+        }
     },
     
     seek: function(decimalPercent) {

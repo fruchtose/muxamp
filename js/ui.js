@@ -56,7 +56,7 @@ $('#previous').click(function() {
 });
 
 $('#play').click(function() {
-    if (playlist.isPlaying()) {
+    if (playlist.isPlaying() || playlist.isPaused()) {
         playlist.togglePause();
     }
     else {
