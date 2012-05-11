@@ -303,12 +303,12 @@ Playlist.prototype = {
                             playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
                             media.interval = window.setInterval(function() {
                                 var data = $("#video").tubeplayer('data');
-                                if (data) {
+                                if (data && data.hasOwnProperty('currentTime') && data.hasOwnProperty('duration')) {
                                     var percent =  (data.currentTime / data.duration) * 100;
                                     timeElapsed.text(secondsToString(data.currentTime));
                                     updateTimebar(percent);
                                 }
-                            }, 334);
+                            }, 333);
                         },
                         onPlayerEnded: function() {
                             clearMediaInterval();
