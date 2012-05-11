@@ -513,6 +513,9 @@ Router.prototype = {
             resolveURL = decodedURL + ".json?consumer_key=" + this.soundcloudConsumerKey + '&callback=?';
         }
         else {
+            if (/soundcloud.com\/[^\/]+\/[^\/]+\/download/.test(url)) {
+                url = url.substring(0, url.lastIndexOf("/download") + 1);
+            }
             resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
         }
         if (!deferred)
