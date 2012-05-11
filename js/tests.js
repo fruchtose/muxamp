@@ -85,6 +85,20 @@ var loadMediaTests = function() {
         });
     });
     
+    test("Resolving a SoundCloud track download", function() {
+        var index = 0, deferred = $.Deferred();
+        expect(3);
+        stop();
+        router.resolveSoundCloud("http://soundcloud.com/dj-ego-3/lovely-sandstorm/download", false, deferred, {
+            trackIndex: index
+        }).always(function(resultsData) {
+            equal(this.state(), "resolved", "The song should be resolved.");
+            equal($.isArray(resultsData.tracks), true, "The resolver should return media objects.");
+            equal(resultsData.trackIndex, index, "The data returned by the resolver should include the same track index as the input.");
+            start();
+        });
+    });
+    
     test("Resolving a SoundCloud set", function() {
         var index = 0, deferred = $.Deferred();
         expect(3);
