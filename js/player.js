@@ -158,7 +158,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
     },
     
     isStopped: function() {
-        return this.playSTate === 0 || ! this.isPlaying();
+        return this.playState === 0 || ! this.isPlaying();
     },
    
     play: function(options) {
