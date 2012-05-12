@@ -165,6 +165,7 @@
 		color: 'red', // 'red' or 'white'
 		showinfo: false,
 		modestbranding: true,
+                volume: 50,
 		
 		// with respect to [wmode] - 'transparent' maintains z-index, but disables GPU acceleration
 		wmode: 'transparent', // you probably want to use 'window' when optimizing for mobile devices
@@ -378,6 +379,8 @@
 				events: {
 					
 					'onReady': function(evt){
+                                            
+                                                evt.target.setVolume(o.volume);
 						
 						TubePlayer.ytplayers[o.playerID] = evt.target;
 						
@@ -567,6 +570,8 @@
 				
 				TubePlayer.ytplayers[playerId] = player;
 				
+                                player.setVolume(o.volume);
+                                
 				player.addEventListener("onStateChange", "$.tubeplayer.defaults.stateChange('"+playerId+"')");
 			
 				player.addEventListener("onError", "$.tubeplayer.defaults.onError('"+playerId+"')");

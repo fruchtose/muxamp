@@ -291,14 +291,9 @@ Playlist.prototype = {
                         width: 399,
                         height: 256,
                         onStop: clearMediaInterval,
-                        onPlayerUnstarted: function() {
-                            playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
-                        },
-                        onPlayerCued: function() {
-                            playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
-                        },
                         onPlayerBuffering: clearMediaInterval,
                         onPlayerPaused: clearMediaInterval,
+                        volume: playlist.isMuted() ? 0 : playlist.getVolume(),
                         onPlayerPlaying: function() {
                             playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
                             media.interval = window.setInterval(function() {
