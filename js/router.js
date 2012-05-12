@@ -506,10 +506,16 @@ Router.prototype = {
         return deferred.promise();
     },
     resolveSoundCloud: function(url, failure, deferred, params) {
-        var router = this, resolveURL, playerLocator = "http://w.soundcloud.com/player/?url=";
-        if (url.indexOf(playerLocator) === 0) {
-            var urlParams = getURLParams(url.substring(url.indexOf("?") + 1));
-            var decodedURL = decodeURIComponent(urlParams['url'][0]);
+        var router = this, resolveURL, miniPlayerLocator = "http://w.soundcloud.com/player/?url=", flashPlayerLocator = "http://player.soundcloud.com/player.swf?url=";
+        var urlParams, decodedURL;
+        if (url.indexOf(miniPlayerLocator) === 0) {
+            urlParams = getURLParams(url.substring(url.indexOf("?") + 1));
+            decodedURL = decodeURIComponent(urlParams['url'][0]);
+            resolveURL = decodedURL + ".json?consumer_key=" + this.soundcloudConsumerKey + '&callback=?';
+        }
+        else if (url.indexOf(flashPlayerLocator) === 0) {
+            urlParams = getURLParams(url.substring(url.indexOf("?") + 1));
+            decodedURL = decodeURIComponent(urlParams['url'][0]);
             resolveURL = decodedURL + ".json?consumer_key=" + this.soundcloudConsumerKey + '&callback=?';
         }
         else {
