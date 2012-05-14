@@ -25,16 +25,30 @@
     <body>
         <div id="wrapper">
             <div id="main">
-                <div id="playlist-view">
-                    <ol id="tracks"></ol>
-                </div>
+                <form id="search-form" class="form-inline" method="post">
+                    <input type="text" id="search-query" />
+                    <input id="search-site" type="hidden" value="ytv" />
+                    <div id="search-site-dropdown" class="btn-group">
+                        <input type="submit" class="btn" id="search-submit" value="Search" />
+                        <button id="site-selector" class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            YouTube&nbsp;<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href onclick="return false;">YouTube</a></li>
+                            <li><a href onclick="return false;">SoundCloud (Tracks)</a></li>
+                        </ul>
+                        
+                    </div>
+                    
+                </form>
+                <div id="search-results-view"><ol id="search-results"></ol></div>
             </div>
             <div id="right-side">
                 <div id="video-container">
                     <div id="video"></div>
                 </div>
                 <div id="side-content">
-                    <div class="rows">
+                    <div id="playlist-controls" class="rows">
                         <div id="timebar-row" class="player-row">
                             <div id="timebar">
                                 <div id="timebar-outer">
@@ -70,24 +84,9 @@
                                 <div id="volume-amount"><i id="volume-symbol" class="icon-volume-up"></i><span id="volume-number">50</span></div>
                             </div>
                         </div>
-                        <div class="player-row">
-                            <form id="adder-form" class="form-inline" method="post">
-                                <div id="adder" class="input-append">
-                                    <input type="text" id="adder-link" />
-                                    <input type="submit" class="btn" id="adder-button" type="button" value="Add Media Source" />
-                                </div>
-                            </form>
-                        </div>
                     </div>
-                </div>
-                <div id="footer">
-                    <div id="footer-content"><a id="about-button" href onclick="return false;">About</a> <b>Muxamp</b>. <noscript>This playlist is written entirely in JavaScript, so if you don't enable it you won't see anything!</noscript>
-                        <?php
-                        $slogan = get_random_db_slogan();
-
-                        if ($slogan !== false)
-                            echo "<span class=\"slogan\">$slogan</span>";
-                        ?>
+                    <div id="playlist-view" style="overflow: auto;">
+                        <ol id="tracks"></ol>
                     </div>
                 </div>
             </div>
@@ -99,18 +98,18 @@
             </div>
             <div class="modal-body">
                 <p><b>Muxamp</b> is a unified playlist that lets you play media from SoundCloud and YouTube in the same playlist. The site is powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. Code is done by Robert Fruchtman.</p>
-                
+
                 <p>Muxamp wants to get out of your way. To use it, copy links into the the textbox next to the "Add Media Source" button. Here are the kinds of links you can add:</p>
-                
+
                 <ol>
                     <li>Reddit subreddits (to fetch media links from other sites)</li> 
                     <li>SoundCloud tracks</li>
                     <li>SoundCloud sets</li>
                     <li>YouTube videos</li>
                 </ol>
-                
+
                 <p><b>Double-click</b> tracks to play. <b>Drag and drop</b> tracks to move them.</p>
-                
+
                 <p><b>Copy and paste</b> the URL to share your playlist. This site won't track you!</p>
             </div>
         </div>
@@ -125,6 +124,7 @@
         <script src="js/soundmanager2-nodebug-jsmin.js" type="text/javascript"></script>
         <script src="js/jsclass.js" type="text/javascript"></script>
         <script src="js/config.js" type="text/javascript"></script>
+        <script src="js/searchresults.js" type="text/javascript"></script>
         <script src="js/player.js" type="text/javascript"></script>
         <script src="js/router.js" type="text/javascript"></script>
         <script src="js/playlist.js" type="text/javascript"></script>

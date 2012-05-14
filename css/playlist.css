@@ -10,11 +10,11 @@ img {
     border: none;
     float: left;
 }
-li {
+#right-side li {
     margin: 0px;
     white-space: pre-line;
 }
-ol, ul {
+#right-side ol, #right-side ul {
     list-style: none;
     margin: 0px;
     padding: 0px;
@@ -42,21 +42,18 @@ a:hover {
     top: 0;
 }
 #main {
+    bottom: 0;
+    left: 0;
     margin-right: 400px;
     min-width: 200px;
-    overflow: auto;
-}
-#right-side {
-    border-left: solid #aaa 1px;
-    bottom: 0;
+    overflow-y: auto;
     position: absolute;
     right: 0;
     top: 0;
-    width: 399px;
 }
-#footer-content, #video-container {
-    background-color: #EEE;
-    color: #2E2E2E;
+#search-site-dropdown {
+    display: inline-block;
+    vertical-align: middle;
 }
 /*#side-content a, #footer a, #video a {
     color: #775739;
@@ -66,9 +63,6 @@ a:hover {
     color: #2E2E2E;
     padding-left: 20px;
     padding-right: 20px;
-}
-.rows {
-    float: left;
 }
 .player-row {
     height: 30px;
@@ -86,6 +80,14 @@ a:hover {
 }
 #playlist-duration-wrapper {
     float: left;
+}
+#playlist-view {
+    bottom: 20px;
+    overflow: auto;
+    position: absolute;
+    right: 20px;
+    top: 340px;
+    width:360px;
 }
 /*.search-link {
     border: solid #888 1px;
@@ -135,24 +137,8 @@ a:hover {
     padding: 0 7px 0 7px;
     top: 5px;
 }
-#adder-form {
-    margin-bottom: 0;
-}
-#adder {
-    padding: 0;
-}
-#adder input, #adder button {
-    margin-top: -4px;
-}
-#adder-link {
-    padding-top: 0;
-    padding-bottom: 0;
-    width: 222px;
-}
-#adder-button {
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-left: -5px;
+#right-side {
+    width: 400px;
 }
 #timebar-row {
     width: 360px;
@@ -230,6 +216,21 @@ a:hover {
 #volume-number {
     margin-left: 6px;
 }
+#video-container, #video {
+    height: 230px;
+    width: 360px;
+    z-index: 15
+}
+#video-container {
+    margin: 20px 0 0 20px;
+    position: absolute;
+    right: 20px;
+}
+#playlist-controls {
+    top: 250px;
+    position: absolute;
+    right: 20px;
+}
 #tracks li .playlist-item {
     min-height: 24px;
     padding-bottom: 1px;
@@ -294,76 +295,9 @@ a:hover {
     text-decoration: none;
 }
 #tracks li.playing a:hover {text-decoration: underline; }
-#search-view {
-    background-color: #fff;
-    border-left: solid #aaa 1px;
-    display: none;
-    height: 100%;
-    padding-left: 20px;
-    padding-right: 20px;
-    position: absolute;
-    right: 400px;
-    top: 0;
-    width: 360px;
-    z-index: 15;
-}
-#search-view .control-group {
-    margin-left: -20px;
-}
-#search-view .control-label {
-    width: 100px;
-}
-#search-view .controls {
-    margin-left: 120px;
-}
-#search-view a {
-    font-weight: bold;
-    vertical-align: middle;
-}
-#search-form {
-    height: 20px;
-    line-height: 20px;
-    vertical-align: middle;
-}
-#search-form input {
-    margin: 2px 0 0;
-}
-#search-button-text {
-    margin-left: 6px;
-}
-#search-options {
-    float: left;
-}
-#search-options label {
-    display: block;
-    float: left;
-    line-height: 20px;
-    padding-right: 13px;
-    white-space: nowrap;
-}
-#search-options input {
-    margin: 0;
-    vertical-align: middle;
-}
-#search-options label span {
-    vertical-align: middle;
-}
-#video-container {
-    border-bottom: solid #aaa 1px;
-    height: 256px;
-    width: 399px;
-    z-index: 15
-}
 #footer {
-    border-top: solid #aaa 1px;
     bottom: 0;
     position: absolute;
-}
-#footer-content {
-    line-height: 20px;
-    min-height: 20px;
-    padding: 5px;
-    text-align: center;
 }
 span.slogan {
     font-style: italic;

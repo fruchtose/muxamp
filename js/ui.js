@@ -1,55 +1,6 @@
-var body, east;var bodyLayoutOptions = {
-    center: {
-        minSize: 810,
-        paneSelector: "#main"
-    },
-    east: {
-        closable: false,
-        minSize: 400,
-        initClosed: false,
-        paneSelector: "#right-side",
-        resizable: false,
-        size: 400,
-        slidable: false,
-        spacing_closed: 0,
-        spacing_open: 0
-    },
-    north: {
-        closable: false,
-        paneSelector: "#player-header",
-        resizable: false,
-        size: 60,
-        slidable: false,
-        spacing_open: 0
-    }
-};
-
-var eastOptions = {
-    center: {
-        paneSelector: "#side-content"
-    },
-    north: {
-        closable: false,
-        paneSelector: "#video-container",
-        resizable: false,
-        size: 257,
-        slidable: false,
-        spacing_open: 0
-    },
-    south: {
-        closable: false,
-        paneSelector: "#footer",
-        resizable: false,
-        size: "auto",
-        slidable: false,
-        spacing_open: 0
-    }
-};
-
-$(document).ready(function() {
-    body = $("body").layout(bodyLayoutOptions); 
-    east = $("#right-side").layout(eastOptions);
-});
+$("#search-media-source .btn dropdown-toggle").click(function() {
+    
+    });
 
 $('#previous').click(function() {
     playlist.previousTrack();
@@ -76,12 +27,47 @@ $('#shuffle').click(function() {
     playlist.shuffle();
 });
 
-$('#adder-form').submit(function(e){
+var siteCodeFromSiteName = function(site) {
+    var result = "";
+    switch(site) {
+        case "YouTube":
+            result = "ytv";
+            break;
+        case "SoundCloud (Tracks)":
+            result = "sct";
+            break;
+    }
+    return result;
+}
+
+var searchForTracks = function(query, site) {
+    var searchURL =  window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'search.php?q=' + encodeURIComponent(query) + "&s=" + site;
+    $.ajax({
+        url: searchURL,
+        dataType: 'json',
+        success: function(searchResults) {
+            searchResultsView.setSearchResults(searchResults);
+        }
+    });
+}
+
+$('#search-site-dropdown a').click(function() {
+    var site = $(this).html();
+    $("#search-site").val(siteCodeFromSiteName(site));
+    $("#site-selector").html(site + '&nbsp;<span class="caret"></span>');
+    var query = $('#search-query').val();
+    if (query) {
+        var site = $("#search-site").val();
+        searchForTracks(query, site);
+    }
+});
+
+$('#search-form').submit(function(e){
     e.preventDefault();
-    var value = $('#adder-link').val();
+    var value = $('#search-query').val();
+    var site = $("#search-site").val();
     if (value) {
-        playlist.addResource(value);
-        $('#adder-link').val("");
+        searchForTracks(value, site);
     }
     return false;
 });

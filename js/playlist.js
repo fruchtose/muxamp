@@ -288,8 +288,8 @@ Playlist.prototype = {
                         autoPlay: true,
                         initialVideo: media.siteMediaID,
                         loadSWFObject: false,
-                        width: 399,
-                        height: 256,
+                        width: 360,
+                        height: 230,
                         onStop: clearMediaInterval,
                         onPlayerBuffering: clearMediaInterval,
                         onPlayerPaused: clearMediaInterval,
@@ -511,7 +511,7 @@ $(document).ready(function() {
     var startPos;
     $(playlist.playlistDOM.parentTable).sortable({
         axis: 'y',
-        containment: '#main',
+        containment: $(playlist.playlistDOM.parentTable).parent(),
         start: function(event, ui) {
             startPos = $(event.target).parent('li').index();
         },
