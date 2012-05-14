@@ -118,7 +118,8 @@ $results = array();
 $soundcloud_key = "2f9bebd6bcd85fa5acb916b14aeef9a4";
 $soundcloud_search_tracks_link = "http://api.soundcloud.com/tracks.json?client_id=$soundcloud_key&filter=streamable&order=hotness&q=$query";
 $youtube_search_videos_link = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=25&orderby=relevance&alt=jsonc&q=$query";
-$query_words = explode("+", strtolower($query));
+$query_words = explode(" ", preg_replace('/[[:punct:]]/', ' ', strtolower($query)));
+print_r($query_words);
 $query_word_count = count($query_words);
 $max_query_similarity = 0;
 $max_plays = 0;
@@ -129,11 +130,17 @@ switch($source) {
         $soundcloud_track_results = array_slice(json_decode(file_get_contents($soundcloud_search_tracks_link)), 0, 25);
         for ($i = 0; $i < count($soundcloud_track_results); $i++) {
             $result = $soundcloud_track_results[$i];
+            if (!isset($result->playback_count)) {
+                $result->playback_count = -$i - 1;
+                $result->favoritings_count = -$i - 1;
+                continue;
+            }
             if (!isset($result->stream_url)) {
                 continue;
             }
             $new_result = new SearchResult("SoundCloud", $result->stream_url . "client_id=$soundcloud_key", $result->permalink_url, $result->id, "sct", "img/soundcloud_orange_white_16.png", $result->user->username, $result->title, $result->duration / 1000, "audio", $result->playback_count, $result->favoritings_count);
-            $new_result->querySimilarity = (count(array_intersect($query_words, explode(" ", strtolower($new_result->artist . " " . $new_result->mediaName)))))/$query_word_count;
+            $comparison_string = preg_replace('/[[:punct:]]/', ' ', strtolower($new_result->artist . " " . $new_result->mediaName));
+            $new_result->querySimilarity = (count(array_intersect($query_words, explode(" ", $comparison_string))))/$query_word_count;
             if ($new_result->plays > $max_plays) {
                 $max_plays = $new_result->plays;
             }
@@ -153,7 +160,8 @@ switch($source) {
             $result = $youtube_video_results[$i];
             $permalink = "http://www.youtube.com/watch?v=" . $result->id;
             $new_result = new SearchResult("YouTube", $permalink, $permalink, $result->id, "ytv", "img/youtube.png", $result->uploader, $result->title, $result->duration, "video", $result->viewCount, $result->favoriteCount);
-            $new_result->querySimilarity = (count(array_intersect($query_words, explode(" ", strtolower($new_result->artist . " " . $new_result->mediaName)))))/$query_word_count;
+            $comparison_string = preg_replace('/[[:punct:]]/', ' ', strtolower($new_result->artist . " " . $new_result->mediaName));
+            $new_result->querySimilarity = (count(array_intersect($query_words, explode(" ", $comparison_string))))/$query_word_count;
             if ($new_result->plays > $max_plays) {
                 $max_plays = $new_result->plays;
             }
@@ -173,8 +181,21 @@ switch($source) {
 if (count($results) > 0) {
     // Groups results by query similarity
     foreach ($results as &$result) {
-        $result->playRelevance = round(log($result->plays + 1) / log($max_plays + 1), 1);
-        $result->favoriteRelevance = round(log($result->favorites + 1) / log($max_favorites + 1), 1);
+        if ($result->plays < 0) {
+            $new_plays = 0;
+            $new_favorites = 0;
+            for ($i = -1 * $result->plays; $i < count($results); $i++) {
+                if ($results[$i]->plays >= 0) {
+                    $new_plays = $results[$i]->plays;
+                    $new_favorites = $results[$i]->favorites;
+                    break;
+                }
+            }
+            $result->plays = $new_plays;
+            $result->favorites = $new_favorites;
+        }
+        $result->playRelevance = log($result->plays + 1) / log($max_plays + 1);
+        $result->favoriteRelevance = log($result->favorites + 1) / log($max_favorites + 1);
         $result->calculateRelevance();
     }
     usort($results, function($a, $b) {

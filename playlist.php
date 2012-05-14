@@ -37,9 +37,9 @@
                             <li><a href onclick="return false;">YouTube</a></li>
                             <li><a href onclick="return false;">SoundCloud (Tracks)</a></li>
                         </ul>
-                        
+
                     </div>
-                    
+
                 </form>
                 <div id="search-results-view"><ol id="search-results"></ol></div>
             </div>
@@ -48,7 +48,7 @@
                     <div id="video"></div>
                 </div>
                 <div id="side-content">
-                    <div id="playlist-controls" class="rows">
+                    <div id="playlist-controls">
                         <div id="timebar-row" class="player-row">
                             <div id="timebar">
                                 <div id="timebar-outer">
@@ -57,36 +57,29 @@
                             </div>
                             <div id="time-elapsed">0:00</div>
                         </div>
-                        <div class="player-row2">
-                            <div id="playlist-info">
-                                <div class="player-row">
-                                    <div id="track-count-wrapper">
-                                        Tracks: <span id="track-count">0</span>
-                                    </div>
-                                    <div id="playlist-duration-wrapper">
-                                        Duration: <span id="playlist-duration">0:00</span>
-                                    </div>
-                                </div>
-                                <div class="player-row">
-                                    <div id="controls" class="btn-group">
-                                        <a href onclick="return false;" id="previous" class="btn"><i class="icon-step-backward"></i></a>
-                                        <a href onclick="return false;" id="play" class="btn"><i class="icon-play"></i></a>
-                                        <a href onclick="return false;" id="stop" class="btn"><i class="icon-stop"></i></a>
-                                        <a href onclick="return false;" id="next" class="btn"><i class="icon-step-forward"></i></a>
-                                        <a href onclick="return false;" id="shuffle" class="btn"><i class="icon-random"></i></a>
-                                    </div>
-                                </div>
+                        <div class="player-row left">
+                            <div id="controls" class="btn-group">
+                                <a href onclick="return false;" id="previous" class="btn"><i class="icon-step-backward"></i></a>
+                                <a href onclick="return false;" id="play" class="btn"><i class="icon-play"></i></a>
+                                <a href onclick="return false;" id="stop" class="btn"><i class="icon-stop"></i></a>
+                                <a href onclick="return false;" id="next" class="btn"><i class="icon-step-forward"></i></a>
+                                <a href onclick="return false;" id="shuffle" class="btn"><i class="icon-random"></i></a>
                             </div>
                             <div id="volume">
                                 <div id="volume-outer">
                                     <div id="volume-inner"></div>
                                 </div>
-                                <div id="volume-amount"><i id="volume-symbol" class="icon-volume-up"></i><span id="volume-number">50</span></div>
                             </div>
+                            <div id="volume-amount"><i id="volume-symbol" class="icon-volume-up"></i><span id="volume-number">50</span></div>
                         </div>
                     </div>
                     <div id="playlist-view" style="overflow: auto;">
                         <ol id="tracks"></ol>
+                    </div>
+                    <div id="track-information" >
+                        <div class="player-row right">
+                            Playlist length: <span id="track-count">0</span> [<span id="playlist-duration">0:00</span>]
+                        </div>
                     </div>
                 </div>
             </div>

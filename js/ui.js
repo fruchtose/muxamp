@@ -53,12 +53,13 @@ var searchForTracks = function(query, site) {
 
 $('#search-site-dropdown a').click(function() {
     var site = $(this).html();
-    $("#search-site").val(siteCodeFromSiteName(site));
+    var oldSiteName = $("#search-site").val();
+    var newSiteName = siteCodeFromSiteName(site);
+    $("#search-site").val(newSiteName);
     $("#site-selector").html(site + '&nbsp;<span class="caret"></span>');
     var query = $('#search-query').val();
-    if (query) {
-        var site = $("#search-site").val();
-        searchForTracks(query, site);
+    if (query && newSiteName != oldSiteName) {
+        searchForTracks(query, newSiteName);
     }
 });
 

@@ -68,11 +68,9 @@ a:hover {
     height: 30px;
     line-height: 30px;
 }
-.player-row2 {
-    height: 60px;
-}
-#playlist-info {
-    float: left;
+.player-row-mini {
+    height: 20px;
+    line-height: 20px;
 }
 #track-count-wrapper {
     float: left;
@@ -82,11 +80,11 @@ a:hover {
     float: left;
 }
 #playlist-view {
-    bottom: 20px;
+    bottom: 40px;
     overflow: auto;
     position: absolute;
     right: 20px;
-    top: 340px;
+    top: 273px;
     width:360px;
 }
 /*.search-link {
@@ -187,47 +185,46 @@ a:hover {
     border: solid #aaa 1px;
     -khtml-user-select: none;
     -moz-user-select: none;
-    background-color: #d33;
+    background-color: #fff;
     float: left;
-    height: 48px;
+    height: 18px;
     margin-top: 5px;
     overflow: hidden;
     user-select: none;
-    width: 18px;
+    width: 48px;
 }
 #volume-inner {
-    background-color: #fff;
+    background-color: #d33;
     bottom: 0;
-    height: 50%;
-    min-height: 0;
-    width: 20px;
+    width: 50%;
+    min-width: 0;
+    height: 20px;
 }
 #volume-amount {
     float: left;
-    line-height: 60px;
     margin-left: 9px;
     vertical-align: middle;
 }
 #volume-amount i {
     cursor: pointer;
-    margin-top: -3px;
+    margin-top: -4px;
     vertical-align: middle;
 }
 #volume-number {
     margin-left: 6px;
 }
 #video-container, #video {
-    height: 230px;
+    height: 203px;
     width: 360px;
     z-index: 15
 }
 #video-container {
-    margin: 20px 0 0 20px;
+    margin: 10px 0 0 20px;
     position: absolute;
     right: 20px;
 }
 #playlist-controls {
-    top: 250px;
+    top: 213px;
     position: absolute;
     right: 20px;
 }
@@ -252,7 +249,11 @@ a:hover {
     z-index: 9;
 }
 #tracks li {
+    cursor: pointer;
     padding: 1px;
+}
+#tracks li:hover {
+    background-color: #cfc;
 }
 #tracks a {
     font-weight: bold;
@@ -295,6 +296,12 @@ a:hover {
     text-decoration: none;
 }
 #tracks li.playing a:hover {text-decoration: underline; }
+#track-information {
+    bottom: 40px;
+    position: absolute;
+    right: 20px;
+    width: 360px;
+}
 #footer {
     bottom: 0;
     position: absolute;

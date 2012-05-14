@@ -289,7 +289,7 @@ Playlist.prototype = {
                         initialVideo: media.siteMediaID,
                         loadSWFObject: false,
                         width: 360,
-                        height: 230,
+                        height: 203,
                         onStop: clearMediaInterval,
                         onPlayerBuffering: clearMediaInterval,
                         onPlayerPaused: clearMediaInterval,
@@ -417,8 +417,8 @@ Playlist.prototype = {
     },
     setVolumeSymbol: function(intPercent) {
         //Update volume bar
-        var volumeBarHeight = 100 - intPercent;
-        $("#volume-inner").height(volumeBarHeight.toString() + "%");
+        var volumeBarWidth = 100 - intPercent;
+        $("#volume-inner").width(volumeBarWidth.toString() + "%");
         $("#volume-number").text(intPercent);
         if (intPercent >= 50) {
             $("#volume-symbol").removeClass("icon-volume-down").removeClass("icon-volume-off").addClass("icon-volume-up");
