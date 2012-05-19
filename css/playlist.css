@@ -26,6 +26,12 @@ a {
 a:hover {
     text-decoration: underline;
 }
+.caret-right {
+  border-left: 4px solid #000;
+  border-right: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
 .left {
     position: absolute;
     left: 0px;
@@ -237,18 +243,43 @@ a:hover {
 .search-actions {
     float: left;
     left: 0;
+    position: absolute;
+    width: 36px;
+}
+.search-action {
+    float: left;
+    left: 0;
     line-height: 24px;
     position: absolute;
     text-align: center;
     vertical-align: middle;
     width: 18px;
 }
+.search-action.add {
+    top: 1px;
+}
+.search-action.play {
+    left: 18px;
+}
+.search-action.play .caret {
+    border-left: 5px solid #662;
+    border-right: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    opacity: 1;
+    filter: alpha(opacity=100);
+    vertical-align: middle;
+}
+.search-action.play .caret:hover {
+    border-left: 5px solid #005580;
+    text-decoration: underline;
+}
 #search-results a {
     font-size: 18px;
 }
 #search-results .desc {
     line-height: 24px;
-    padding-left: 24px;
+    padding-left: 42px;
     vertical-align: middle;
 }
 #search-results li, #tracks li .playlist-item {
@@ -270,7 +301,7 @@ a:hover {
     z-index: 9;
 }
 #tracks li {
-    cursor: pointer;
+    cursor: move;
     padding: 1px;
 }
 #tracks li:hover {

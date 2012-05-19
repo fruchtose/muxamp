@@ -53,7 +53,7 @@ Playlist.prototype = {
             appendedHTML += this._getDOMRowForMediaObject(mediaObject, currentLength + parseInt(index) + 1);
         }
         if ($.isNumeric(insertLocation)) {
-            $(this.playlistDOM.allRowsInTable).get(insertLocation).append(appendedHTML);
+            $($(this.playlistDOM.allRowsInTable).get(insertLocation)).append(appendedHTML);
         }
         else {
             $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
@@ -120,7 +120,7 @@ Playlist.prototype = {
         }
         var addedDuration = 0;
         if ($.isNumeric(insertLocation)) {
-            this.list = this.list.slice(0, insertLocation).concat(mediaObjects).concat(this.list.slice(insertLocation));
+            this.list = this.list.slice(0, insertLocation + 1).concat(mediaObjects).concat(this.list.slice(insertLocation + 1));
         }
         else {
             this.list = this.list.concat(mediaObjects);
@@ -133,7 +133,7 @@ Playlist.prototype = {
         if (this.settings.updateURLOnAdd) {
             this.refreshWindowLocationHash();
         }
-        if (currentTrack != undefined && currentTrack.toString()) {
+        if ($.isNumeric(currentTrack)) {
             this.setCurrentTrack(currentTrack);
         }
         else {

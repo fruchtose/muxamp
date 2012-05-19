@@ -5,8 +5,9 @@ function SearchResultsView(root) {
 
 SearchResultsView.prototype = {
     _getResultRow: function(result) {
-        var add = '<a class="search-add-result" href onclick="return false;">+</a>';
-        var actions = '<div class="search-actions">' + add + '</div>';
+        var add = '<div class="search-action add"><a class="search-add-result" href onclick="return false;">+</a></div>';
+        var play ='<div class="search-action play"><a class="search-play-result" href onclick="return false;"><span class="caret caret-right"></span></a></div>';
+        var actions = '<div class="search-actions">' + add + play + '</div>';
         var desc = '<div class="desc">' + result.artist + " - " + result.mediaName + '</div>';
         return "<li>" + ' ' + actions + desc + "</li>";
     },

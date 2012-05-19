@@ -19,6 +19,13 @@ $("#search-results li").livequery(function() {
         var mediaObject = getMediaObject(searchResult);
         playlist.addTracks(mediaObject);
     });
+    li.find('.search-play-result').on('click', function() {
+        var resultIndex = li.index();
+        var searchResult = searchResultsView.results[resultIndex];
+        var mediaObject = getMediaObject(searchResult);
+        playlist.addTracks(mediaObject, playlist.currentTrack, playlist.currentTrack);
+        playlist.nextTrack(true);
+    });
 }, function() {
     $(this).find('.search-add-result').off('click');
 });
