@@ -1,6 +1,11 @@
-$("#search-media-source .btn dropdown-toggle").click(function() {
-    
+$(".search-add-result").livequery(function() {
+    $(this).on('click', function(){
+        var resultIndex = $(this).parentsUntil('ul').index();
+        playlist.addResource(searchResultsView.results[resultIndex].permalink);
     });
+}, function() {
+    $(this).off('click');
+});
 
 $('#previous').click(function() {
     playlist.previousTrack();

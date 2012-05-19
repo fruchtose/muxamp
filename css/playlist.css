@@ -51,6 +51,9 @@ a:hover {
     right: 0;
     top: 0;
 }
+#search-results {
+    list-style: none;
+}
 #search-site-dropdown {
     display: inline-block;
     vertical-align: middle;
@@ -228,10 +231,28 @@ a:hover {
     position: absolute;
     right: 20px;
 }
-#tracks li .playlist-item {
+#search-results {
+    margin: 0;
+}
+.search-actions {
+    float: left;
+    left: 0;
+    line-height: 24px;
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    width: 22px;
+}
+#search-results a {
+    font-size: 18px;
+}
+#search-results .desc {
+    line-height: 24px;
+    padding-left: 22px;
+    vertical-align: middle;
+}
+#search-results li, #tracks li .playlist-item {
     min-height: 24px;
-    padding-bottom: 1px;
-    padding-top: 1px;
 }
 #tracks li .desc {
     padding-bottom: 0.25em;
@@ -255,7 +276,7 @@ a:hover {
 #tracks li:hover {
     background-color: #cfc;
 }
-#tracks a {
+#search-results a, #tracks a {
     font-weight: bold;
     padding-right: 0;
 }

@@ -42,7 +42,7 @@ Playlist.prototype = {
             obj.removeTrack(id);
         });
     },
-    _addPlaylistDOMRows: function(mediaObjects) {
+    _addPlaylistDOMRows: function(mediaObjects, insertLocation) {
         if ( !(mediaObjects instanceof Array) ) {
             mediaObjects = [mediaObjects];
         }
@@ -52,7 +52,12 @@ Playlist.prototype = {
             var mediaObject = mediaObjects[index];
             appendedHTML += this._getDOMRowForMediaObject(mediaObject, currentLength + parseInt(index) + 1);
         }
-        $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
+        if ($.isNumeric(insertLocation)) {
+            $(this.playlistDOM.allRowsInTable).get(insertLocation).append(appendedHTML);
+        }
+        else {
+            $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
+        }
         for (index in mediaObjects){
             $(this.playlistDOM.getRowForID(mediaObjects[index].id)).dblclick(function() {
                 playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
@@ -72,7 +77,7 @@ Playlist.prototype = {
         var left = '<div class ="left">' + remove + links + '</div>';
         return left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     },
-    addResource: function(urls) {
+    addResource: function(urls, insertLocation) {
         var playlist = this;
         var deferred = $.Deferred();
         if (!$.isArray(urls)) {
@@ -81,7 +86,7 @@ Playlist.prototype = {
         var actionArray = [];
         for (var url in urls) {
             actionArray.push(this.router.addResource(urls[url], function(mediaObjects) {
-                playlist.addTracks(mediaObjects);
+                playlist.addTracks(mediaObjects, playlist.currentTrack, insertLocation);
             }));
         }
         $.whenAll.apply(null, actionArray).always(function(resolved) {
@@ -89,14 +94,14 @@ Playlist.prototype = {
         });
         return deferred.promise();
     },
-    addResourceAndWaitUntilLoaded: function(urls) {
+    addResourceAndWaitUntilLoaded: function(urls, insertLocation) {
         var playlist = this;
         var deferred = $.Deferred();
         if (!$.isArray(urls)) {
             urls = [urls];
         }
         var mediaHandler = function(mediaObjects) {
-            playlist.addTracks(mediaObjects);
+            playlist.addTracks(mediaObjects, playlist.currentTrack, insertLocation);
         };
         var actionArray = [];
         $.blockUI();
@@ -109,36 +114,24 @@ Playlist.prototype = {
         });
         return deferred.promise();
     },
-    addTracks: function(mediaObjects, currentTrack) {
+    addTracks: function(mediaObjects, currentTrack, insertLocation) {
         if ( !(mediaObjects instanceof Array) ) {
             mediaObjects = [mediaObjects];
         }
         var addedDuration = 0;
-        this.list = this.list.concat(mediaObjects);
-        this._addPlaylistDOMRows(mediaObjects);
+        if ($.isNumeric(insertLocation)) {
+            this.list = this.list.slice(0, insertLocation).concat(mediaObjects).concat(this.list.slice(insertLocation));
+        }
+        else {
+            this.list = this.list.concat(mediaObjects);
+        }
+        this._addPlaylistDOMRows(mediaObjects, insertLocation);
         for (var i in mediaObjects) {
             var mediaObject = mediaObjects[i];
-            addedDuration += mediaObject.getDuration()
+            addedDuration += mediaObject.getDuration();
         }
         if (this.settings.updateURLOnAdd) {
-            var newHash = '', slicedList = [];
-            if (mediaObjects.length > 0) {
-                newHash = mediaObjects[0].siteCode + '=' + mediaObjects[0].siteMediaID;
-                slicedList = mediaObjects.slice(1);
-            }
-            for (var j in slicedList) {
-                newHash += '&' + slicedList[j].siteCode + '=' + slicedList[j].siteMediaID;
-            }
-            if (this.list.length - mediaObjects.length > 0) {
-                newHash = '&' + newHash;
-            }
-            // Making sure user cannot create huuuuuuuge URL by default
-            if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
-                window.location.hash += newHash;
-            }
-            else {
-                alert("Your playlist URL will not be appended because it is too long.");
-            }
+            this.refreshWindowLocationHash();
         }
         if (currentTrack != undefined && currentTrack.toString()) {
             this.setCurrentTrack(currentTrack);

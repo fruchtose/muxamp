@@ -116,10 +116,9 @@ class SearchResult {
 $results = array();
 
 $soundcloud_key = "2f9bebd6bcd85fa5acb916b14aeef9a4";
-$soundcloud_search_tracks_link = "http://api.soundcloud.com/tracks.json?client_id=$soundcloud_key&filter=streamable&order=hotness&q=$query";
+$soundcloud_search_tracks_link = "http://api.soundcloud.com/tracks.json?client_id=$soundcloud_key&limit=25&offset=0&filter=streamable&order=hotness&q=$query";
 $youtube_search_videos_link = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=25&orderby=relevance&alt=jsonc&q=$query";
 $query_words = explode(" ", preg_replace('/[[:punct:]]/', ' ', strtolower($query)));
-print_r($query_words);
 $query_word_count = count($query_words);
 $max_query_similarity = 0;
 $max_plays = 0;
@@ -138,7 +137,7 @@ switch($source) {
             if (!isset($result->stream_url)) {
                 continue;
             }
-            $new_result = new SearchResult("SoundCloud", $result->stream_url . "client_id=$soundcloud_key", $result->permalink_url, $result->id, "sct", "img/soundcloud_orange_white_16.png", $result->user->username, $result->title, $result->duration / 1000, "audio", $result->playback_count, $result->favoritings_count);
+            $new_result = new SearchResult("SoundCloud", $result->stream_url . "?client_id=$soundcloud_key", $result->permalink_url, $result->id, "sct", "img/soundcloud_orange_white_16.png", $result->user->username, $result->title, $result->duration / 1000, "audio", $result->playback_count, $result->favoritings_count);
             $comparison_string = preg_replace('/[[:punct:]]/', ' ', strtolower($new_result->artist . " " . $new_result->mediaName));
             $new_result->querySimilarity = (count(array_intersect($query_words, explode(" ", $comparison_string))))/$query_word_count;
             if ($new_result->plays > $max_plays) {
@@ -204,7 +203,7 @@ if (count($results) > 0) {
         }
         return ($a->relevance > $b->relevance) ? -1 : 1;
     });
-    /*foreach ($results as &$result) {
+    foreach ($results as &$result) {
         unset($result->favoriteRelevance);
         unset($result->favorites);
         unset($result->playRelevance);
@@ -213,7 +212,7 @@ if (count($results) > 0) {
         unset($result->relevance);
     }
     // Sorts results by favorite count in descending order
-    usort($results, function($a, $b) {
+    /*usort($results, function($a, $b) {
         if ($a->favorites == $b->favorites) {
             return 0;
         }

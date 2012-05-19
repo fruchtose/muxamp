@@ -41,7 +41,7 @@
                     </div>
 
                 </form>
-                <div id="search-results-view"><ol id="search-results"></ol></div>
+                <div id="search-results-view"><ul id="search-results"></ul></div>
             </div>
             <div id="right-side">
                 <div id="video-container">
@@ -77,8 +77,11 @@
                         <ol id="tracks"></ol>
                     </div>
                     <div id="track-information" >
-                        <div class="player-row right">
+                        <div class="player-row left">
                             Playlist length: <span id="track-count">0</span> [<span id="playlist-duration">0:00</span>]
+                        </div>
+                        <div class="player-row right">
+                            <a id="about-button" href onclick="return false;"><strong>About Muxamp</strong></a>
                         </div>
                     </div>
                 </div>
@@ -90,24 +93,24 @@
                 <h3>About</h3>
             </div>
             <div class="modal-body">
-                <p><b>Muxamp</b> is a unified playlist that lets you play media from SoundCloud and YouTube in the same playlist. The site is powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. Code is done by Robert Fruchtman.</p>
+                <p><b>Muxamp</b> is a unified playlist that lets you enjoy media from SoundCloud and YouTube in the same playlist. The site is powered by <a href="http://www.reddit.com">Reddit</a>, <a href="http://www.soundcloud.com">SoundCloud</a> and <a href="http://www.youtube.com">YouTube</a>. This web app is the work of Robert Fruchtman.</p>
 
-                <p>Muxamp wants to get out of your way. To use it, copy links into the the textbox next to the "Add Media Source" button. Here are the kinds of links you can add:</p>
+                <p>Muxamp wants to get out of your way. To use the site, use the search bar to locate audio and video from among the following sites:</p>
 
                 <ol>
-                    <li>Reddit subreddits (to fetch media links from other sites)</li> 
-                    <li>SoundCloud tracks</li>
-                    <li>SoundCloud sets</li>
+                    <li>Reddit</li> 
+                    <li>SoundCloud</li>
                     <li>YouTube videos</li>
                 </ol>
 
                 <p><b>Double-click</b> tracks to play. <b>Drag and drop</b> tracks to move them.</p>
 
-                <p><b>Copy and paste</b> the URL to share your playlist. This site won't track you!</p>
+                <p><b>Copy and paste</b> the URL to share your playlist. This site won't track you, promise!</p>
             </div>
         </div>
         <script src="js/swfobject.js" type="text/javascript"></script>
         <script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
+        <script src="js/jquery.livequery.min.js" type="text/javascript"></script>
         <script src="js/jquery.whenall.js" type="text/javascript"></script>
         <script src="js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
         <script src="js/jquery.layout-latest.min.js" type="text/javascript"></script>
