@@ -42,14 +42,14 @@ a:hover {
     top: 0;
 }
 #main {
-    bottom: 0;
-    left: 0;
+    bottom: 10px;
+    left: 20px;
     margin-right: 400px;
     min-width: 200px;
     overflow-y: auto;
     position: absolute;
-    right: 0;
-    top: 0;
+    right: 20px;
+    top: 10px;
 }
 #search-results {
     list-style: none;
@@ -241,14 +241,14 @@ a:hover {
     position: absolute;
     text-align: center;
     vertical-align: middle;
-    width: 22px;
+    width: 18px;
 }
 #search-results a {
     font-size: 18px;
 }
 #search-results .desc {
     line-height: 24px;
-    padding-left: 22px;
+    padding-left: 24px;
     vertical-align: middle;
 }
 #search-results li, #tracks li .playlist-item {

@@ -414,7 +414,7 @@ Router.prototype = {
                 //Tracks have stream URL
                 if (data.stream_url) {
                     var id = router.getNewTrackID();
-                    var trackObject = new SoundCloudObject(id, data.stream_url, consumerKey, data, router.soundManager);
+                    var trackObject = new SoundCloudObject(id, data.id, data.stream_url, data.permalink_url, consumerKey, data.user.username, data.title, data.duration / 1000, router.soundManager);
                     deferred.resolve($.extend({}, params, {
                         tracks: [trackObject]
                     }));
