@@ -13,6 +13,13 @@ $("#search-results li").livequery(function() {
         return mediaObject;
     };
     var li = $(this);
+    li.on('dblclick', function() {
+        var resultIndex = $(this).index();
+        var searchResult = searchResultsView.results[resultIndex];
+        var mediaObject = getMediaObject(searchResult);
+        playlist.addTracks(mediaObject, playlist.currentTrack, playlist.currentTrack);
+        playlist.nextTrack(true);
+    });
     li.find('.search-add-result').on('click', function(){
         var resultIndex = li.index();
         var searchResult = searchResultsView.results[resultIndex];
@@ -27,7 +34,10 @@ $("#search-results li").livequery(function() {
         playlist.nextTrack(true);
     });
 }, function() {
-    $(this).find('.search-add-result').off('click');
+    var li = $(this);
+    li.off('dblclick');
+    li.find('.search-add-result').off('click');
+    li.find('.search-play-result').off('click');
 });
 
 $('#previous').click(function() {

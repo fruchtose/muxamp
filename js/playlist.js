@@ -53,7 +53,12 @@ Playlist.prototype = {
             appendedHTML += this._getDOMRowForMediaObject(mediaObject, currentLength + parseInt(index) + 1);
         }
         if ($.isNumeric(insertLocation)) {
-            $($(this.playlistDOM.allRowsInTable).get(insertLocation)).append(appendedHTML);
+            if ($(this.playlistDOM.allRowsInTable).size()) {
+                $($(this.playlistDOM.allRowsInTable).get(insertLocation)).append(appendedHTML);
+            }
+            else {
+                $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
+            }
         }
         else {
             $(this.playlistDOM.lastElementOfParent).append(appendedHTML);

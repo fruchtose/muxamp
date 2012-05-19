@@ -277,13 +277,16 @@ a:hover {
 #search-results a {
     font-size: 18px;
 }
+#search-results li {
+    cursor: pointer;
+}
+#search-results li, #tracks li .playlist-item {
+    min-height: 24px;
+}
 #search-results .desc {
     line-height: 24px;
     padding-left: 42px;
     vertical-align: middle;
-}
-#search-results li, #tracks li .playlist-item {
-    min-height: 24px;
 }
 #tracks li .desc {
     padding-bottom: 0.25em;
@@ -304,7 +307,7 @@ a:hover {
     cursor: move;
     padding: 1px;
 }
-#tracks li:hover {
+#search-results li:hover, #tracks li:hover {
     background-color: #cfc;
 }
 #search-results a, #tracks a {

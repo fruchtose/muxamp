@@ -98,9 +98,8 @@
                 <p>Muxamp wants to get out of your way. To use the site, use the search bar to locate audio and video from among the following sites:</p>
 
                 <ol>
-                    <li>Reddit</li> 
                     <li>SoundCloud</li>
-                    <li>YouTube videos</li>
+                    <li>YouTube</li>
                 </ol>
 
                 <p><b>Double-click</b> tracks to play. <b>Drag and drop</b> tracks to move them.</p>

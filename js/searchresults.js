@@ -17,7 +17,7 @@ SearchResultsView.prototype = {
         for (i in results) {
             rows.push(this._getResultRow(results[i]));
         }
-        $(this.root).html(rows.join(""));
+        $(this.root).html(rows.join("")).disableSelection();
     }
 };
 
