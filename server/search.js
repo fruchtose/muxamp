@@ -117,7 +117,7 @@ SearchManager.prototype = {
 		var searchManager = this;
 		var deferred = $.Deferred();
 		var words = getSeparatedWords(query);
-		console.log("Searching SoundCloud for " + words.join(" "));
+		console.log("Searching YouTube for " + words.join(" "));
 		request({
 			json: true,
 			method: 'GET',
@@ -151,16 +151,38 @@ SearchManager.prototype = {
 	},
 	searchYouTubeVideos: function(query, deferred) {
 		var searchManager = this;
+		var deferred = $.Deferred();
 		var words = getSeparatedWords(query);
 		request({
 			json: true,
 			method: 'GET',
-			url: searchManager.youtubeSearchURI
+			url: searchManager.youtubeSearchURI + encodeURIComponent(query)
 		}, function(error, response, body) {
 			if (error) {
 				deferred.reject();
 				return;
 			}
+			var i, results = [];
+			var videos = body.data;
+			if (!videos) {
+				return results;
+			}
+			videos = videos.items;
+			if (!videos) {
+				return results;
+			}
+			for (i in videos) {
+				var result = videos[i];
+				var permalink = 'http://www.youtube.com/watch?v=' + result.id;
+				var searchResult = new SearchResult("YouTube", permalink, permalink, result.id, "ytv", result.uploader, result.title, result.duration, "video", result.viewCount, result.favoriteCount);
+				var resultWords = getSeparatedWords(searchResult.artist + ' ' + searchResult.mediaName);
+				var intersection = getIntersection(words, resultWords);
+				searchResult.querySimilarity = intersection.length / words.length;
+				searchManager.checkMaxPlays(searchResult.plays);
+				searchManager.checkMaxFavorites(searchResult.favorites);
+				results.push(searchResult);
+			}
+			deferred.resolve(results);
 		});
 		return deferred.promise();
 	}
