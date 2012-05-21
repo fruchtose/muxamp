@@ -21,8 +21,7 @@ var getSeparatedWords = function(query) {
 	return query.replace(/[^\w\s]|_/g, ' ').toLowerCase().split(' ');
 };
 
-function SearchResult(siteName, url, permalink, siteMediaID, siteCode, artist, mediaName, duration, type, plays, favorites) {
-	this.siteName = siteName;
+function SearchResult(url, permalink, siteMediaID, siteCode, artist, mediaName, duration, type, plays, favorites) {
 	this.url = url;
 	this.permalink = permalink;
 	this.siteMediaID = siteMediaID;
@@ -142,7 +141,7 @@ SearchManager.prototype = {
 				if (undefined == result.stream_url) {
 					continue;
 				}
-				var searchResult = new SearchResult("SoundCloud", result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
+				var searchResult = new SearchResult(result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
 				var resultWords = getSeparatedWords(searchResult.artist + ' ' + searchResult.mediaName);
 				var intersection = getIntersection(words, resultWords);
 				searchResult.querySimilarity = intersection.length / words.length;
@@ -179,7 +178,7 @@ SearchManager.prototype = {
 			for (i in videos) {
 				var result = videos[i];
 				var permalink = 'http://www.youtube.com/watch?v=' + result.id;
-				var searchResult = new SearchResult("YouTube", permalink, permalink, result.id, "ytv", result.uploader, result.title, result.duration, "video", result.viewCount, result.favoriteCount);
+				var searchResult = new SearchResult(permalink, permalink, result.id, "ytv", result.uploader, result.title, result.duration, "video", result.viewCount, result.favoriteCount);
 				var resultWords = getSeparatedWords(searchResult.artist + ' ' + searchResult.mediaName);
 				var intersection = getIntersection(words, resultWords);
 				searchResult.querySimilarity = intersection.length / words.length;
