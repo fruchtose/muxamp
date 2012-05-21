@@ -87,13 +87,8 @@ var SoundObject = new JS.Class(MediaObject, {
 });
 
 var SoundCloudObject = new JS.Class(SoundObject, {
-    initialize: function(id, trackID, url, permalink, consumerKey, artist, title, duration, soundManager) {
-        var apiURL = url;
-        if (apiURL.indexOf(consumerKey) < 0) {
-            (apiURL.toString().indexOf("secret_token") == -1) ? apiURL = apiURL + '?' : apiURL = apiURL + '&';
-            apiURL = apiURL + 'consumer_key=' + consumerKey;
-        }
-        this.callSuper("SoundCloud", apiURL, permalink, id, trackID, 'sct',soundManager, artist, title, duration);
+    initialize: function(id, trackID, url, permalink, artist, title, duration, soundManager) {
+        this.callSuper("SoundCloud", url, permalink, id, trackID, 'sct',soundManager, artist, title, duration);
     }
 });
 

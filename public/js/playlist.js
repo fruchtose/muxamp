@@ -19,12 +19,11 @@ var PlaylistDOMInformation = function() {
     this.removalHyperlink = "a.remove";
 };
 
-function Playlist(router, soundManager) {
+function Playlist(soundManager) {
     this.currentTrack = 0;
     this.currentVolumePercent = 50; // Start at 50% so users can increase/decrease volume if they want to
     this.list = [];
     this.playlistDOM = new PlaylistDOMInformation();
-    this.router = router;
     this.soundManager = soundManager;
     this.totalDuration = 0; // Duration in seconds
     this.settings = {
@@ -504,7 +503,7 @@ Playlist.prototype = {
         }
     }
 }
-var playlist = new Playlist(router, soundManager);
+var playlist = new Playlist(soundManager);
 $(document).ready(function() {
     var startPos;
     $(playlist.playlistDOM.parentTable).sortable({

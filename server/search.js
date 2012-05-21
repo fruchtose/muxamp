@@ -114,6 +114,7 @@ SearchManager.prototype = {
 		});
 	},
 	searchSoundCloudTracks: function(query) {
+		var soundcloudConsumerKey = '2f9bebd6bcd85fa5acb916b14aeef9a4';
 		var searchManager = this;
 		var deferred = $.Deferred();
 		var words = getSeparatedWords(query);
@@ -137,7 +138,7 @@ SearchManager.prototype = {
 				if (undefined == result.stream_url) {
 					continue;
 				}
-				var searchResult = new SearchResult("SoundCloud", result.stream_url + "?client_id=$soundcloud_key", result.permalink_url, result.id, "sct", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
+				var searchResult = new SearchResult("SoundCloud", result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
 				var resultWords = getSeparatedWords(searchResult.artist + ' ' + searchResult.mediaName);
 				var intersection = getIntersection(words, resultWords);
 				searchResult.querySimilarity = intersection.length / words.length;
