@@ -1,5 +1,11 @@
 {
   "name":"muxamp",
   "node":"0.6.17",
-  "author":"rfruchtm"
+  "author":"Robert Fruchtman",
+  "dependencies" : {
+    "contextify" : "0.1.x",
+    "express"    : "2.5.x",
+    "jquery"     : "1.7.x",
+    "request"    : "2.9.x"
+  }
 }
