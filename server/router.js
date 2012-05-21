@@ -1,3 +1,81 @@
+var soundManager = {};
+var $ = require('./jquery.whenall');
+
+function KeyValuePair(key, value) {
+    this.key = key;
+    this.value = value;
+}
+
+KeyValuePair.prototype.toString = function() {
+    return "(" + this.key.toString() + "=" + this.value.toString() + ")";
+}
+
+var hashTableToFlatList = function(table) {
+    var flatList = [];
+    var hash;
+    for (hash in table) {
+        var list = table[hash];
+        if (list && $.isArray(list)) {
+            list = hashTableToFlatList(list);
+        }
+        if ($.isArray(list)) {
+            flatList = flatList.concat(list);
+        }
+        else flatList.push(list);
+    }
+    return flatList;
+};
+
+// 
+// // Original code by Andy E of Stack Overflow
+// http://stackoverflow.com/a/7676115/959934
+// Modified by me to allow multiple values to be associated with a single key
+function getURLParams(source, useOrderedList) {
+    var urlParams = {};
+    var orderedList = [];
+    var e,
+    a = /\+/g,  // Regex for replacing addition symbol with a space
+    r = /([^&=;]+)=?([^&;]*)/g,
+    d = function (s) {
+        //Returns the original string if it can't be URI component decoded
+        var spaced = s.replace(a, " ");
+        try {
+            return decodeURIComponent(spaced);
+        }
+        catch(e) {
+            return spaced;
+        }
+    },
+    q = source;
+    if (q[0] == '#') {
+        q = q.substring(1);
+    }
+
+    while (e = r.exec(q)) {
+        var key = d(e[1]);
+        var value = d(e[2]);
+        if (useOrderedList) {
+            var listItem = new KeyValuePair(key, value);
+            orderedList.push(listItem);
+        }
+        else {
+            if (!urlParams[key]) {
+                urlParams[key] = [value];
+            }
+            else {
+                // If key already found in the query string, the value is tacked on
+                urlParams[key].push(value);
+            }
+        }
+    }
+    if (useOrderedList) {
+        return orderedList;
+    }
+    else {
+        return urlParams;
+    }
+};
+
 function MultilevelTable() {
     this.dirty = true;
     this.table = [];
@@ -49,7 +127,7 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
     this.buildRoutingTable = function() {
         var router = this;
         var table = [];
-        table.push({
+        /*table.push({
             site: 'Reddit',
             test: function(input) {
                 return (typeof input == "string" && input.indexOf("reddit.com/r/") >= 0) ||
@@ -64,7 +142,7 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
                 }
                 else return null;
             }
-        });
+        });*/
         table.push({
             site: 'SoundCloud',
             test: function(input) {
@@ -100,7 +178,7 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
                 else return null;
             }
         });
-        table.push({
+        /*table.push({
             site: 'Internet',
             test: function(input) {
                 return router.testResource(input, ['Internet']) === null;
@@ -112,7 +190,7 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
                 else return null;
             }
         });
-        return table;
+        return table;*/
     }
     
     this.routingTable = this.buildRoutingTable();
@@ -654,4 +732,12 @@ Router.prototype = {
         return typeof url == "string" && /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i.test(url);
     }
 };
-var router = new Router(soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");
+
+module.exports = {
+	getRouter: function() {
+		return new Router(soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");
+	},
+	getURLParams: function(source, useOrderedList) {
+		return getURLParams(source, useOrderedList);
+	}
+};

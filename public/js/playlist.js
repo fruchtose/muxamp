@@ -81,43 +81,6 @@ Playlist.prototype = {
         var left = '<div class ="left">' + remove + links + '</div>';
         return left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
     },
-    addResource: function(urls, insertLocation) {
-        var playlist = this;
-        var deferred = $.Deferred();
-        if (!$.isArray(urls)) {
-            urls = [urls];
-        }
-        var actionArray = [];
-        for (var url in urls) {
-            actionArray.push(this.router.addResource(urls[url], function(mediaObjects) {
-                playlist.addTracks(mediaObjects, playlist.currentTrack, insertLocation);
-            }));
-        }
-        $.whenAll.apply(null, actionArray).always(function(resolved) {
-            deferred.resolve();
-        });
-        return deferred.promise();
-    },
-    addResourceAndWaitUntilLoaded: function(urls, insertLocation) {
-        var playlist = this;
-        var deferred = $.Deferred();
-        if (!$.isArray(urls)) {
-            urls = [urls];
-        }
-        var mediaHandler = function(mediaObjects) {
-            playlist.addTracks(mediaObjects, playlist.currentTrack, insertLocation);
-        };
-        var actionArray = [];
-        $.blockUI();
-        for (var url in urls) {
-            actionArray.push(this.router.addResource(urls[url], mediaHandler));
-        }
-        $.whenAll.apply(null, actionArray).always(function(resolved) {
-            $.unblockUI();
-            deferred.resolve();
-        });
-        return deferred.promise();
-    },
     addTracks: function(mediaObjects, currentTrack, insertLocation) {
         if ( !(mediaObjects instanceof Array) ) {
             mediaObjects = [mediaObjects];

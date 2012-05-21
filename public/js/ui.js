@@ -1,24 +1,4 @@
-var counter = (function() {
-	var val = 1;
-	return function() {
-		return val++;
-	};
-})();
-
 $("#search-results li").livequery(function() {
-    var getMediaObject = function(searchResult) {
-        var mediaObject = null;
-        var id = counter();
-        switch (searchResult.siteName) {
-            case 'SoundCloud':
-                mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, searchResult.artist, searchResult.mediaName, searchResult.duration, soundManager);
-                break;
-            case 'YouTube':
-                mediaObject = new YouTubeObject(id, searchResult.siteMediaID, searchResult.artist, searchResult.mediaName, searchResult.duration);
-                break;
-        }
-        return mediaObject;
-    };
     var li = $(this);
     li.on('dblclick', function() {
         var resultIndex = $(this).index();
