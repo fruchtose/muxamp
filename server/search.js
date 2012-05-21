@@ -31,8 +31,12 @@ function SearchResult(siteName, url, permalink, siteMediaID, siteCode, artist, m
 	this.mediaName = mediaName;
 	this.duration = duration;
 	this.type = type;
-	this.plays = plays;
-	this.favorites = favorites;
+	if (undefined != plays) {
+		this.plays = plays;
+	}
+	if (undefined != favorites) {
+		this.favorites = favorites;
+	}
 }
 
 SearchResult.prototype = {
@@ -192,5 +196,6 @@ SearchManager.prototype = {
 module.exports = {
   search: function() {
 	return new SearchManager();
-  }
+  },
+  searchResult: SearchResult
 };

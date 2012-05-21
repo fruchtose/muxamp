@@ -1,5 +1,6 @@
-var soundManager = {};
 var $ = require('./jquery.whenall');
+var search = require('./search');
+var request = require('request');
 
 function KeyValuePair(key, value) {
     this.key = key;
@@ -111,16 +112,14 @@ MultilevelTable.prototype = {
     }
 };
 
-function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
+function Router (soundcloudConsumerKey, youtubeKey) {
     var defaults = { 
     };
     
     this.opts = $.extend({}, defaults);
     this.actionQueue = [];
-    this.soundManager = (typeof soundManager === 'object') ? soundManager : null;
     this.soundcloudConsumerKey = soundcloudConsumerKey != "" ? soundcloudConsumerKey : "";
     this.youtubeKey = youtubeKey != null ? youtubeKey : "";
-    this.nextNewID = 1;
     this.lastRedditRequest = new Date(0);  
     this.requestsInProgress = 0;
     
@@ -189,8 +188,8 @@ function Router (soundManager, soundcloudConsumerKey, youtubeKey) {
                 }
                 else return null;
             }
-        });
-        return table;*/
+        });*/
+        return table;
     }
     
     this.routingTable = this.buildRoutingTable();
@@ -216,7 +215,7 @@ Router.prototype = {
         var success = false;
         var deferred = $.Deferred();
         var failure = function() {
-            alert("Unable to fetch content from " + url + ".");
+            console.log("Unable to fetch content from " + url + ".");
         }
         var deferredAction = $.Deferred();
         var isString = typeof url == "string";
@@ -451,22 +450,18 @@ Router.prototype = {
         };
         // If a data object is not provided, the data is fetched using the id
         if (typeof playlistID == 'string') {
-            var resolveURL = 'http://api.soundcloud.com/playlists/' + playlistID + ".json?consumer_key=" + consumerKey + '&callback=?';
+            var resolveURL = 'http://api.soundcloud.com/playlists/' + playlistID + ".json?consumer_key=" + consumerKey;
             var options = {
-                url: resolveURL,
-                error: errorFunction,
-                dataType: 'json',
-                success: function(data, textStatus) {
-                    if (textStatus == "success") {
-                        addPlaylistData(data);
-                    }
-                    else {
-                        errorFunction();
-                    }
-                },
-                timeout: 10000
+                uri: resolveURL,
+                json: true
             };
-            $.ajax(options);
+            request(options, function(error, response, body) {
+            	if (error) {
+            		errorFunction();
+            		return;
+            	}
+            	addPlaylistData(body);
+            });
         }
         // If a data object is provided, the track data is fetched from it
         else addPlaylistData(playlistID);
@@ -492,7 +487,8 @@ Router.prototype = {
                 //Tracks have stream URL
                 if (data.stream_url) {
                     var id = router.getNewTrackID();
-                    var trackObject = new SoundCloudObject(id, data.id, data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.user.username, data.title, data.duration / 1000, router.soundManager);
+                    var trackObject = new search.searchResult("SoundCloud", data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.id, "sct", data.user.username, data.title, data.duration / 1000, "audio");
+                    //var trackObject = new SoundCloudObject(id, data.id, data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.user.username, data.title, data.duration / 1000, router.soundManager);
                     deferred.resolve($.extend({}, params, {
                         tracks: [trackObject]
                     }));
@@ -504,22 +500,18 @@ Router.prototype = {
         };
         // If a data object is not provided, the data is fetched using the id
         if (typeof trackID == 'string') {
-            var resolveURL = 'http://api.soundcloud.com/tracks/' + trackID + ".json?consumer_key=" + consumerKey + '&callback=?';
+            var resolveURL = 'http://api.soundcloud.com/tracks/' + trackID + ".json?consumer_key=" + consumerKey;
             var options = {
-                url: resolveURL,
-                dataType: 'json',
-                error: errorFunction,
-                success: function(data, textStatus) {
-                    if (textStatus == "success") {
-                        addTrackData(data);
-                    }
-                    else {
-                        errorFunction();
-                    }
-                },
-                timeout: 10000
+                uri: resolveURL,
+                json: true
             };
-            $.ajax(options);
+            request(options, function(error, response, body) {
+            	if (error) {
+            		errorFunction();
+            		return;
+            	}
+            	addTrackData(body);
+            });
         /*if (queue) {
                 queue.add(options);
             }
@@ -545,26 +537,30 @@ Router.prototype = {
             if (failure)
                 failure();
         }
-        var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json&callback=?';
+        var youtubeAPI = 'https://gdata.youtube.com/feeds/api/videos/' + youtubeID + '?v=2&alt=json';
         var options = {
-            url: youtubeAPI,
-            dataType: 'json',
-            timeout: 5000,
-            success: function(response) {
-                var entry = response.entry;
-                var authorObj = entry.author[0];
-                var author = authorObj.name.$t;
-                var title = entry.title.$t;
-                var duration = parseInt(entry.media$group.yt$duration.seconds);
-                var id = router.getNewTrackID();
-                var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
-                deferred.resolve($.extend({}, params, {
-                    tracks: [trackObject]
-                }));
-            },
-            error: errorFunction
+            uri: youtubeAPI,
+            json: true,
+            strictSSL: false
         };
-        $.ajax(options);
+        request(options, function(error, response, body) {
+        	if (error) {
+        		errorFunction();
+        		return;
+        	}
+        	var entry = body.entry;
+            var authorObj = entry.author[0];
+            var author = authorObj.name.$t;
+            var title = entry.title.$t;
+            var duration = parseInt(entry.media$group.yt$duration.seconds);
+            var id = router.getNewTrackID();
+            var url = 'http://www.youtube.com/watch?v=' + youtubeID;
+            var trackObject = new search.searchResult("YouTube", url, url, youtubeID, "ytv", author, title, duration, "video");
+            //var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
+            deferred.resolve($.extend({}, params, {
+                tracks: [trackObject]
+            }));
+        });
         return deferred.promise();
     },
     resolveInternetLink: function(url, failure, deferred, params) {
@@ -589,18 +585,18 @@ Router.prototype = {
         if (url.indexOf(miniPlayerLocator) === 0) {
             urlParams = getURLParams(url.substring(url.indexOf("?") + 1));
             decodedURL = decodeURIComponent(urlParams['url'][0]);
-            resolveURL = decodedURL + ".json?consumer_key=" + this.soundcloudConsumerKey + '&callback=?';
+            resolveURL = decodedURL + ".json?consumer_key=" + this.soundcloudConsumerKey;
         }
         else if (url.indexOf(flashPlayerLocator) === 0) {
             urlParams = getURLParams(url.substring(url.indexOf("?") + 1));
             decodedURL = decodeURIComponent(urlParams['url'][0]);
-            resolveURL = decodedURL + ".json?consumer_key=" + this.soundcloudConsumerKey + '&callback=?';
+            resolveURL = decodedURL + ".json?consumer_key=" + this.soundcloudConsumerKey;
         }
         else {
             if (/soundcloud.com\/[^\/]+\/[^\/]+\/download/.test(url)) {
                 url = url.substring(0, url.lastIndexOf("/download") + 1);
             }
-            resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey + '&callback=?';
+            resolveURL = 'http://api.soundcloud.com/resolve?url=' + url + '&format=json&consumer_key=' + this.soundcloudConsumerKey;
         }
         if (!deferred)
             deferred = $.Deferred();
@@ -616,36 +612,32 @@ Router.prototype = {
             if (failure)
                 failure();
         }
-        var ajaxOptions = {
-            url: resolveURL,
-            error: errorFunction,
-            timeout: 5000,
-            dataType: 'json',
-            success: function(data, textStatus) {
-                if (textStatus == "success") {
-                    if ( !(data.kind == "track" || data.kind == "playlist") ) {
-                        errorFunction();
-                        return;
-                    }
-                    if (data.streamable != true) {
-                        errorFunction();
-                        return;
-                    }
-                    
-                    //Tracks have stream URL
-                    if (data.stream_url) {
-                        router.processSoundCloudTrack(data, failure, deferred, params);
-                    }
-                    else {
-                        router.processSoundCloudPlaylist(data, failure, deferred, params);
-                    }
-                }
-                else {
-                    errorFunction();
-                }
-            }
+        var requestOptions = {
+    		uri: resolveURL,
+    		json: true
         };
-        $.ajax(ajaxOptions);
+        request(requestOptions, function(error, response, body) {
+        	if (error) {
+        		errorFunction();
+        		return;
+        	}
+        	if ( !(body.kind == "track" || body.kind == "playlist") ) {
+                errorFunction();
+                return;
+            }
+            if (body.streamable != true) {
+                errorFunction();
+                return;
+            }
+            
+            //Tracks have stream URL
+            if (body.stream_url) {
+                router.processSoundCloudTrack(body, failure, deferred, params);
+            }
+            else {
+                router.processSoundCloudPlaylist(body, failure, deferred, params);
+            }
+        });
         return deferred.promise();
     /*if (queue) {
             queue.add(ajaxOptions);
@@ -735,7 +727,7 @@ Router.prototype = {
 
 module.exports = {
 	getRouter: function() {
-		return new Router(soundManager, "2f9bebd6bcd85fa5acb916b14aeef9a4", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");
+		return new Router("2f9bebd6bcd85fa5acb916b14aeef9a4", "AI39si5BFyt8MJ8G-sU6ZtLTT8EESCsLT6NS3K8VrA1naS1mIKy5qfsAl6lQ208tIwJQWXuDUebBRee2QNo3CAjQx58KmkxaKw");
 	},
 	getURLParams: function(source, useOrderedList) {
 		return getURLParams(source, useOrderedList);
