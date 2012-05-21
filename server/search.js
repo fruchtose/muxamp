@@ -21,12 +21,12 @@ var getSeparatedWords = function(query) {
 	return query.replace(/[^\w\s]|_/g, ' ').toLowerCase().split(' ');
 };
 
-function SearchResult(url, permalink, siteMediaID, siteCode, artist, mediaName, duration, type, plays, favorites) {
+function SearchResult(url, permalink, siteMediaID, siteCode, author, mediaName, duration, type, plays, favorites) {
 	this.url = url;
 	this.permalink = permalink;
 	this.siteMediaID = siteMediaID;
 	this.siteCode = siteCode;
-	this.artist = artist;
+	this.author = author;
 	this.mediaName = mediaName;
 	this.duration = duration;
 	this.type = type;
@@ -49,7 +49,7 @@ SearchResult.prototype = {
 function SearchManager () {
 	this.soundcloudKey = "2f9bebd6bcd85fa5acb916b14aeef9a4";
 	this.soundcloudSearchURI = "http://api.soundcloud.com/tracks.json?client_id=" + this.soundcloudKey + "&limit=25&offset=0&filter=streamable&order=hotness&q=";
-	this.youtubeSearchURI = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=25&orderby=relevance&alt=jsonc&q=";
+	this.youtubeSearchURI = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=25&orderby=relevance&alt=json&q=";
 	this.reset();
 }
 
@@ -142,7 +142,7 @@ SearchManager.prototype = {
 					continue;
 				}
 				var searchResult = new SearchResult(result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
-				var resultWords = getSeparatedWords(searchResult.artist + ' ' + searchResult.mediaName);
+				var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
 				var intersection = getIntersection(words, resultWords);
 				searchResult.querySimilarity = intersection.length / words.length;
 				searchManager.checkMaxPlays(searchResult.plays);
@@ -167,19 +167,26 @@ SearchManager.prototype = {
 				return;
 			}
 			var i, results = [];
-			var videos = body.data;
-			if (!videos) {
+			var feed = body.feed;
+			if (!feed) {
 				return results;
 			}
-			videos = videos.items;
+			var videos = feed.entry;
 			if (!videos) {
 				return results;
 			}
 			for (i in videos) {
-				var result = videos[i];
-				var permalink = 'http://www.youtube.com/watch?v=' + result.id;
-				var searchResult = new SearchResult(permalink, permalink, result.id, "ytv", result.uploader, result.title, result.duration, "video", result.viewCount, result.favoriteCount);
-				var resultWords = getSeparatedWords(searchResult.artist + ' ' + searchResult.mediaName);
+				var entry = videos[i];
+				var id = entry['id']['$t'].split(':').pop();
+				var permalink = 'http://www.youtube.com/watch?v=' + id;
+				var authorObj = entry.author[0];
+	            var author = authorObj.name.$t;
+				var title = entry.title.$t;
+	            var duration = parseInt(entry.media$group.yt$duration.seconds);
+	            var viewCount = entry['yt$statistics']['viewCount'];
+	            var favoriteCount = entry['yt$statistics']['favoriteCount'];
+				var searchResult = new SearchResult(permalink, permalink, id, "ytv", author, title, duration, "video", viewCount, favoriteCount);
+				var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
 				var intersection = getIntersection(words, resultWords);
 				searchResult.querySimilarity = intersection.length / words.length;
 				searchManager.checkMaxPlays(searchResult.plays);

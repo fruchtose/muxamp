@@ -8,12 +8,12 @@ var counter = (function() {
 var getMediaObject = function(searchResult) {
     var mediaObject = null;
     var id = counter();
-    switch (searchResult.siteName) {
-        case 'SoundCloud':
-            mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, searchResult.artist, searchResult.mediaName, searchResult.duration, soundManager);
+    switch (searchResult.siteCode) {
+        case 'sct':
+            mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, searchResult.author, searchResult.mediaName, searchResult.duration, soundManager);
             break;
-        case 'YouTube':
-            mediaObject = new YouTubeObject(id, searchResult.siteMediaID, searchResult.artist, searchResult.mediaName, searchResult.duration);
+        case 'ytv':
+            mediaObject = new YouTubeObject(id, searchResult.siteMediaID, searchResult.author, searchResult.mediaName, searchResult.duration);
             break;
     }
     return mediaObject;
