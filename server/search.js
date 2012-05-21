@@ -1,4 +1,27 @@
-function SearchResult(siteName, url, permalink, siteMediaID, siteCode, icon, artist, mediaName, duration, type, plays, favorites) {
+var $ = require('jquery-deferred'),
+	request = require('request');
+
+// Thanks to Jeffrey To http://www.falsepositives.com/index.php/2009/12/01/javascript-function-to-get-the-intersect-of-2-arrays/
+var getIntersection = function(arr1, arr2) {
+    var r = [], o = {}, l = arr2.length, i, v;
+    for (i = 0; i < l; i++) {
+        o[arr2[i]] = true;
+    }
+    l = arr1.length;
+    for (i = 0; i < l; i++) {
+        v = arr1[i];
+        if (v in o) {
+            r.push(v);
+        }
+    }
+    return r;
+}
+
+var getSeparatedWords = function(query) {
+	return query.replace(/[^\w\s]|_/g, ' ').toLowerCase().split(' ');
+};
+
+function SearchResult(siteName, url, permalink, siteMediaID, siteCode, artist, mediaName, duration, type, plays, favorites) {
 	this.siteName = siteName;
 	this.url = url;
 	this.permalink = permalink;
@@ -14,9 +37,9 @@ function SearchResult(siteName, url, permalink, siteMediaID, siteCode, icon, art
 
 SearchResult.prototype = {
 	calculateRelevance: function() {
-        	var lambdaPlays = 0.70;
-        	var lambdaFavorites = 0.30;
-        	this.relevance = (lambdaPlays * this. playRelevance + lambdaFavorites * this.favoriteRelevance) * this.querySimilarity;	
+    	var lambdaPlays = 0.70;
+    	var lambdaFavorites = 0.30;
+    	this.relevance = (lambdaPlays * this.playRelevance + lambdaFavorites * this.favoriteRelevance) * this.querySimilarity;	
 	}
 };
 
@@ -24,33 +47,87 @@ function SearchManager () {
 	this.soundcloudKey = "2f9bebd6bcd85fa5acb916b14aeef9a4";
 	this.soundcloudSearchURI = "http://api.soundcloud.com/tracks.json?client_id=" + this.soundcloudKey + "&limit=25&offset=0&filter=streamable&order=hotness&q=";
 	this.youtubeSearchURI = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=25&orderby=relevance&alt=jsonc&q=";
-
+	this.reset();
 }
 
 SearchManager.prototype = {
-	getSeparatedWords: function(query) {
-		var words = query.replace(/[^\w\s]|_/g, ' ').toLowerCase().split(' ');
+	checkMaxFavorites: function(favs) {
+		if (favs > this.maxFavorites) {
+			this.maxFavorites = favs;
+		}
+	},
+    checkMaxPlays: function(plays) {
+		if (plays > this.maxPlays) {
+			this.maxPlays = plays;
+		}
+	},
+	reset: function() {
+		this.maxFavorites = 0;
+		this.maxPlays = 0;
 	},
 	search: function(query, site) {
-		var results =[];
+		this.reset();
+		var deferred, searchManager = this;
 		switch(site) {
 			case 'sct':
-				results = this.searchSoundCloudTracks(query);
+				deferred = this.searchSoundCloudTracks(query);
 				break;
 			case 'ytv':
-				results = this.searchYouTubeVideos(query);
+				deferred = this.searchYouTubeVideos(query);
 				break;
 		}
+		return deferred.pipe(function(results) {
+			var i;
+			for (i in results) {
+				if (results[i].plays < 0) {
+					var newPlays = 0, newFavorites = 0, j;
+					for (j = -1 * results[i].plays; j < results.length; j++) {
+						if (results[j].plays >= 0) {
+							newPlays = results[j].plays;
+							newFavorites = results[j].plays;
+							break;
+						}
+					}
+					results[i].plays = newPlays;
+					results[i].favorites = newFavorites;
+				}
+				var plays = results[i].plays, favs = results[i].favorites;
+				results[i].playRelevance = Math.log(plays + 1) / Math.log(searchManager.maxPlays + 1);
+				results[i].favoriteRelevance = Math.log(favs + 1) / Math.log(searchManager.maxFavorites + 1);
+				results[i].calculateRelevance();
+			}
+			results.sort(function(a, b) {
+				return b.relevance - a.relevance;
+			});
+			for (i in results) {
+				delete results[i].favoriteRelevance;
+				delete results[i].favorites;
+				delete results[i].playRelevance;
+				delete results[i].plays;
+				delete results[i].querySimilarity;
+				//delete results[i].relevance;
+			}
+			return results;
+		},
+		function(failedResults) {
+			return [];
+		});
 	},
 	searchSoundCloudTracks: function(query) {
 		var searchManager = this;
-		var words = this.getSeparatedWords(query);
+		var deferred = $.Deferred();
+		var words = getSeparatedWords(query);
+		console.log("Searching SoundCloud for " + words.join(" "));
 		request({
 			json: true,
 			method: 'GET',
-			url: searchManager.soundcloudSearchURI
+			url: searchManager.soundcloudSearchURI + encodeURIComponent(query)
 		}, function(error, response, body) {
-			var i;
+			if (error) {
+				deferred.reject();
+				return;
+			}
+			var i, results = [];
 			for (i in body) {
 				var result = body[i];
 				if (undefined == result.playback_count) {
@@ -61,19 +138,36 @@ SearchManager.prototype = {
 					continue;
 				}
 				var searchResult = new SearchResult("SoundCloud", result.stream_url + "?client_id=$soundcloud_key", result.permalink_url, result.id, "sct", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
-				var resultWords = this.getSeparatedWords(searchResult.artist + ' ' + searchResult.mediaName);
+				var resultWords = getSeparatedWords(searchResult.artist + ' ' + searchResult.mediaName);
+				var intersection = getIntersection(words, resultWords);
+				searchResult.querySimilarity = intersection.length / words.length;
+				searchManager.checkMaxPlays(searchResult.plays);
+				searchManager.checkMaxFavorites(searchResult.favorites);
+				results.push(searchResult);
 			}
+			deferred.resolve(results);
 		});
+		return deferred.promise();
 	},
-	searchYouTubeVideos: function(query) {
+	searchYouTubeVideos: function(query, deferred) {
 		var searchManager = this;
-		var words = this.getSeparatedWords(query);
+		var words = getSeparatedWords(query);
 		request({
 			json: true,
 			method: 'GET',
 			url: searchManager.youtubeSearchURI
 		}, function(error, response, body) {
-			
+			if (error) {
+				deferred.reject();
+				return;
+			}
 		});
+		return deferred.promise();
 	}
+};
+
+module.exports = {
+  search: function() {
+	return new SearchManager();
+  }
 };

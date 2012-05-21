@@ -1,7 +1,7 @@
 $("#search-results li").livequery(function() {
     var getMediaObject = function(searchResult) {
         var mediaObject = null;
-        var id =router.getNewTrackID();
+        var id = router.getNewTrackID();
         switch (searchResult.siteName) {
             case 'SoundCloud':
                 mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, router.soundcloudConsumerKey, searchResult.artist, searchResult.mediaName, searchResult.duration, soundManager);
@@ -79,7 +79,7 @@ var siteCodeFromSiteName = function(site) {
 }
 
 var searchForTracks = function(query, site) {
-    var searchURL =  window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'search.php?q=' + encodeURIComponent(query) + "&s=" + site;
+    var searchURL =  window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'search/' +site + '/'+ encodeURIComponent(query);
     $.ajax({
         url: searchURL,
         dataType: 'json',
