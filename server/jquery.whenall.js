@@ -1,4 +1,4 @@
-var $ = jQuery = module.exports = require('jquery');
+var $ = jQuery = module.exports = require('jquery-deferred');
 
 $.extend({
     whenAll: function( firstParam ) {
