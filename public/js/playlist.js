@@ -42,7 +42,8 @@ Playlist.prototype = {
         });
     },
     _addPlaylistDOMRows: function(mediaObjects, insertLocation) {
-        if ( !(mediaObjects instanceof Array) ) {
+        var index;
+    	if ( !(mediaObjects instanceof Array) ) {
             mediaObjects = [mediaObjects];
         }
         var playlist = this, appendedHTML = '';
@@ -53,10 +54,10 @@ Playlist.prototype = {
         }
         if ($.isNumeric(insertLocation)) {
             if ($(this.playlistDOM.allRowsInTable).size()) {
-                $($(this.playlistDOM.allRowsInTable).get(insertLocation)).append(appendedHTML);
+                $($(this.playlistDOM.allRowsInTable).get(insertLocation)).after(appendedHTML);
             }
             else {
-                $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
+                $(this.playlistDOM.parentTable).append(appendedHTML);
             }
         }
         else {
