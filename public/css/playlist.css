@@ -252,33 +252,40 @@ a:hover {
     float: left;
     left: 0;
     position: absolute;
-    width: 36px;
+    width: 40px;
 }
-.search-action {
+.thin-button {
+	background: #CACACA;
+	border-radius: 4px;
     float: left;
+    height: 16px;
     left: 0;
-    line-height: 24px;
+    line-height: 16px;
+    margin-left: 4px;
     position: absolute;
     text-align: center;
+    top: 4px;
     vertical-align: middle;
-    width: 18px;
+    width: 16px;
 }
-.search-action.add {
-    top: 1px;
+.thin-button:first-child {
+	margin-left: 0;
 }
-.search-action.play {
-    left: 18px;
+.search-actions .thin-button.play {
+    left: 16px;
+    line-height: 12px;
 }
-.search-action.play .caret {
+.search-actions .thin-button.play .caret {
     border-left: 5px solid #662;
     border-right: 0;
     border-top: 5px solid transparent;
     border-bottom: 5px solid transparent;
+    line-height: 16px;
     opacity: 1;
     filter: alpha(opacity=100);
     vertical-align: middle;
 }
-.search-action.play .caret:hover {
+.search-actions .thin-button.play .caret:hover {
     border-left: 5px solid #005580;
     text-decoration: underline;
 }
@@ -293,7 +300,7 @@ a:hover {
 }
 #search-results .desc {
     line-height: 24px;
-    padding-left: 42px;
+    padding-left: 40px;
     vertical-align: middle;
 }
 #tracks li .desc {
@@ -313,7 +320,6 @@ a:hover {
 }
 #tracks li {
     cursor: move;
-    padding: 1px;
 }
 #search-results li:hover, #tracks li:hover {
     background-color: #cfc;
@@ -328,31 +334,13 @@ a:hover {
 #tracks .right a {
     padding-left: 1em;
 }
-#tracks li .remove {
-    float: left;
-    font-size: 18px;
-    height: 24px;
-    line-height: 24px;
-    text-align: center;
-    vertical-align: middle;
-    width: 22px;
-}
 #tracks li .link {
-    float: left;
-    height: 16px;
-    margin: 4px auto 0 0;
-    text-align: center;
-    width: 26px;
-}
-#tracks li .link img {
-    margin-left: 5px;
+    left: 20px;
 }
 #tracks li.playing {
-    border: solid #111 1px;
     background-color: #333;
     color: #ddd;
     min-height: 24px;
-    padding: 0;
 }
 #tracks li.playing a {
     color: #eeeecc;

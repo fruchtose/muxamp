@@ -10,7 +10,6 @@ var fs = require('fs');
 
 app.get('/', function(req, res) {
 	var file = __dirname + '/public/playlist.html';
-	console.log('Request for ' + file.toString());
 	fs.readFile(file, 'utf8', function(err, text) {
 		res.send(text);
 	});
