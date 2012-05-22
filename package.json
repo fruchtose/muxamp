@@ -9,5 +9,6 @@
     "express"         : "2.5.x",
     "jquery-deferred" : "0.2.x",
     "request"         : "2.9.x"
+    "gzippo"          : "0.1.x"
   }
 }

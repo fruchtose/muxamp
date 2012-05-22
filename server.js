@@ -1,11 +1,12 @@
 var express = require('express'), app = express.createServer();
+var gzippo = require('gzippo');
 var search = require('./server/search').search();
 var mediaRouterBase = require('./server/router');
 var mediaRouter = mediaRouterBase.getRouter();
 var url = require('url');
 var $ = require('./server/jquery.whenall');
 
-app.use(express.static(__dirname + '/public'));
+app.use(gzippo.staticGzip(__dirname + '/public'));
 var fs = require('fs');
 
 app.get('/', function(req, res) {
