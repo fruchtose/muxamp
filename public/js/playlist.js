@@ -82,11 +82,11 @@ Playlist.prototype = {
         return '<li class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</li>';
     },
     _getDOMTableCellsForMediaObject: function(mediaObject, index) {
-    	var remove = '<div class="thin-button remove"><a href onclick="return false;" class="remove" >&times;</a></div>';
+    	var remove = '<div class="removebox"><div class="removetext"><a href onclick="return false;" class="remove" >&times;</a></div></div>';
     	var extLink = '<a href="' + mediaObject.permalink +'" target="_blank"><img src="' + mediaObject.icon + '"/></a>';
         var links = '<div class="thin-button link">' + extLink + '</div>';
-        var left = '<div class ="left">' + remove + links + '</div>';
-        return left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span>';
+        var left = '<div class ="left">' + links + '</div>';
+        return remove + '<div class=content>' + left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span></div></div>';
     },
     addTracks: function(mediaObjects, currentTrack, insertLocation) {
         if ( !(mediaObjects instanceof Array) ) {

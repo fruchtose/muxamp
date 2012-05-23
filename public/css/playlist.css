@@ -94,7 +94,7 @@ a:hover {
     position: absolute;
     right: 20px;
     top: 273px;
-    width:360px;
+    width:380px;
 }
 /*.search-link {
     border: solid #888 1px;
@@ -303,9 +303,12 @@ a:hover {
     padding-left: 40px;
     vertical-align: middle;
 }
+#tracks li .content {
+	margin-left: 20px;
+}
 #tracks li .desc {
     padding-bottom: 0.25em;
-    padding-right: 1em;
+    padding-right: 0.25em;
     padding-top: 0.25em;
     padding-left: 52px;
     vertical-align: middle;
@@ -321,12 +324,34 @@ a:hover {
 #tracks li {
     cursor: move;
 }
-#search-results li:hover, #tracks li:hover {
+#search-results li:hover, #tracks li:hover .content {
     background-color: #cfc;
 }
 #search-results a, #tracks a {
     font-weight: bold;
     padding-right: 0;
+}
+#tracks .removebox {
+	background: #CACACA;
+	-webkit-border-top-left-radius: 8px;
+	-webkit-border-bottom-left-radius: 8px;
+	-moz-border-radius-topleft: 8px;
+	-moz-border-radius-bottomleft: 8px;
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+    float: left;
+    height: 16px;
+    left: 0;
+    width: 20px;
+}
+#tracks .removebox .removetext {
+	font-size: 18px;
+	height: 16px;
+	line-height: 16px;
+	margin-left: 4px;
+	text-align: center;
+    vertical-align: middle;
+	width: 12px;
 }
 #tracks .desc a {
     padding-right: 0.5em;
@@ -337,7 +362,7 @@ a:hover {
 #tracks li .link {
     left: 20px;
 }
-#tracks li.playing {
+#tracks li.playing .content {
     background-color: #333;
     color: #ddd;
     min-height: 24px;
