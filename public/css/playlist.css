@@ -70,8 +70,6 @@ a:hover {
 }*/
 #side-content {
     color: #2E2E2E;
-    padding-left: 20px;
-    padding-right: 20px;
 }
 .player-row {
     height: 30px;
@@ -90,11 +88,11 @@ a:hover {
 }
 #playlist-view {
     bottom: 40px;
-    overflow: auto;
+    overflow-y: scroll;
     position: absolute;
     right: 20px;
     top: 273px;
-    width:380px;
+    width:400px;
 }
 /*.search-link {
     border: solid #888 1px;
@@ -295,8 +293,8 @@ a:hover {
 #search-results li {
     cursor: pointer;
 }
-#search-results li, #tracks li .playlist-item {
-    min-height: 24px;
+#search-results li, #tracks li .desc {
+    height: 36px;
 }
 #search-results .desc {
     line-height: 24px;
@@ -304,54 +302,47 @@ a:hover {
     vertical-align: middle;
 }
 #tracks li .content {
-	margin-left: 20px;
+	margin-left: 40px;
 }
 #tracks li .desc {
-    padding-bottom: 0.25em;
-    padding-right: 0.25em;
-    padding-top: 0.25em;
+    padding: 2px 2px 2px 0;
     padding-left: 52px;
     vertical-align: middle;
 
 }
 #tracks li .left {
     float: left;
-    width: 48px;
+    left: 40px;
+    width: 40px;
     text-align: center;
     vertical-align: middle;
-    z-index: 9;
 }
 #tracks li {
     cursor: move;
 }
-#search-results li:hover, #tracks li:hover .content {
+#tracks li:hover .close {
+	display: block;
+}
+#search-results li:hover, #tracks li .content:hover {
     background-color: #cfc;
 }
 #search-results a, #tracks a {
     font-weight: bold;
     padding-right: 0;
 }
-#tracks .removebox {
-	background: #CACACA;
-	-webkit-border-top-left-radius: 8px;
-	-webkit-border-bottom-left-radius: 8px;
-	-moz-border-radius-topleft: 8px;
-	-moz-border-radius-bottomleft: 8px;
-	border-top-left-radius: 8px;
-	border-bottom-left-radius: 8px;
-    float: left;
-    height: 16px;
-    left: 0;
-    width: 20px;
-}
-#tracks .removebox .removetext {
+#tracks .close {
+-	webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border: 2px solid black;
+	border-radius: 10px;
+	display: none;
+	float: left;
 	font-size: 18px;
-	height: 16px;
-	line-height: 16px;
-	margin-left: 4px;
+	height: 17px;
+	margin: 10px 0 0 10px;
 	text-align: center;
-    vertical-align: middle;
-	width: 12px;
+	vertical-align: middle;
+	width: 17px;
 }
 #tracks .desc a {
     padding-right: 0.5em;
@@ -367,11 +358,10 @@ a:hover {
     color: #ddd;
     min-height: 24px;
 }
-#tracks li.playing a {
+#tracks li.playing .content a {
     color: #eeeecc;
     text-decoration: none;
 }
-#tracks li.playing a:hover {text-decoration: underline; }
 #track-information {
     bottom: 40px;
     position: absolute;

@@ -64,15 +64,15 @@ Playlist.prototype = {
             $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
         }
         for (index in mediaObjects){
-            $(this.playlistDOM.getRowForID(mediaObjects[index].id)).dblclick(function() {
+        	var row = $(this.playlistDOM.getRowForID(mediaObjects[index].id));
+            row.dblclick(function() {
                 playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
-            })/*.hover(function() {
-            	var $this = $(this);
-            	var remove = $this.find('.remove');
-            	remove.position({my: 'right center', at: 'left center', of: $this}).removeClass('hide');
-            }).mouseleave(function() {
-            	//$(this).find('.remove').addClass('hide');
-            })*/;
+            });
+            /*row.hover(function() {
+            	var $this = $(this).closest('li');
+            	var remove = $($this.find(playlist.playlistDOM.removalHyperlink));
+            	remove.toggle();
+            });*/
             $(this.playlistDOM.getRemovalHyperlinkForID(mediaObjects[index].id)).live('click', function() {
                 playlist.removeTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index());
             });
@@ -82,7 +82,7 @@ Playlist.prototype = {
         return '<li class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</li>';
     },
     _getDOMTableCellsForMediaObject: function(mediaObject, index) {
-    	var remove = '<div class="removebox"><div class="removetext"><a href onclick="return false;" class="remove" >&times;</a></div></div>';
+    	var remove = '<a href onclick="return false;" class="remove close">&times;</a>';
     	var extLink = '<a href="' + mediaObject.permalink +'" target="_blank"><img src="' + mediaObject.icon + '"/></a>';
         var links = '<div class="thin-button link">' + extLink + '</div>';
         var left = '<div class ="left">' + links + '</div>';
