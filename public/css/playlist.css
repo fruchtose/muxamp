@@ -2,6 +2,8 @@ html {
     overflow-x: hidden;
 }
 body {
+	//background-color: #014A57;
+	//color: #FFFCD1;
     overflow-x: hidden;
     overflow-y: hidden;
     -ms-overflow-y: hidden;
@@ -10,9 +12,14 @@ img {
     border: none;
     float: left;
 }
-#right-side li {
-    margin: 0px;
-    white-space: pre-line;
+.align-bottom {
+	vertical-align: bottom;
+}
+.left-column {
+	float: left;
+}
+.right-column {
+	float: right;
 }
 #right-side ol, #right-side ul {
     list-style: none;
@@ -20,7 +27,7 @@ img {
     padding: 0px;
 }
 a {
-    color: #666622;
+    color: #B2AF80;
     text-decoration: none;
 }
 .caret-right {
@@ -65,9 +72,6 @@ a {
     color: #775739;
     font-weight: bold;
 }*/
-#side-content {
-    color: #2E2E2E;
-}
 .player-row {
     height: 30px;
     line-height: 30px;
@@ -290,83 +294,86 @@ a {
 #search-results li {
     cursor: pointer;
 }
-#search-results li, #tracks li .desc {
-    height: 36px;
-}
-#search-results .desc {
-    line-height: 24px;
-    padding-left: 40px;
-    vertical-align: middle;
-}
-#tracks li .content {
+li .content {
+	//background: #072A30;
+	//color: #fff;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
-	margin: 4px 4px 0 40px;
+	height: 36px;
+	line-height: 18px;
+	margin: 0 4px 0 40px;
+	padding: 4px;
 }
-#tracks li:first-child .content {
-	margin-top: 0;
+li .content {
+	//background: #6D0C28;
+	//color: #eebfee;
 }
-#tracks li .desc {
-    padding: 2px 2px 2px 0;
-    padding-left: 52px;
-    vertical-align: middle;
-
+li:hover .content {
+	background-color: #eee;
+}
+#tracks li .name {
+	float: left;
+	font-weight: bold;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+#tracks li .dur-box {
+	float: right;
+}
+#tracks li .artist {
+	clear: left;
 }
 #tracks li .left {
     float: left;
-    left: 40px;
+    left: 20px;
     width: 40px;
     text-align: center;
     vertical-align: middle;
 }
 #tracks li {
     cursor: move;
+    margin: 4px 0 4px 0;
 }
-#tracks li:hover .close {
+#tracks li:hover .action {
 	display: block;
 }
-#search-results li:hover, #tracks li:hover .content {
-    background-color: #cfc;
+#tracks li:hover .artist {
+	clear: none;
 }
-#search-results a, #tracks a {
-    font-weight: bold;
-    padding-right: 0;
-}
-#tracks .close {
--	webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	border: 2px solid black;
-	border-radius: 10px;
+.action {
+	webkit-border-radius: 11px;
+	-moz-border-radius: 11px;
+	border-radius: 11px;
 	display: none;
 	float: left;
-	font-size: 18px;
-	height: 17px;
-	margin: 10px 0 0 10px;
+	margin: 9px 0 0 14px;
+	padding: 2px 3px 0 3px;
+}
+/*.action {
+-	webkit-border-radius: 12px;
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	border: 2px solid black;
+	color: black;
+	display: none;
+	float: left;
+	font-size: 14px;
+	font-weight: bold;
+	height: 16px;
+	line-height: 14px;
+	margin: 8px 0 0 8px;
+	padding: 4px 3px 0px 3px;
 	text-align: center;
-	vertical-align: middle;
-	width: 17px;
-}
-#tracks .desc a {
-    padding-right: 0.5em;
-}
-#tracks .right a {
-    padding-left: 1em;
-}
-#tracks li .link {
-    left: 20px;
-}
-#tracks li.playing .content {
-    background-color: #333;
-    color: #ddd;
-    min-height: 24px;
-}
-#tracks li.playing .content a {
-    color: #eeeecc;
-    text-decoration: none;
+	min-width: 14px;
+}*/
+#search-results-view .action {
+	display: inherit;
 }
 #track-information {
-    bottom: 40px;
+    bottom: 10px;
+    height: 30px;
     position: absolute;
     right: 20px;
     width: 360px;

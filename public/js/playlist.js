@@ -16,7 +16,13 @@ var PlaylistDOMInformation = function() {
         return selector;
     };
     
+    this.content = ".content";
+    
     this.removalHyperlink = "a.remove";
+    
+    this.trackName = "div.name";
+    
+    this.trackDurationBox = "div.dur-box";
 };
 
 function Playlist(soundManager) {
@@ -65,14 +71,10 @@ Playlist.prototype = {
         }
         for (index in mediaObjects){
         	var row = $(this.playlistDOM.getRowForID(mediaObjects[index].id));
-            row.dblclick(function() {
+            row.find(this.playlistDOM.trackName).width(row.find(this.playlistDOM.content).width() - row.find(this.playlistDOM.trackDurationBox).width());
+        	row.dblclick(function() {
                 playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
             });
-            /*row.hover(function() {
-            	var $this = $(this).closest('li');
-            	var remove = $($this.find(playlist.playlistDOM.removalHyperlink));
-            	remove.toggle();
-            });*/
             $(this.playlistDOM.getRemovalHyperlinkForID(mediaObjects[index].id)).live('click', function() {
                 playlist.removeTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index());
             });
@@ -82,11 +84,13 @@ Playlist.prototype = {
         return '<li class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</li>';
     },
     _getDOMTableCellsForMediaObject: function(mediaObject, index) {
-    	var remove = '<a href onclick="return false;" class="remove close">&times;</a>';
+    	//var remove = '<a href onclick="return false;" class="action remove close">&times;</a>';
+    	var remove = '<a href onclick="return false;" class="btn action remove"><i class="icon-remove""></i></a>';
     	var extLink = '<a href="' + mediaObject.permalink +'" target="_blank"><img src="' + mediaObject.icon + '"/></a>';
         var links = '<div class="thin-button link">' + extLink + '</div>';
         var left = '<div class ="left">' + links + '</div>';
-        return remove + '<div class=content>' + left + '<div class="desc">' + '<span class="index">' + index + "</span>. " +mediaObject.artist + ' - ' + mediaObject.mediaName + ' ' + '[' + secondsToString(mediaObject.getDuration()) + ']' + '</span></div></div>';
+        var trackInfo = '<div class="track"><div class="name">' + mediaObject.mediaName + '</div>' + '<div class="dur-box">[<span class="duration">' + secondsToString(mediaObject.duration) + '</span>]</div></div>' + '<div class="artist">' + mediaObject.artist + '</div>';
+        return remove + '<div class=content>' + trackInfo + '</div>';
     },
     addTracks: function(mediaObjects, currentTrack, insertLocation) {
         if ( !(mediaObjects instanceof Array) ) {
