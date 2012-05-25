@@ -1,7 +1,12 @@
+/*
+Milan Week http://kuler.adobe.com/#themeID/1875670
+*/
 html {
     overflow-x: hidden;
 }
 body {
+	background: #DEDCC3;
+	color: #414349;
 	//background-color: #014A57;
 	//color: #FFFCD1;
     overflow-x: hidden;
@@ -21,13 +26,13 @@ img {
 .right-column {
 	float: right;
 }
-#right-side ol, #right-side ul {
+#search-results, #tracks {
     list-style: none;
     margin: 0px;
-    padding: 0px;
+    padding: 0 0 4px 0;
 }
 a {
-    color: #B2AF80;
+    color: #877963;
     text-decoration: none;
 }
 .caret-right {
@@ -68,10 +73,6 @@ a {
     display: inline-block;
     vertical-align: middle;
 }
-/*#side-content a, #footer a, #video a {
-    color: #775739;
-    font-weight: bold;
-}*/
 .player-row {
     height: 30px;
     line-height: 30px;
@@ -93,52 +94,12 @@ a {
     position: absolute;
     right: 20px;
     top: 273px;
-    width:400px;
+    width: 360px;
 }
-/*.search-link {
-    border: solid #888 1px;
-    float: left;
-    display: block;
-    height: 16px;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 5px;
-    width: 199px;
-}
-.search-button-container  {
-    float: left;
-    display: block;
-}
-.search-button-container img {
-    margin-top: 5px;
-    vertical-align: middle;
-    z-index: 14;
-}
-.search-button {
-    margin-left: -133px;
-    margin-right: 0;
-    padding-right: 0;
-    z-index: 15;
-}
-.search-button:active {
-    color: #99795b;
-}*/
 #controls {
     float: left;
     z-index: 12;
 }
-/*#controls a {
-    background-image: url("../img/controls.png");
-    float: left;
-    display: block;
-    height: 20px;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 6px;
-    padding-left: 0;
-    padding-right: 0;
-    width: 40px;
-}*/
 #controls a.btn {
     padding: 0 7px 0 7px;
     top: 5px;
@@ -247,74 +208,77 @@ a {
 #search-results {
     margin: 0;
 }
-.search-actions {
+.actions {
+	display: none;
     float: left;
-    left: 0;
+    left: 4px;
     position: absolute;
-    width: 40px;
+    width: 48px;
 }
-.thin-button {
-	background: #CACACA;
-	border-radius: 4px;
-    float: left;
-    height: 16px;
-    left: 0;
-    line-height: 16px;
-    margin-left: 4px;
-    position: absolute;
-    text-align: center;
-    top: 4px;
-    vertical-align: middle;
-    width: 16px;
+#playlist-view .actions {
+	width: 22px;
 }
-.thin-button:first-child {
+li:hover .actions {
+	display: block;
+}
+.actions .action {
+	margin-left: 4px;
+}
+.actions .action:first-child {
 	margin-left: 0;
-}
-.search-actions .thin-button.play {
-    left: 16px;
-    line-height: 12px;
-}
-.search-actions .thin-button.play .caret {
-    border-left: 5px solid #662;
-    border-right: 0;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    line-height: 16px;
-    opacity: 1;
-    filter: alpha(opacity=100);
-    vertical-align: middle;
-}
-.search-actions .thin-button.play .caret:hover {
-    border-left: 5px solid #005580;
-    text-decoration: underline;
-}
-#search-results a {
-    font-size: 18px;
-}
-#search-results li {
-    cursor: pointer;
 }
 li .content {
 	//background: #072A30;
 	//color: #fff;
-	-webkit-border-radius: 4px;
+	background: #F2F1E9;
+	border-bottom: 1px solid rgb(192, 192, 192);
+	border-left: 1px solid rgb(192, 192, 192);
+	border-right: 1px solid rgb(192, 192, 192);
+	-moz-box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(255,255,255, 0.5);
+	-webkit-box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
+	box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
+	/*border: 1px solid #333;
+	-moz-box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 1px 5px rgba(255,255,255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+	box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+	color: #fff;*/
+	/*-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
-	border-radius: 4px;
+	border-radius: 4px;*/
 	height: 36px;
 	line-height: 18px;
-	margin: 0 4px 0 40px;
+	margin: 0 4px 0 0;
 	padding: 4px;
+}
+li:first-child .content {
+	-webkit-border-top-left-radius: 4px;
+	-webkit-border-top-right-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	border-top: 1px solid rgb(192, 192, 192);
+	-moz-box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 0 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(255,255,255, 0.5);
+	-webkit-box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 0 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
+	box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 0 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
+}
+li:last-child .content {
+	-webkit-border-bottom-right-radius: 4px;
+	-webkit-border-bottom-left-radius: 4px;
+	-moz-border-radius-bottomright: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
 }
 li .content {
 	//background: #6D0C28;
 	//color: #eebfee;
 }
 li:hover .content {
-	background-color: #eee;
+	color: #6E9489;
 }
 #tracks li.playing .content {
-	background: #333;
-	color: #fff;
+	background: #EDCE4F;
 }
 #tracks li .name {
 	float: left;
@@ -336,12 +300,9 @@ li:hover .content {
     text-align: center;
     vertical-align: middle;
 }
-#tracks li {
+#search-results li, #tracks li {
     cursor: move;
-    margin: 4px 0 4px 0;
-}
-#tracks li:hover .action {
-	display: block;
+    margin: px 0 4px 0;
 }
 #tracks li:hover .artist {
 	clear: none;
@@ -350,30 +311,11 @@ li:hover .content {
 	webkit-border-radius: 11px;
 	-moz-border-radius: 11px;
 	border-radius: 11px;
-	display: none;
 	float: left;
-	margin: 9px 0 0 14px;
+	height: 18px;
+	margin: 11px 0 0 14px;
 	padding: 2px 3px 0 3px;
-}
-/*.action {
--	webkit-border-radius: 12px;
-	-moz-border-radius: 12px;
-	border-radius: 12px;
-	border: 2px solid black;
-	color: black;
-	display: none;
-	float: left;
-	font-size: 14px;
-	font-weight: bold;
-	height: 16px;
-	line-height: 14px;
-	margin: 8px 0 0 8px;
-	padding: 4px 3px 0px 3px;
-	text-align: center;
-	min-width: 14px;
-}*/
-#search-results-view .action {
-	display: inherit;
+	vertical-align: top;
 }
 #track-information {
     bottom: 10px;

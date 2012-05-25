@@ -90,7 +90,7 @@ Playlist.prototype = {
         var links = '<div class="thin-button link">' + extLink + '</div>';
         var left = '<div class ="left">' + links + '</div>';
         var trackInfo = '<div class="track"><div class="name">' + mediaObject.mediaName + '</div>' + '<div class="dur-box">[<span class="duration">' + secondsToString(mediaObject.duration) + '</span>]</div></div>' + '<div class="artist">' + mediaObject.artist + '</div>';
-        return remove + '<div class=content>' + trackInfo + '</div>';
+        return '<div class="actions">' + remove + '</div><div class=content>' + trackInfo + '</div>';
     },
     addTracks: function(mediaObjects, currentTrack, insertLocation) {
         if ( !(mediaObjects instanceof Array) ) {
