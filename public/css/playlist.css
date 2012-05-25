@@ -312,6 +312,10 @@ li .content {
 li:hover .content {
 	background-color: #eee;
 }
+#tracks li.playing .content {
+	background: #333;
+	color: #fff;
+}
 #tracks li .name {
 	float: left;
 	font-weight: bold;
