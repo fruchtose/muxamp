@@ -21,27 +21,39 @@
         </script>
     </head>
     <body>
-        <div id="wrapper">
-            <div id="main">
-                <form id="search-form" class="form-inline" method="post">
-                    <input type="text" id="search-query" />
-                    <input id="search-site" type="hidden" value="ytv" />
-                    <div id="search-site-dropdown" class="btn-group">
-                        <input type="submit" class="btn" id="search-submit" value="Search" />
-                        <button id="site-selector" class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                            YouTube&nbsp;<span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a href onclick="return false;">YouTube</a></li>
-                            <li><a href onclick="return false;">SoundCloud (Tracks)</a></li>
-                        </ul>
-
-                    </div>
-
-                </form>
+    	<div id="header">
+    		<div id="header-container" class="container">
+	    		<div class="row">
+		    		<form id="search-form" class="span7 form-inline form-search" method="post">
+		                <input type="text" id="search-query" class="search-query" />
+		                <input id="search-site" type="hidden" value="ytv" />
+		                <div id="search-site-dropdown" class="btn-group">
+		                    <input type="submit" class="btn" id="search-submit" value="Search" />
+		                    <button id="site-selector" class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+		                        YouTube&nbsp;<span class="caret"></span>
+		                    </button>
+		                    <ul class="dropdown-menu">
+		                        <li><a href onclick="return false;">YouTube</a></li>
+		                        <li><a href onclick="return false;">SoundCloud (Tracks)</a></li>
+		                    </ul>
+		                </div>
+		            </form>
+		            <div id="track-information" class="span5" >
+		                <span class="left-column">
+		                    Playlist length: <span id="track-count">0</span> [<span id="playlist-duration">0:00</span>]
+		                </span>
+		                <span class="right-column">
+		                    <a id="about-button" href onclick="return false;"><strong>About Muxamp</strong></a>
+		                </span>
+		            </div>
+	            </div>
+            </div>
+    	</div>
+        <div id="wrapper" class="container">
+            <div id="main" class="span7 no-margin">
                 <div id="search-results-view"><ul id="search-results"></ul></div>
             </div>
-            <div id="right-side">
+            <div id="right-side" class="span5 offset7">
                 <div id="video-container">
                     <div id="video"></div>
                 </div>
@@ -73,14 +85,6 @@
                     </div>
                     <div id="playlist-view">
                         <ol id="tracks"></ol>
-                    </div>
-                    <div id="track-information" class="align-bottom" >
-                        <div class="player-row left-column">
-                            Playlist length: <span id="track-count">0</span> [<span id="playlist-duration">0:00</span>]
-                        </div>
-                        <div class="player-row right-column">
-                            <a id="about-button" href onclick="return false;"><strong>About Muxamp</strong></a>
-                        </div>
                     </div>
                 </div>
             </div>

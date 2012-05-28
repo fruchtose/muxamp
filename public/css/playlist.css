@@ -26,6 +26,20 @@ img {
 .right-column {
 	float: right;
 }
+#header {
+	border-bottom: 1px solid #394563;
+	border-top: 1px solid #394563;
+	color: #DEDCC3;
+	background: #414349;
+	display: block;
+	height: 50px;
+	width: 100%;
+}
+#header-container {
+	margin-top: 5px;
+}
+#search-form {
+}
 #search-results, #tracks {
     list-style: none;
     margin: 0px;
@@ -51,20 +65,30 @@ a {
     right: 0px;
     text-align: right;
 }
+[class*=span].no-margin {
+	margin-left: 0;
+}
 #wrapper {
+	bottom: 0;
+	left: 0;
     padding-left: 0;
     padding-right: 0; 
-    top: 0;
+    position: fixed;
+    right: 0;
+    top: 52px;
 }
 #main {
-    bottom: 10px;
-    left: 20px;
+	height: 100%;
+	left: 0;
+	position: relative;
+    /*bottom: 0;
+    left: 10px;
     margin-right: 400px;
     min-width: 400px;
     overflow-y: auto;
     position: absolute;
     right: 20px;
-    top: 10px;
+    top: 0px;*/
 }
 #search-results {
     list-style: none;
@@ -89,12 +113,11 @@ a {
     float: left;
 }
 #playlist-view {
-    bottom: 40px;
+    bottom: 0;
     overflow-y: scroll;
-    position: absolute;
-    right: 20px;
-    top: 273px;
-    width: 360px;
+    position: fixed;
+    top: 327px;
+    width: 380px;
 }
 #controls {
     float: left;
@@ -105,7 +128,10 @@ a {
     top: 5px;
 }
 #right-side {
-    width: 400px;
+	height: 100%;
+	margin-left: 560px;
+    position: absolute;
+    /*width: 400px;*/
 }
 #timebar-row {
     width: 360px;
@@ -183,27 +209,36 @@ a {
     margin-left: 6px;
 }
 #video-container, #video {
-    height: 203px;
-    width: 360px;
-    z-index: 15
+    width: 380px;
+    position: relative;
+    
 }
 #video-container {
-    margin: 10px 0 0 20px;
-    position: absolute;
-    right: 20px;
+	background: #414349;
+	border-bottom: 1px solid #394563;
+	border-left: 1px solid #394563;
+	border-right: 1px solid #394563;
+	height: 214px;
+	top: -1px;
+	width: 378px;
+}
+#video {
+	margin-left: auto;
+	margin-right: auto;
+	top: 1px;
+}
+#side-content {
+	height: 100%;
+	position: relative;
 }
 #playlist-controls {
-    top: 213px;
-    position: absolute;
-    right: 20px;
+    height: 60px;
 }
 #search-results-view {
 	bottom: 0;
-	left: 0;
 	overflow: auto;
 	position: absolute;
-	right: 0;
-	top: 38px;
+	top: 0px;
 }
 #search-results {
     margin: 0;
@@ -211,7 +246,7 @@ a {
 .actions {
 	display: none;
     float: left;
-    left: 4px;
+    left: 1px;
     position: absolute;
     width: 48px;
 }
@@ -230,14 +265,11 @@ li:hover .actions {
 li .content {
 	//background: #072A30;
 	//color: #fff;
-	background: #F2F1E9;
-	border-bottom: 1px solid rgb(192, 192, 192);
-	border-left: 1px solid rgb(192, 192, 192);
-	border-right: 1px solid rgb(192, 192, 192);
-	-moz-box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(255,255,255, 0.5);
-	-webkit-box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
-	box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
-	/*border: 1px solid #333;
+	/*border-bottom: 1px solid #414349;
+	-moz-box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(255,255,255, 0.5);
+	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
+	box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
+	border: 1px solid #333;
 	-moz-box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 1px 5px rgba(255,255,255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 	box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
@@ -245,22 +277,15 @@ li .content {
 	/*-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;*/
+	border: 1px solid transparent;
 	height: 36px;
 	line-height: 18px;
-	margin: 0 4px 0 0;
-	padding: 4px;
+	padding: 4px 4px 4px 0;
 }
 li:first-child .content {
-	-webkit-border-top-left-radius: 4px;
-	-webkit-border-top-right-radius: 4px;
-	-moz-border-radius-topleft: 4px;
-	-moz-border-radius-topright: 4px;
-	border-top-left-radius: 4px;
-	border-top-right-radius: 4px;
-	border-top: 1px solid rgb(192, 192, 192);
-	-moz-box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 0 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(255,255,255, 0.5);
-	-webkit-box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 0 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
-	box-shadow: 4px 4px rgba(0, 0, 0, 0.5), inset 0 0 0 rgba(255,255,255, 0.5), inset 0 0 0 rgba(0, 0, 0, 0.3);
+	/*-moz-box-shadow: inset 0 0 0 rgba(255,255,255, 0.5);
+	-webkit-box-shadow: inset 0 0 0 rgba(0, 0, 0, 0.3);
+	box-shadow: inset 0 0 0 rgba(0, 0, 0, 0.3);*/
 }
 li:last-child .content {
 	-webkit-border-bottom-right-radius: 4px;
@@ -275,6 +300,13 @@ li .content {
 	//color: #eebfee;
 }
 li:hover .content {
+	border-color: #414349;
+	/*-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;*/
+	-moz-box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5);
+	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5);
+	box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5);
 	color: #6E9489;
 }
 #tracks li.playing .content {
@@ -318,11 +350,7 @@ li:hover .content {
 	vertical-align: top;
 }
 #track-information {
-    bottom: 10px;
-    height: 30px;
-    position: absolute;
-    right: 20px;
-    width: 360px;
+	line-height: 28px;
 }
 #footer {
     bottom: 0;
