@@ -101,7 +101,7 @@ $('#search-form').submit(function(e){
 $(document).ready(function() {
     var volumeOuter = $("#volume-outer");
     volumeOuter.slider({
-        orientation: "vertical",
+        orientation: "horizontal",
         range: "min",
         min: 0,
         max: 100,

@@ -388,9 +388,9 @@ Playlist.prototype = {
     },
     setVolumeSymbol: function(intPercent) {
         //Update volume bar
-        var volumeBarWidth = 100 - intPercent;
-        $("#volume-inner").width(volumeBarWidth.toString() + "%");
-        $("#volume-number").text(intPercent);
+        var volumeBarWidth = intPercent.toString();
+        $("#volume-inner").width(volumeBarWidth + "%");
+        $("#volume-number").text(volumeBarWidth);
         if (intPercent >= 50) {
             $("#volume-symbol").removeClass("icon-volume-down").removeClass("icon-volume-off").addClass("icon-volume-up");
         }

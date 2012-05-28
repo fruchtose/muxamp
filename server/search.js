@@ -121,7 +121,7 @@ SearchManager.prototype = {
 		var searchManager = this;
 		var deferred = $.Deferred();
 		var words = getSeparatedWords(query);
-		console.log("Searching YouTube for " + words.join(" "));
+		console.log("Searching SoundCloud for " + words.join(" "));
 		request({
 			json: true,
 			method: 'GET',
