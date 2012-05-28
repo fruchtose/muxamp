@@ -81,11 +81,6 @@ a {
 	height: 100%;
 	margin-top: 0;
 }
-#tab-list.nav-tabs > li:nth-child(2) > a{
-	-webkit-border-top-left-radius: 0;
-	-moz-border-radius-topleft: 0;
-	border-top-left-radius: 0;
-}
 #main {
 	height: 100%;
 	left: 0;
@@ -228,6 +223,7 @@ a {
 	border-left: 1px solid #394563;
 	border-right: 1px solid #394563;
 	height: 214px;
+	margin-bottom: 3px;
 	top: -1px;
 	width: 378px;
 }
