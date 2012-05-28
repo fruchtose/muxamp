@@ -37,6 +37,12 @@ img {
 }
 #search-form {
 }
+#search-query {
+	width: 159px;
+}
+#site-selector {
+	width: 152px;
+}
 #search-results, #tracks {
     list-style: none;
     margin: 0px;
