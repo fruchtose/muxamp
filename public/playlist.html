@@ -24,8 +24,8 @@
     	<div id="header">
     		<div id="header-container" class="container">
 	    		<div class="row">
-		    		<form id="search-form" class="span7 form-inline form-search" method="post">
-		                <input type="text" id="search-query" class="search-query" />
+		    		<form id="search-form" class="span5 form-inline form-search" method="post">
+		                <input type="text" id="search-query" class="span2 search-query" />
 		                <input id="search-site" type="hidden" value="ytv" />
 		                <div id="search-site-dropdown" class="btn-group">
 		                    <input type="submit" class="btn" id="search-submit" value="Search" />
@@ -38,7 +38,7 @@
 		                    </ul>
 		                </div>
 		            </form>
-		            <div id="track-information" class="span5" >
+		            <div id="track-information" class="span5 offset2" >
 		                <span class="left-column">
 		                    Playlist length: <span id="track-count">0</span> [<span id="playlist-duration">0:00</span>]
 		                </span>
@@ -50,44 +50,59 @@
             </div>
     	</div>
         <div id="wrapper" class="container">
-            <div id="main" class="span7 no-margin">
-                <div id="search-results-view"><ul id="search-results"></ul></div>
-            </div>
-            <div id="right-side" class="span5 offset7">
-                <div id="video-container">
-                    <div id="video"></div>
-                </div>
-                <div id="side-content">
-                    <div id="playlist-controls">
-                        <div id="timebar-row" class="player-row">
-                            <div id="timebar">
-                                <div id="timebar-outer">
-                                    <div id="timebar-inner"></div>
-                                </div>
-                            </div>
-                            <div id="time-elapsed">0:00</div>
-                        </div>
-                        <div class="player-row left">
-                            <div id="controls" class="btn-group">
-                                <a href onclick="return false;" id="previous" class="btn"><i class="icon-step-backward"></i></a>
-                                <a href onclick="return false;" id="play" class="btn"><i class="icon-play"></i></a>
-                                <a href onclick="return false;" id="stop" class="btn"><i class="icon-stop"></i></a>
-                                <a href onclick="return false;" id="next" class="btn"><i class="icon-step-forward"></i></a>
-                                <a href onclick="return false;" id="shuffle" class="btn"><i class="icon-random"></i></a>
-                            </div>
-                            <div id="volume">
-                                <div id="volume-outer">
-                                    <div id="volume-inner"></div>
-                                </div>
-                            </div>
-                            <div id="volume-amount"><i id="volume-symbol" class="icon-volume-up"></i><span id="volume-number">50</span></div>
-                        </div>
-                    </div>
-                    <div id="playlist-view">
-                        <ol id="tracks"></ol>
-                    </div>
-                </div>
-            </div>
+        	<div class="row" style="height: 100%;">
+        		<div class="span12" style="height: 100%;">
+		        	<div id="tabs" class="tabbable tabs-left">
+		        		<ul id="tab-list" class="nav nav-tabs">
+		        			<li><div id="video-container">
+		                <div id="video"></div>
+		            </div></li>
+		        			<li><a href="#tab1" data-toggle="tab">Search Results</a></li>
+		        			<li><a class="active" href="#tab2" data-toggle="tab">Playlist</a></li>
+		        		</ul>
+		        		<div class="tab-content">
+		        			<div id="tab1" class="tab-pane">
+		        				 <div id="search-results-view">
+			        				 <ul id="search-results">
+			        				 </ul>
+		        				 </div>
+		        			</div>
+		        			<div id="tab2" class="tab-pane active">
+				                <div id="side-content">
+				                    <div id="playlist-controls">
+				                        <div id="timebar-row" class="player-row">
+				                            <div id="timebar">
+				                                <div id="timebar-outer">
+				                                    <div id="timebar-inner"></div>
+				                                </div>
+				                            </div>
+				                            <div id="time-elapsed">0:00</div>
+				                        </div>
+				                        <div class="player-row left">
+				                            <div id="controls" class="btn-group">
+				                                <a href onclick="return false;" id="previous" class="btn"><i class="icon-step-backward"></i></a>
+				                                <a href onclick="return false;" id="play" class="btn"><i class="icon-play"></i></a>
+				                                <a href onclick="return false;" id="stop" class="btn"><i class="icon-stop"></i></a>
+				                                <a href onclick="return false;" id="next" class="btn"><i class="icon-step-forward"></i></a>
+				                                <a href onclick="return false;" id="shuffle" class="btn"><i class="icon-random"></i></a>
+				                            </div>
+				                            <div id="volume">
+				                                <div id="volume-outer">
+				                                    <div id="volume-inner"></div>
+				                                </div>
+				                            </div>
+				                            <div id="volume-amount"><i id="volume-symbol" class="icon-volume-up"></i><span id="volume-number">50</span></div>
+				                        </div>
+				                    </div>
+				                    <div id="playlist-view">
+				                        <ol id="tracks"></ol>
+				                    </div>
+				                </div>
+				            </div>
+				        </div>
+					</div>
+				</div>
+			</div>
         </div>
         <div id="about" class="modal hide">
             <div class="modal-header">

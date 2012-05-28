@@ -5,13 +5,10 @@ html {
     overflow-x: hidden;
 }
 body {
-	background: #DEDCC3;
-	color: #414349;
+	/*background: #DEDCC3;*/
+	/*color: #414349;*/
 	//background-color: #014A57;
 	//color: #FFFCD1;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    -ms-overflow-y: hidden;
 }
 img {
     border: none;
@@ -76,6 +73,18 @@ a {
     position: fixed;
     right: 0;
     top: 52px;
+}
+#tabs {
+	height: 100%;
+}
+#tab-list {
+	height: 100%;
+	margin-top: 0;
+}
+#tab-list.nav-tabs > li:nth-child(2) > a{
+	-webkit-border-top-left-radius: 0;
+	-moz-border-radius-topleft: 0;
+	border-top-left-radius: 0;
 }
 #main {
 	height: 100%;
