@@ -24,13 +24,13 @@ img {
 	float: right;
 }
 #header {
-	border-bottom: 1px solid #394563;
-	border-top: 1px solid #394563;
 	color: #DEDCC3;
-	background: #414349;
+	background-color: #414349;
 	display: block;
 	height: 50px;
 	width: 100%;
+	position: fixed;
+	top: 0;
 }
 #header-container {
 	margin-top: 5px;
@@ -74,11 +74,9 @@ a {
 #wrapper {
 	bottom: 0;
 	left: 0;
-    padding-left: 0;
-    padding-right: 0; 
     position: fixed;
     right: 0;
-    top: 52px;
+    top: 50px;
 }
 #tabs {
 	height: 100%;
@@ -86,6 +84,13 @@ a {
 #tab-list {
 	height: 100%;
 	margin-top: 0;
+	margin-right: 0;
+}
+#tab-list > li > a {
+	text-align: right;
+}
+#tab-content {
+	height: 100%;
 }
 #main {
 	height: 100%;
@@ -225,18 +230,16 @@ a {
 }
 #video-container {
 	background: #414349;
-	border-bottom: 1px solid #394563;
-	border-left: 1px solid #394563;
-	border-right: 1px solid #394563;
+	-webkit-border-bottom-left-radius: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	border-bottom-left-radius: 4px;
 	height: 214px;
 	margin-bottom: 3px;
-	top: -1px;
-	width: 378px;
+	width: 380px;
 }
 #video {
 	margin-left: auto;
 	margin-right: auto;
-	top: 1px;
 }
 #side-content {
 	height: 100%;
@@ -371,7 +374,7 @@ span.slogan {
     font-style: italic;
     z-index: inherit; 
 }
-.modal ol, ul {
+.modal ol, .modal ul {
     margin: 6px 0 6px 26px;
 }
 .modal ol {
