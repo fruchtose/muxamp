@@ -38,14 +38,9 @@
 		                    </ul>
 		                </div>
 		            </form>
-		            <div id="track-information" class="span5 offset2" >
-		                <span class="left-column">
-		                    Playlist length: <span id="track-count">0</span> [<span id="playlist-duration">0:00</span>]
-		                </span>
-		                <span class="right-column">
-		                    <a id="about-button" href onclick="return false;"><strong>About Muxamp</strong></a>
-		                </span>
-		            </div>
+		            <span class="right-column">
+		                <a id="about-button" href onclick="return false;"><strong>About Muxamp</strong></a>
+		            </span>
 	            </div>
             </div>
     	</div>
@@ -54,11 +49,13 @@
         		<div class="span12" style="height: 100%;">
 		        	<div id="tabs" class="tabbable tabs-left">
 		        		<ul id="tab-list" class="nav nav-tabs">
-		        			<li><div id="video-container">
-		                <div id="video"></div>
-		            </div></li>
+		        			<li>
+		        				<div id="video-container">
+					                <div id="video"></div>
+					            </div>
+		            		</li>
 		        			<li><a href="#tab1" data-toggle="tab">Search Results</a></li>
-		        			<li><a class="active" href="#tab2" data-toggle="tab">Playlist</a></li>
+		        			<li><a class="active" href="#tab2" data-toggle="tab">Playlist &mdash; <span id="track-count">0</span> item<span id="multiple-tracks">s</span> [<span id="playlist-duration">0:00</span>]</a></li>
 		        		</ul>
 		        		<div id="tab-content" class="tab-content">
 		        			<div id="tab1" class="tab-pane">
@@ -70,29 +67,6 @@
 		        			<div id="tab2" class="tab-pane active">
 				                <div id="side-content">
 				                    <div id="playlist-controls">
-				                        <div id="timebar-row" class="player-row">
-				                            <div id="timebar">
-				                                <div id="timebar-outer">
-				                                    <div id="timebar-inner"></div>
-				                                </div>
-				                            </div>
-				                            <div id="time-elapsed">0:00</div>
-				                        </div>
-				                        <div class="player-row left">
-				                            <div id="controls" class="btn-group">
-				                                <a href onclick="return false;" id="previous" class="btn"><i class="icon-step-backward"></i></a>
-				                                <a href onclick="return false;" id="play" class="btn"><i class="icon-play"></i></a>
-				                                <a href onclick="return false;" id="stop" class="btn"><i class="icon-stop"></i></a>
-				                                <a href onclick="return false;" id="next" class="btn"><i class="icon-step-forward"></i></a>
-				                                <a href onclick="return false;" id="shuffle" class="btn"><i class="icon-random"></i></a>
-				                            </div>
-				                            <div id="volume">
-				                                <div id="volume-outer">
-				                                    <div id="volume-inner"></div>
-				                                </div>
-				                            </div>
-				                            <div id="volume-amount"><i id="volume-symbol" class="icon-volume-up"></i><span id="volume-number">50</span></div>
-				                        </div>
 				                    </div>
 				                    <div id="playlist-view">
 				                        <ol id="tracks"></ol>
@@ -103,6 +77,31 @@
 					</div>
 				</div>
 			</div>
+        </div>
+        <div id="footer">
+        	<div id="footer-container" class="container">
+        		<div class="row">
+                    <div id="controls" class="span2 btn-group">
+                        <a href onclick="return false;" id="previous" class="btn"><i class="icon-step-backward"></i></a>
+                        <a href onclick="return false;" id="play" class="btn"><i class="icon-play"></i></a>
+                        <a href onclick="return false;" id="stop" class="btn"><i class="icon-stop"></i></a>
+                        <a href onclick="return false;" id="next" class="btn"><i class="icon-step-forward"></i></a>
+                        <a href onclick="return false;" id="shuffle" class="btn"><i class="icon-random"></i></a>
+                    </div>
+                    <div id="volume" class="span2">
+                        <div id="volume-outer">
+                            <div id="volume-inner"></div>
+                        </div>
+                        <div id="volume-amount"><i id="volume-symbol" class="icon-volume-up icon-white"></i><span id="volume-number">50</span></div>
+                    </div>
+                	<div id="timebar-row" class="span7 offset1">
+                        <div id="timebar-outer">
+                            <div id="timebar-inner"></div>
+                        </div>
+                        <div id="time-elapsed">0:00</div>
+                    </div>
+                </div>
+        	</div>
         </div>
         <div id="about" class="modal hide">
             <div class="modal-header">

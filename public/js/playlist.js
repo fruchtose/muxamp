@@ -121,6 +121,7 @@ Playlist.prototype = {
         this.totalDuration += addedDuration;
         $('#playlist-duration').text(secondsToString(this.totalDuration));
         $(this.playlistDOM.parentTable).sortable('refresh');
+        this.updateTrackEnumeration();
     },
     clear: function() {
         if (!this.isEmpty()) {
@@ -137,6 +138,7 @@ Playlist.prototype = {
             $('#track-count').text(this.list.length.toString());
             this.totalDuration = 0;
             $('#playlist-duration').text(secondsToString(this.totalDuration));
+            this.updateTrackEnumeration();
         }
     },
     getVolume: function() {
@@ -341,6 +343,7 @@ Playlist.prototype = {
             $('#track-count').text(this.list.length.toString());
             this.totalDuration -= trackDuration;
             $('#playlist-duration').text(secondsToString(this.totalDuration));
+            this.updateTrackEnumeration();
         }
     },
     renumberTracks: function(startingIndex) {
@@ -475,8 +478,16 @@ Playlist.prototype = {
         if (options) {
             this.settings = $.extend({}, this.settings, options);
         }
+    },
+    updateTrackEnumeration: function() {
+        if (this.list.length == 1 && $("#multiple-tracks").text().length) {
+        	$("#multiple-tracks").empty();
+        }
+        else if (!$("#multiple-tracks").text().length) {
+        	$("#multiple-tracks").text("s");
+        }
     }
-}
+};
 var playlist = new Playlist(soundManager);
 $(document).ready(function() {
     var startPos;

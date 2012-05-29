@@ -24,16 +24,25 @@ img {
 	float: right;
 }
 #header {
+	top: 0;
+}
+#footer {
+	bottom: 0;
+}
+#header, #footer {
 	color: #DEDCC3;
 	background-color: #414349;
 	display: block;
-	height: 50px;
+	height: 38px;
 	width: 100%;
 	position: fixed;
-	top: 0;
 }
-#header-container {
+#header-container, #footer-container {
 	margin-top: 5px;
+}
+#header-container .row, #footer-container .row {
+	height: 28px;
+	line-height: 28px;
 }
 #search-form {
 }
@@ -72,11 +81,11 @@ a {
 	margin-left: 0;
 }
 #wrapper {
-	bottom: 0;
+	bottom: 38px;
 	left: 0;
     position: fixed;
     right: 0;
-    top: 50px;
+    top: 38px;
 }
 #tabs {
 	height: 100%;
@@ -91,6 +100,7 @@ a {
 }
 #tab-content {
 	height: 100%;
+	margin-bottom: 38px;
 }
 #main {
 	height: 100%;
@@ -135,11 +145,10 @@ a {
     width: 380px;
 }
 #controls {
-    float: left;
     z-index: 12;
 }
 #controls a.btn {
-    padding: 0 7px 0 7px;
+    padding: 0 6px 0 6px;
     top: 5px;
 }
 #right-side {
@@ -149,15 +158,11 @@ a {
     /*width: 400px;*/
 }
 #timebar-row {
-    width: 360px;
-}
-#timebar {
-    cursor: pointer;
-    float: left;
-    z-index: 11;
 }
 #time-elapsed {
     float: right;
+    text-align: center;
+    width: 50px;
 }
 #timebar-outer {
     -webkit-border-radius: 4px;
@@ -165,11 +170,12 @@ a {
     border-radius: 4px;
     background-color: #fff;
     border: solid #aaa 1px;
+    cursor: pointer;
     float: left;
     height: 18px;
     margin-top: 5px;
     overflow: hidden;
-    width: 308px;
+    width: 488px;
 }
 #timebar-inner {
     -webkit-border-top-right-radius: 1px;
@@ -185,8 +191,6 @@ a {
 }
 #volume {
     cursor: pointer;
-    float: left;
-    margin-left: 13px;
 }
 #volume-outer {
     -webkit-border-radius: 4px;
@@ -238,8 +242,6 @@ a {
 	width: 380px;
 }
 #video {
-	margin-left: auto;
-	margin-right: auto;
 }
 #side-content {
 	height: 100%;
@@ -364,11 +366,13 @@ li:hover .content {
 	vertical-align: top;
 }
 #track-information {
+	bottom: 0;
+	left: 0;
 	line-height: 28px;
+	position: absolute;
 }
-#footer {
-    bottom: 0;
-    position: absolute;
+#track-information .right-column {
+	padding-right: 12px;
 }
 span.slogan {
     font-style: italic;
