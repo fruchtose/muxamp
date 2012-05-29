@@ -49,33 +49,53 @@
         		<div class="span12" style="height: 100%;">
 		        	<div id="tabs" class="tabbable tabs-left">
 		        		<ul id="tab-list" class="nav nav-tabs">
-		        			<li>
-		        				<div id="video-container">
-					                <div id="video"></div>
-					            </div>
-		            		</li>
 		        			<li><a href="#tab1" data-toggle="tab">Search Results</a></li>
 		        			<li><a class="active" href="#tab2" data-toggle="tab">Playlist &mdash; <span id="track-count">0</span> item<span id="multiple-tracks">s</span> [<span id="playlist-duration">0:00</span>]</a></li>
 		        		</ul>
 		        		<div id="tab-content" class="tab-content">
 		        			<div id="tab1" class="tab-pane">
-		        				<div id="search-results-view">
-			        				 <ul id="search-results">
-			        				 </ul>
-		        				 </div>
-		        			</div>
+		        				 <table id="search-results" class="table table-condensed table-striped">
+			                		<thead>
+			                			<tr>
+			                				<th>#</th>
+			                				<th>Uploader</th>
+			                				<th>Title</th>
+			                			</tr>
+			                		</thead>
+			                		<tbody>
+			                		</tbody>
+			                	</table>
+	        				 </div>
 		        			<div id="tab2" class="tab-pane active">
-				                <div id="side-content">
+			                	<table id="tracks" class="table table-condensed table-striped">
+			                		<thead>
+			                			<tr>
+			                				<th>#</th>
+			                				<th>Uploader</th>
+			                				<th>Title</th>
+			                			</tr>
+			                		</thead>
+			                		<tbody>
+			                		</tbody>
+			                	</table>
+				                <!--<div id="side-content">
 				                    <div id="playlist-controls">
 				                    </div>
 				                    <div id="playlist-view">
 				                        <ol id="tracks"></ol>
 				                    </div>
-				                </div>
+				                </div>-->
 				            </div>
 				        </div>
 					</div>
 				</div>
+			</div>
+			<div class="row">
+				<div class="span5">
+					<div id="video-container">
+		                <div id="video"></div>
+		            </div>
+	            </div>
 			</div>
         </div>
         <div id="footer">

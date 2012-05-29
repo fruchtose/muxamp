@@ -1,14 +1,14 @@
 var PlaylistDOMInformation = function() {
-    this.parentTable = "ol#tracks";
+    this.parentTable = "table#tracks tbody";
     
     this.lastElementOfParent = this.parentTable + ":last";
     
-    this.lastRowInParent = this.parentTable + " li:last";
+    this.lastRowInParent = this.parentTable + " tr:last";
     
-    this.allRowsInTable = this.parentTable + " li";
+    this.allRowsInTable = this.parentTable + " tr";
     
     this.getRowForID = function(id) {
-        return this.parentTable + " li." + id;
+        return this.parentTable + " tr." + id;
     };
     
     this.getRemovalHyperlinkForID =  function(id) {
@@ -81,16 +81,20 @@ Playlist.prototype = {
         }
     },
     _getDOMRowForMediaObject: function(mediaObject, index) {
-        return '<li class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</li>';
+        return '<tr class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</tr>';
     },
     _getDOMTableCellsForMediaObject: function(mediaObject, index) {
+    	var number = '<td>' + index + '</td>';
+    	var uploader = '<td>' + mediaObject.artist + '</td>';
+    	var title = '<td>' + mediaObject.mediaName + '</td>';
+    	return number + uploader + title;
     	//var remove = '<a href onclick="return false;" class="action remove close">&times;</a>';
-    	var remove = '<a href onclick="return false;" class="btn action remove"><i class="icon-remove""></i></a>';
+    	/*var remove = '<a href onclick="return false;" class="btn action remove"><i class="icon-remove""></i></a>';
     	var extLink = '<a href="' + mediaObject.permalink +'" target="_blank"><img src="' + mediaObject.icon + '"/></a>';
         var links = '<div class="thin-button link">' + extLink + '</div>';
         var left = '<div class ="left">' + links + '</div>';
         var trackInfo = '<div class="track"><div class="name">' + mediaObject.mediaName + '</div>' + '<div class="dur-box">[<span class="duration">' + secondsToString(mediaObject.duration) + '</span>]</div></div>' + '<div class="artist">' + mediaObject.artist + '</div>';
-        return '<div class="actions">' + remove + '</div><div class=content>' + trackInfo + '</div>';
+        return '<div class="actions">' + remove + '</div><div class=content>' + trackInfo + '</div>';*/
     },
     addTracks: function(mediaObjects, currentTrack, insertLocation) {
         if ( !(mediaObjects instanceof Array) ) {
@@ -206,7 +210,7 @@ Playlist.prototype = {
                     this.setCurrentTrack(newIndex);
                 }
                 else {
-                    this.setCurrentTrack(Math.max(0, $('li.playing').index()));
+                    this.setCurrentTrack(Math.max(0, $(this.playlist.playlistDOM. allRowsInTabe +'.playing').index()));
                 }
             
                 var minIndex = Math.min(originalIndex, newIndex);
@@ -261,8 +265,8 @@ Playlist.prototype = {
                         autoPlay: true,
                         initialVideo: media.siteMediaID,
                         loadSWFObject: false,
-                        width: 378,
-                        height: 213,
+                        width: $("#video").width(),
+                        height: $("#video").height(),
                         onStop: clearMediaInterval,
                         onPlayerBuffering: clearMediaInterval,
                         onPlayerPaused: clearMediaInterval,
@@ -495,11 +499,11 @@ $(document).ready(function() {
         axis: 'y',
         containment: $(playlist.playlistDOM.parentTable).parent(),
         start: function(event, ui) {
-            startPos = $(event.target).parent('li').index();
+            startPos = $(event.target).parent(playlist.playlistDOM.allRowsInTable).index();
         },
         tolerance: 'pointer',
         update: function(event, ui) {
-            var pos = Math.max(0, Math.min(playlist.list.length - 1, $(event.target).parent('li').index()));
+            var pos = Math.max(0, Math.min(playlist.list.length - 1, $(event.target).parent(playlist.playlistDOM.allRowsInTable).index()));
             playlist.moveTrack(startPos, pos);
         }
     });

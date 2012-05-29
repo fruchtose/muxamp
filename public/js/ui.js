@@ -1,30 +1,30 @@
-$("#search-results li").livequery(function() {
-    var li = $(this);
-    li.on('dblclick', function() {
+$("#search-results tbody tr").livequery(function() {
+    var row = $(this);
+    row.on('dblclick', function() {
         var resultIndex = $(this).index();
         var searchResult = searchResultsView.results[resultIndex];
         var mediaObject = getMediaObject(searchResult);
         playlist.addTracks(mediaObject, playlist.currentTrack, playlist.currentTrack);
         playlist.nextTrack(true);
     });
-    li.find('.search-add-result').on('click', function(){
-        var resultIndex = li.index();
+    row.find('.search-add-result').on('click', function(){
+        var resultIndex = row.index();
         var searchResult = searchResultsView.results[resultIndex];
         var mediaObject = getMediaObject(searchResult);
         playlist.addTracks(mediaObject);
     });
-    li.find('.search-play-result').on('click', function() {
-        var resultIndex = li.index();
+    row.find('.search-play-result').on('click', function() {
+        var resultIndex = row.index();
         var searchResult = searchResultsView.results[resultIndex];
         var mediaObject = getMediaObject(searchResult);
         playlist.addTracks(mediaObject, playlist.currentTrack, playlist.currentTrack);
         playlist.nextTrack(true);
     });
 }, function() {
-    var li = $(this);
-    li.off('dblclick');
-    li.find('.search-add-result').off('click');
-    li.find('.search-play-result').off('click');
+    var row = $(this);
+    row.off('dblclick');
+    row.find('.search-add-result').off('click');
+    row.find('.search-play-result').off('click');
 });
 
 $('#previous').click(function() {
