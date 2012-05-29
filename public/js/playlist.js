@@ -84,7 +84,9 @@ Playlist.prototype = {
         return '<tr class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</tr>';
     },
     _getDOMTableCellsForMediaObject: function(mediaObject, index) {
-    	var number = '<td>' + index + '</td>';
+    	var remove = '<a href onclick="return false;" class="btn action remove"><i class="icon-remove""></i></a>';
+    	var actions = '<div class="actions">' + remove + '</div>';
+    	var number = '<td><span class="index">' + index + '</span></td>';
     	var uploader = '<td>' + mediaObject.artist + '</td>';
     	var title = '<td>' + mediaObject.mediaName + '</td>';
     	return number + uploader + title;
@@ -210,7 +212,7 @@ Playlist.prototype = {
                     this.setCurrentTrack(newIndex);
                 }
                 else {
-                    this.setCurrentTrack(Math.max(0, $(this.playlist.playlistDOM. allRowsInTabe +'.playing').index()));
+                    this.setCurrentTrack(Math.max(0, $(this.playlistDOM.allRowsInTabe +'.playing').index()));
                 }
             
                 var minIndex = Math.min(originalIndex, newIndex);
@@ -498,6 +500,18 @@ $(document).ready(function() {
     $(playlist.playlistDOM.parentTable).sortable({
         axis: 'y',
         containment: $(playlist.playlistDOM.parentTable).parent(),
+        helper: function(event, ui) {
+    		var children = ui.children();
+    		var helper = ui.clone();
+    		helper.children().each(function(index) {
+    			$(this).width(children.eq(index).width());
+    		});
+    		/*ui.children().each(function() {
+    			//$this = $(this);
+    			//$this.width($this.width());
+    		});*/
+    		return helper;
+    	},
         start: function(event, ui) {
             startPos = $(event.target).parent(playlist.playlistDOM.allRowsInTable).index();
         },

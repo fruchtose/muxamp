@@ -36,6 +36,7 @@ img {
 	height: 38px;
 	width: 100%;
 	position: fixed;
+	z-index: 6;
 }
 #header-container, #footer-container {
 	margin-top: 5px;
@@ -153,6 +154,8 @@ a {
     /*width: 400px;*/
 }
 #timebar-row {
+	margin-left: 80px;
+	width: 558px;
 }
 #time-elapsed {
     float: right;
@@ -170,7 +173,7 @@ a {
     height: 18px;
     margin-top: 5px;
     overflow: hidden;
-    width: 488px;
+    width: 506px;
 }
 #timebar-inner {
     -webkit-border-top-right-radius: 1px;
@@ -255,10 +258,11 @@ a {
 }
 .actions {
 	display: none;
-    float: left;
-    left: 1px;
+	margin-left: -4px;
+	margin-top: -2px;
     position: absolute;
     width: 48px;
+    z-index: 5;
 }
 #playlist-view .actions {
 	width: 22px;
@@ -354,7 +358,7 @@ li:hover .content {
 	border-radius: 11px;
 	float: left;
 	height: 18px;
-	margin: 11px 0 0 14px;
+	margin: 0 0 0 14px;
 	padding: 2px 3px 0 3px;
 	vertical-align: top;
 }
