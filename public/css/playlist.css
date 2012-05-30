@@ -11,6 +11,10 @@ img {
     border: none;
     float: left;
 }
+.table td {
+	line-height: 22px;
+	vertical-align: middle;
+}
 .align-bottom {
 	vertical-align: bottom;
 }
@@ -120,9 +124,17 @@ a {
 	height: 100%;
 	margin-top: 0;
 	margin-right: 0;
-	width: 380px;
+	width: 379px;
 }
 #tab-list > li > a {
+	border-left: none;
+	-webkit-border-top-left-radius: 0;
+	-webkit-border-bottom-left-radius: 0;
+	-moz-border-radius-topleft: 0;
+	-moz-border-radius-bottomleft: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	padding-right: 11px;
 	text-align: right;
 }
 #tab-content {
@@ -168,12 +180,9 @@ a {
     top: 327px;
     width: 380px;
 }
-#controls {
-    z-index: 12;
-}
 #controls a.btn {
     padding: 0 6px 0 6px;
-    top: 5px;
+    top: 4px;
 }
 #right-side {
 	height: 100%;
@@ -206,7 +215,7 @@ a {
 	cursor: pointer;
 	border: 0px none #333;
 	height: 20px;
-	margin-top: 5px;
+	margin-top: 4px;
 	/*-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 	-moz-box-shadow:    inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 	box-shadow:         inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);*/
