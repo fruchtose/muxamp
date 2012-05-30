@@ -31,14 +31,21 @@ img {
 #header, #footer {
 	color: #FFF;
 	background-color: #414349;
+	background-image: linear-gradient(bottom, rgb(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
+	background-image: -o-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
+	background-image: -moz-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
+	background-image: -ms-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
 	display: block;
 	height: 38px;
 	width: 100%;
 	position: fixed;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
 	z-index: 6;
 }
 #header-container, #footer-container {
-	margin-top: 5px;
+	height: 28px;
+	margin-top: 4px;
 }
 #header-container .row, #footer-container .row {
 	height: 28px;
@@ -178,7 +185,6 @@ a {
     -moz-border-radius: 4px;
     border-radius: 4px;
     background-color: #fff;
-    border: solid #aaa 1px;
     cursor: pointer;
     float: left;
     height: 18px;
@@ -201,11 +207,17 @@ a {
 #volume {
     cursor: pointer;
 }
+#volume-outer, #timebar-outer {
+	border: solid 1px #CCC;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	-moz-box-shadow:    inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	box-shadow:         inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
 #volume-outer {
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    border: solid #aaa 1px;
     -khtml-user-select: none;
     -moz-user-select: none;
     background-color: #fff;
