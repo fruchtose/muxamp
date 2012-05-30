@@ -72,6 +72,7 @@ var searchForTracks = function(query, site) {
         dataType: 'json',
         success: function(searchResults) {
             searchResultsView.setSearchResults(searchResults);
+            $("#search-nav").tab('show');
         }
     });
 }

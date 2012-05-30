@@ -1,6 +1,7 @@
 function SearchResultsView(root, selector) {
     this.results = [];
     this.root = root.toString();
+    this.selector = selector;
     this.resultSelector  = this.root + ' ' + selector;
 }
 
@@ -9,10 +10,11 @@ SearchResultsView.prototype = {
 		var add = '<a class="btn action search-add-result" href onclick="return false;"><i class="icon-plus"></i></a>';
 	    var play ='<a class="btn action search-play-result" href onclick="return false;"><i class="icon-play"></i></a>';
 	    var actions = '<div class="actions">' + add + play + '</div>';
-		var number = '<td>' + index + '</td>';
-		var uploader = '<td>' + result.author + '</td>';
-		var title = '<td>' + result.mediaName + '</td>';
-		return '<tr>' + number + uploader + title + '</tr>';
+	    var actionsCell = '<td class="action-cell">' + actions + '</td>';
+	    var number = '<td>' + index + '</td>';
+		var uploader = '<td class="uploader">' + result.author + '</td>';
+		var title = '<td class="title">' + result.mediaName + '</td>';
+		return '<tr>' + actionsCell + number + uploader + title + '</tr>';
         /*var add = '<a class="btn action search-add-result" href onclick="return false;"><i class="icon-plus"></i></a>';
         var play ='<a class="btn action search-play-result" href onclick="return false;"><i class="icon-play"></i></a>';
         var actions = '<div class="actions">' + add + play + '</div>';
@@ -25,8 +27,30 @@ SearchResultsView.prototype = {
         for (i in results) {
             rows.push(this._getResultRow(results[i], parseInt(i) + 1));
         }
-        $(this.root).html(rows.join("")).disableSelection();
+        $(this.root).html(rows.join(""))
+        .find(this.selector).draggable({
+        	// thanks to David Petersen
+        	helper: function(event, ui) {
+        		var originalRow = $(event.target).closest('tr');
+        		//var newRow = originalRow.clone()
+        		//.data("search-index", originalRow.index());
+        		return $('<div class="drag-search-result"></div>')
+        		.data("search-index", originalRow.index())
+        		.append(originalRow.find('.uploader').html() + ' &mdash; ' + originalRow.find('.title').html()).appendTo('body');
+        	}
+        }).disableSelection();
     }
 };
 
 var searchResultsView = new SearchResultsView("#search-results tbody", 'tr');
+$("#playlist-tab").droppable({
+	accept: '#search-results .ui-draggable',
+	drop: function(event, ui) {
+		//alert("Hi");
+		var index = ui.helper.data("search-index");
+		ui.helper.remove();
+		playlist.addTracks(getMediaObject(searchResultsView.results[index]));
+		
+	},
+	hoverClass: 'nav-hover'
+});

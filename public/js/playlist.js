@@ -7,18 +7,15 @@ var PlaylistDOMInformation = function() {
     
     this.allRowsInTable = this.parentTable + " tr";
     
+    this.getActionForID = function(id, action) {
+    	return this.getRowForID(id) + " a." + action;
+    }
+    
     this.getRowForID = function(id) {
         return this.parentTable + " tr." + id;
     };
     
-    this.getRemovalHyperlinkForID =  function(id) {
-        var selector = this.getRowForID(id) + " " + this.removalHyperlink;
-        return selector;
-    };
-    
     this.content = ".content";
-    
-    this.removalHyperlink = "a.remove";
     
     this.trackName = "div.name";
     
@@ -43,7 +40,7 @@ Playlist.prototype = {
         var appendedHTML = this._getDOMRowForMediaObject(mediaObject, index);
         $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
         var id = mediaObject.id;
-        $(this.playlistDOM.getRemovalHyperlinkForID(id)).live('click', function() {
+        $(this.playlistDOM.getActionForID(id, 'remove')).live('click', function() {
             obj.removeTrack(id);
         });
     },
@@ -75,8 +72,11 @@ Playlist.prototype = {
         	row.dblclick(function() {
                 playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
             });
-            $(this.playlistDOM.getRemovalHyperlinkForID(mediaObjects[index].id)).live('click', function() {
+            $(this.playlistDOM.getActionForID(mediaObjects[index].id, 'remove')).live('click', function() {
                 playlist.removeTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index());
+            });
+            $(this.playlistDOM.getActionForID(mediaObjects[index].id, 'play')).live('click', function() {
+                playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
             });
         }
     },
@@ -85,11 +85,13 @@ Playlist.prototype = {
     },
     _getDOMTableCellsForMediaObject: function(mediaObject, index) {
     	var remove = '<a href onclick="return false;" class="btn action remove"><i class="icon-remove""></i></a>';
-    	var actions = '<div class="actions">' + remove + '</div>';
+    	var play = '<a href onclick="return false;" class="btn action play"><i class="icon-play"></i></a>';
+    	var actions = '<div class="actions">' + remove + play + '</div>';
+    	var actionsCell = '<td class="action-cell">' + actions + '</td>';
     	var number = '<td><span class="index">' + index + '</span></td>';
     	var uploader = '<td>' + mediaObject.artist + '</td>';
     	var title = '<td>' + mediaObject.mediaName + '</td>';
-    	return number + uploader + title;
+    	return actionsCell + number + uploader + title;
     	//var remove = '<a href onclick="return false;" class="action remove close">&times;</a>';
     	/*var remove = '<a href onclick="return false;" class="btn action remove"><i class="icon-remove""></i></a>';
     	var extLink = '<a href="' + mediaObject.permalink +'" target="_blank"><img src="' + mediaObject.icon + '"/></a>';
@@ -506,10 +508,6 @@ $(document).ready(function() {
     		helper.children().each(function(index) {
     			$(this).width(children.eq(index).width());
     		});
-    		/*ui.children().each(function() {
-    			//$this = $(this);
-    			//$this.width($this.width());
-    		});*/
     		return helper;
     	},
         start: function(event, ui) {

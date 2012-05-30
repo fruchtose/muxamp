@@ -5,10 +5,6 @@ html {
     overflow-x: hidden;
 }
 body {
-	/*background: #DEDCC3;*/
-	/*color: #414349;*/
-	//background-color: #014A57;
-	//color: #FFFCD1;
 }
 img {
     border: none;
@@ -23,6 +19,9 @@ img {
 .right-column {
 	float: right;
 }
+.nav-hover {
+	background-color: #EEE;
+}
 #header {
 	top: 0;
 }
@@ -30,7 +29,7 @@ img {
 	bottom: 0;
 }
 #header, #footer {
-	color: #DEDCC3;
+	color: #FFF;
 	background-color: #414349;
 	display: block;
 	height: 38px;
@@ -55,9 +54,21 @@ img {
 }
 #search-results, #tracks {
 }
+#search-results tr {
+	cursor: pointer;
+}
+a, a:hover {
+	text-decoration: none;
+}
 a {
-    color: #877963;
-    text-decoration: none;
+	color: #877963;
+}
+#header a {
+	color: #F2F1E9;
+    
+}
+#header a:hover, #footer a:hover {
+	color: #DEDCC3;
 }
 .caret-right {
   border-left: 4px solid #000;
@@ -258,11 +269,23 @@ a {
 }
 .actions {
 	display: none;
-	margin-left: -4px;
-	margin-top: -2px;
-    position: absolute;
     width: 48px;
-    z-index: 5;
+}
+.action-cell {
+	height: 22px;
+	width: 48px;
+}
+.action-header {
+	width: 48px;
+}
+.number-cell {
+	width: 51px;
+}
+.uploader-cell {
+	width: 160px;
+}
+.title-cell {
+	width: 260px;
 }
 #playlist-view .actions {
 	width: 22px;
@@ -323,8 +346,8 @@ li:hover .content {
 	box-shadow: inset 0 1px 0 rgba(255,255,255, 0.5);
 	color: #6E9489;
 }
-#tracks li.playing .content {
-	background: #EDCE4F;
+#tracks .playing td {
+	background: #3D3;
 }
 #tracks li .name {
 	float: left;

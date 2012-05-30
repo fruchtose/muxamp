@@ -49,17 +49,18 @@
         		<div class="span12" style="height: 100%;">
 		        	<div id="tabs" class="tabbable tabs-left">
 		        		<ul id="tab-list" class="nav nav-tabs">
-		        			<li><a href="#tab1" data-toggle="tab">Search Results</a></li>
-		        			<li><a class="active" href="#tab2" data-toggle="tab">Playlist &mdash; <span id="track-count">0</span> item<span id="multiple-tracks">s</span> [<span id="playlist-duration">0:00</span>]</a></li>
+		        			<li><a id="search-nav" href="#tab1" data-toggle="tab">Search Results</a></li>
+		        			<li id="playlist-tab"><a class="active" href="#tab2" data-toggle="tab">Playlist &mdash; <span id="track-count">0</span> item<span id="multiple-tracks">s</span> [<span id="playlist-duration">0:00</span>]</a></li>
 		        		</ul>
 		        		<div id="tab-content" class="tab-content">
 		        			<div id="tab1" class="tab-pane">
 		        				 <table id="search-results" class="table table-condensed table-striped">
 			                		<thead>
 			                			<tr>
-			                				<th>#</th>
-			                				<th>Uploader</th>
-			                				<th>Title</th>
+			                				<th><div class="action-header"></div></th>
+			                				<th class="number-cell">#</th>
+			                				<th class="uploader-cell">Uploader</th>
+			                				<th class="title-cell">Title</th>
 			                			</tr>
 			                		</thead>
 			                		<tbody>
@@ -70,9 +71,10 @@
 			                	<table id="tracks" class="table table-condensed table-striped">
 			                		<thead>
 			                			<tr>
-			                				<th>#</th>
-			                				<th>Uploader</th>
-			                				<th>Title</th>
+			                				<th><div class="action-header"></div></th>
+			                				<th class="number-cell">#</th>
+			                				<th class="uploader-cell">Uploader</th>
+			                				<th class="title-cell">Title</th>
 			                			</tr>
 			                		</thead>
 			                		<tbody>
