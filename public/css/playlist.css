@@ -66,8 +66,6 @@ img {
 #site-selector {
 	width: 152px;
 }
-#search-results, #tracks {
-}
 #search-results tr {
 	cursor: pointer;
 }
@@ -140,6 +138,7 @@ a {
 #tab-content {
 	height: 100%;
 	margin-bottom: 38px;
+	overflow-y: scroll;
 }
 #alert-container {
 	bottom: 38px;
@@ -261,7 +260,7 @@ a {
 	width: 51px;
 }
 .uploader-cell {
-	width: 160px;
+	width: 145px;
 }
 .title-cell {
 	width: 260px;
