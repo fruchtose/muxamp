@@ -487,7 +487,7 @@ Router.prototype = {
                 //Tracks have stream URL
                 if (data.stream_url) {
                     var id = router.getNewTrackID();
-                    var trackObject = new search.searchResult(data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.id, "sct", data.user.username, data.title, data.duration / 1000, "audio");
+                    var trackObject = new search.searchResult(data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.id, "sct", "img/soundcloud_orange_white_16.png",data.user.username, data.title, data.duration / 1000, "audio");
                     //var trackObject = new SoundCloudObject(id, data.id, data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.user.username, data.title, data.duration / 1000, router.soundManager);
                     deferred.resolve($.extend({}, params, {
                         tracks: [trackObject]
@@ -555,7 +555,7 @@ Router.prototype = {
             var duration = parseInt(entry.media$group.yt$duration.seconds);
             var id = router.getNewTrackID();
             var url = 'http://www.youtube.com/watch?v=' + youtubeID;
-            var trackObject = new search.searchResult(url, url, youtubeID, "ytv", author, title, duration, "video");
+            var trackObject = new search.searchResult(url, url, youtubeID, "ytv", "img/youtube.png", author, title, duration, "video");
             //var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
             deferred.resolve($.extend({}, params, {
                 tracks: [trackObject]
