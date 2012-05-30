@@ -125,9 +125,10 @@ SearchManager.prototype = {
 		request({
 			json: true,
 			method: 'GET',
+			timeout: 5000,
 			url: searchManager.soundcloudSearchURI + encodeURIComponent(query)
 		}, function(error, response, body) {
-			if (error) {
+			if (error || response.statusCode != 200) {
 				deferred.reject();
 				return;
 			}
@@ -160,9 +161,10 @@ SearchManager.prototype = {
 		request({
 			json: true,
 			method: 'GET',
+			timeout: 5000,
 			url: searchManager.youtubeSearchURI + encodeURIComponent(query)
 		}, function(error, response, body) {
-			if (error) {
+			if (error || response.statusCode != 200) {
 				deferred.reject();
 				return;
 			}

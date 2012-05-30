@@ -52,6 +52,15 @@ $('#shuffle').click(function() {
     playlist.shuffle();
 });
 
+var alertError = function(title, body) {
+	var header = '<h4 class="alert-heading">' + title + '</h4>'
+	var body = '<span class="body">' + body + '</span>';
+	var close = '<a class="close" data-dismiss="alert" href="#">&times;</a>';
+	var alert = '<div class="alert alert-error">' + close + header + body + '</div>'; 
+	var container = $('#alerts');
+	container.append(alert);
+}
+
 var siteCodeFromSiteName = function(site) {
     var result = "";
     switch(site) {

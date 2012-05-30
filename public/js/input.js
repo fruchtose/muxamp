@@ -7,14 +7,16 @@ var counter = (function() {
 
 var getMediaObject = function(searchResult) {
     var mediaObject = null;
-    var id = counter();
-    switch (searchResult.siteCode) {
-        case 'sct':
-            mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, searchResult.author, searchResult.mediaName, searchResult.duration, soundManager);
-            break;
-        case 'ytv':
-            mediaObject = new YouTubeObject(id, searchResult.siteMediaID, searchResult.author, searchResult.mediaName, searchResult.duration);
-            break;
+    if (searchResult) {
+	    var id = counter();
+	    switch (searchResult.siteCode) {
+	        case 'sct':
+	            mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, searchResult.author, searchResult.mediaName, searchResult.duration, soundManager);
+	            break;
+	        case 'ytv':
+	            mediaObject = new YouTubeObject(id, searchResult.siteMediaID, searchResult.author, searchResult.mediaName, searchResult.duration);
+	            break;
+	    }
     }
     return mediaObject;
 };
@@ -44,6 +46,11 @@ var fetchTracksFromString = function(str) {
     		if (mediaObjects.length) {
     			playlist.addTracks(mediaObjects);
     		}
+    		else {
+    			alertError("Unable to load playlist", "The tracks you want to load " +
+    				"are invalid, or you are unable to connect to the Internet. " + 
+    				"Please address these issues and try again.");
+    		}
     	}
     });
 }
@@ -55,16 +62,6 @@ var loadFunction = function() {
         playlist.updateSettings({
             updateURLOnAdd: false
         });
-        /*var inputResources = [];
-        for (var param in urlParams) {
-            var keyValuePair = urlParams[param];
-            inputResources.push(keyValuePair);
-        }
-        playlist.addResourceAndWaitUntilLoaded(inputResources).always(function() {
-            playlist.updateSettings({
-                updateURLOnAdd: true
-            });
-        });*/
         fetchTracksFromString(window.location.hash.substring(1)).always(function() {
         	playlist.updateSettings({
                 updateURLOnAdd: true

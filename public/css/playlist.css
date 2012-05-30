@@ -141,17 +141,16 @@ a {
 	height: 100%;
 	margin-bottom: 38px;
 }
+#alert-container {
+	bottom: 38px;
+	position: fixed;
+}
+#alerts {
+	margin: 12px 11px -6px 12px;
+}
 #search-site-dropdown {
     display: inline-block;
     vertical-align: middle;
-}
-.player-row {
-    height: 30px;
-    line-height: 30px;
-}
-.player-row-mini {
-    height: 20px;
-    line-height: 20px;
 }
 #track-count-wrapper {
     float: left;
