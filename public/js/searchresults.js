@@ -14,7 +14,8 @@ SearchResultsView.prototype = {
 		var uploader = '<td class="uploader-cell">' + result.author + '</td>';
 		var title = '<td class="title-cell">' + result.mediaName + '</td>';
 		var duration = '<td class="duration-cell">' + secondsToString(result.duration) + '</td>';
-		return '<tr>' + actionsCell + uploader + title + duration + '</tr>';
+		var link = '<td class="link-cell"><a href="' + result.permalink + '"><img src="' + result.icon + '" /></a></td>';
+		return '<tr>' + actionsCell + uploader + title + duration + link + '</tr>';
         /*var add = '<a class="btn action search-add-result" href onclick="return false;"><i class="icon-plus"></i></a>';
         var play ='<a class="btn action search-play-result" href onclick="return false;"><i class="icon-play"></i></a>';
         var actions = '<div class="actions">' + add + play + '</div>';

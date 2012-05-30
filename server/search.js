@@ -21,11 +21,12 @@ var getSeparatedWords = function(query) {
 	return query.replace(/[^\w\s]|_/g, ' ').toLowerCase().split(' ');
 };
 
-function SearchResult(url, permalink, siteMediaID, siteCode, author, mediaName, duration, type, plays, favorites) {
+function SearchResult(url, permalink, siteMediaID, siteCode, icon, author, mediaName, duration, type, plays, favorites) {
 	this.url = url;
 	this.permalink = permalink;
 	this.siteMediaID = siteMediaID;
 	this.siteCode = siteCode;
+	this.icon = icon;
 	this.author = author;
 	this.mediaName = mediaName;
 	this.duration = duration;
@@ -142,7 +143,7 @@ SearchManager.prototype = {
 				if (undefined == result.stream_url) {
 					continue;
 				}
-				var searchResult = new SearchResult(result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
+				var searchResult = new SearchResult(result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", "img/soundcloud_orange_white_16.png", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
 				var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
 				var intersection = getIntersection(words, resultWords);
 				searchResult.querySimilarity = intersection.length / words.length;
@@ -187,7 +188,7 @@ SearchManager.prototype = {
 	            var duration = parseInt(entry.media$group.yt$duration.seconds);
 	            var viewCount = entry['yt$statistics']['viewCount'];
 	            var favoriteCount = entry['yt$statistics']['favoriteCount'];
-				var searchResult = new SearchResult(permalink, permalink, id, "ytv", author, title, duration, "video", viewCount, favoriteCount);
+				var searchResult = new SearchResult(permalink, permalink, id, "ytv", "img/youtube.png", author, title, duration, "video", viewCount, favoriteCount);
 				var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
 				var intersection = getIntersection(words, resultWords);
 				searchResult.querySimilarity = intersection.length / words.length;

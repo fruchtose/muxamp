@@ -148,6 +148,10 @@ a {
     display: inline-block;
     vertical-align: middle;
 }
+#search-site-dropdown a {
+	color: #333;
+	text-shadow: none;
+}
 #track-count-wrapper {
     float: left;
     margin-right: 1em;
@@ -266,13 +270,16 @@ a {
 	width: 48px;
 }
 .uploader-cell {
-	width: 113px;
+	width: 130px;
 }
 .title-cell {
-	width: 292px;
+	width: 320px;
 }
 .duration-cell {
 	width: 50px;
+}
+.link-cell {
+	width: 26px;
 }
 #playlist-view .actions {
 	width: 22px;
