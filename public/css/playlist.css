@@ -299,10 +299,10 @@ a {
 tr:hover .actions {
 	display: block;
 }
-.actions .action {
+.action {
 	margin-left: 4px;
 }
-.actions .action:first-child {
+.action:first-child {
 	margin-left: 0;
 }
 li .content {
@@ -385,9 +385,7 @@ li:hover .content {
 	webkit-border-radius: 11px;
 	-moz-border-radius: 11px;
 	border-radius: 11px;
-	float: left;
 	height: 18px;
-	margin: 0 0 0 14px;
 	padding: 2px 3px 0 3px;
 	vertical-align: top;
 }
