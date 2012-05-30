@@ -119,7 +119,6 @@ a {
 	height: 100%;
 	margin-top: 0;
 	margin-right: 0;
-	width: 300px;
 }
 #tab-list > li > a {
 	border-left: none;
@@ -220,12 +219,11 @@ a {
     margin-left: 6px;
 }
 #video-container, #video {
-	height: 162px;
+	height: 200px;
     position: absolute;
     width: 288px;
 }
 #video-container {
-	border: 1px solid transparent;
 	-webkit-border-top-left-radius: 4px;
 	-webkit-border-bottom-left-radius: 4px;
 	-moz-border-radius-topleft: 4px;
@@ -270,16 +268,16 @@ a {
 	width: 48px;
 }
 .uploader-cell {
-	width: 130px;
+	width: 128px;
 }
 .title-cell {
-	width: 320px;
+	width: 318px;
 }
 .duration-cell {
 	width: 50px;
 }
 .link-cell {
-	width: 26px;
+	width: 30px;
 }
 #playlist-view .actions {
 	width: 22px;
