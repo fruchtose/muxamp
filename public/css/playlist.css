@@ -66,9 +66,6 @@ img {
 #site-selector {
 	width: 152px;
 }
-#search-results tr {
-	cursor: pointer;
-}
 a, a:hover {
 	text-decoration: none;
 }
@@ -122,7 +119,7 @@ a {
 	height: 100%;
 	margin-top: 0;
 	margin-right: 0;
-	width: 379px;
+	width: 300px;
 }
 #tab-list > li > a {
 	border-left: none;
@@ -219,9 +216,9 @@ a {
     margin-left: 6px;
 }
 #video-container, #video {
-	height: 198px;
+	height: 162px;
     position: absolute;
-    width: 352px;
+    width: 288px;
 }
 #video-container {
 	border: 1px solid transparent;
@@ -231,7 +228,7 @@ a {
 	-moz-border-radius-bottomleft: 4px;
 	border-top-left-radius: 4px;
 	border-bottom-left-radius: 4px;
-	padding: 8px 14px;
+	padding: 8px 5px;
 	top: 76px;
 }
 #video {
@@ -243,7 +240,19 @@ a {
 #playlist-controls {
     height: 60px;
 }
-#search-results-view {
+#search-results, #tracks {
+	table-layout: fixed;
+}
+#search-results tr {
+	cursor: pointer;
+}
+#search-results tbody td, #tracks tbody td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+#tracks tbody tr {
+	cursor: pointer;
 }
 .actions {
 	display: none;
@@ -256,14 +265,14 @@ a {
 .action-header {
 	width: 48px;
 }
-.number-cell {
-	width: 51px;
-}
 .uploader-cell {
-	width: 145px;
+	width: 113px;
 }
 .title-cell {
-	width: 260px;
+	width: 292px;
+}
+.duration-cell {
+	width: 50px;
 }
 #playlist-view .actions {
 	width: 22px;

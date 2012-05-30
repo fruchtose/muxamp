@@ -88,10 +88,10 @@ Playlist.prototype = {
     	var play = '<a href onclick="return false;" class="btn action play"><i class="icon-play"></i></a>';
     	var actions = '<div class="actions">' + remove + play + '</div>';
     	var actionsCell = '<td class="action-cell">' + actions + '</td>';
-    	var number = '<td><span class="index">' + index + '</span></td>';
-    	var uploader = '<td>' + mediaObject.artist + '</td>';
-    	var title = '<td>' + mediaObject.mediaName + '</td>';
-    	return actionsCell + number + uploader + title;
+    	var uploader = '<td class="uploader-cell">' + mediaObject.artist + '</td>';
+    	var title = '<td class="title-cell">' + mediaObject.mediaName + '</td>';
+    	var duration = '<td class="duration-cell">' + secondsToString(mediaObject.duration) + '</td>';
+    	return actionsCell + uploader + title + duration;
     	//var remove = '<a href onclick="return false;" class="action remove close">&times;</a>';
     	/*var remove = '<a href onclick="return false;" class="btn action remove"><i class="icon-remove""></i></a>';
     	var extLink = '<a href="' + mediaObject.permalink +'" target="_blank"><img src="' + mediaObject.icon + '"/></a>';

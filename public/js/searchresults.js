@@ -11,10 +11,10 @@ SearchResultsView.prototype = {
 	    var play ='<a class="btn action search-play-result" href onclick="return false;"><i class="icon-play"></i></a>';
 	    var actions = '<div class="actions">' + add + play + '</div>';
 	    var actionsCell = '<td class="action-cell">' + actions + '</td>';
-	    var number = '<td>' + index + '</td>';
-		var uploader = '<td class="uploader">' + result.author + '</td>';
-		var title = '<td class="title">' + result.mediaName + '</td>';
-		return '<tr>' + actionsCell + number + uploader + title + '</tr>';
+		var uploader = '<td class="uploader-cell">' + result.author + '</td>';
+		var title = '<td class="title-cell">' + result.mediaName + '</td>';
+		var duration = '<td class="duration-cell">' + secondsToString(result.duration) + '</td>';
+		return '<tr>' + actionsCell + uploader + title + duration + '</tr>';
         /*var add = '<a class="btn action search-add-result" href onclick="return false;"><i class="icon-plus"></i></a>';
         var play ='<a class="btn action search-play-result" href onclick="return false;"><i class="icon-play"></i></a>';
         var actions = '<div class="actions">' + add + play + '</div>';
@@ -36,7 +36,7 @@ SearchResultsView.prototype = {
         		//.data("search-index", originalRow.index());
         		return $('<div class="drag-search-result"></div>')
         		.data("search-index", originalRow.index())
-        		.append(originalRow.find('.uploader').html() + ' &mdash; ' + originalRow.find('.title').html()).appendTo('body');
+        		.append(originalRow.find('.uploader-cell').html() + ' &mdash; ' + originalRow.find('.title-cell').html()).appendTo('body');
         	}
         }).disableSelection();
     }
