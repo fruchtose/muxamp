@@ -1,4 +1,6 @@
 var PlaylistDOMInformation = function() {
+	this.container = "#tab-content";
+	
     this.parentTable = "table#tracks tbody";
     
     this.lastElementOfParent = this.parentTable + ":last";
@@ -215,7 +217,7 @@ Playlist.prototype = {
                     this.setCurrentTrack(newIndex);
                 }
                 else {
-                    this.setCurrentTrack(Math.max(0, $(this.playlistDOM.allRowsInTabe +'.playing').index()));
+                    this.setCurrentTrack(Math.max(0, $(this.playlistDOM.allRowsInTable +'.playing').index()));
                 }
             
                 var minIndex = Math.min(originalIndex, newIndex);
@@ -516,7 +518,13 @@ $(document).ready(function() {
         },
         tolerance: 'pointer',
         update: function(event, ui) {
-            var pos = Math.max(0, Math.min(playlist.list.length - 1, $(event.target).parent(playlist.playlistDOM.allRowsInTable).index()));
+            var pos = -1;
+            if ($(event.target).attr('id') && '#' + $(event.target).attr('id') == playlist.playlistDOM.container) {
+            	pos = playlist.list.length - 1;
+            }
+            else {
+            	pos = Math.max(0, Math.min(playlist.list.length - 1, $(event.target).parent(playlist.playlistDOM.allRowsInTable).index()));
+            }
             playlist.moveTrack(startPos, pos);
         }
     });
