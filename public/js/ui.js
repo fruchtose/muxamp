@@ -27,6 +27,21 @@ $("#search-results tbody tr").livequery(function() {
     row.find('.search-play-result').off('click');
 });
 
+$("#play-all").click(function() {
+	var tracks = [];
+	$.each(searchResultsView.results, function() {
+		tracks.push(getMediaObject(this));
+	});
+	if (tracks.length > 0) {
+		playlist.addTracks(tracks);
+		playlist.play();
+	}
+});
+
+$("#clear").click(function() {
+	playlist.clear();
+});
+
 $('#previous').click(function() {
     playlist.previousTrack();
 });

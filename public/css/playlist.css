@@ -256,6 +256,10 @@ a {
 #tracks tbody tr {
 	cursor: pointer;
 }
+.tab-actions {
+	margin-left: 5px;
+	margin-top: 5px;
+}
 .actions {
 	display: none;
     width: 48px;
