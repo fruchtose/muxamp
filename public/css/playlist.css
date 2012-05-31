@@ -170,8 +170,8 @@ a {
     top: 4px;
 }
 #timebar-row {
-	margin-left: 80px;
-	width: 558px;
+	margin-left: 1px;
+	width: 637px;
 }
 #time-elapsed {
     float: right;
@@ -180,7 +180,7 @@ a {
 }
 #timebar-outer {
     float: left;
-    width: 496px;
+    width: 575px;
 }
 #timebar-inner {
     height: 20px;
