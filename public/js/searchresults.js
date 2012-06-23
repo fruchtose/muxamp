@@ -28,8 +28,14 @@ SearchResultsView.prototype = {
         for (i in results) {
             rows.push(this._getResultRow(results[i], parseInt(i) + 1));
         }
-        $(this.root).html(rows.join(""))
-        .find(this.selector).draggable({
+        var tableRows;
+        if (searchResultsPage <= 0) {
+        	tableRows = $(this.root).html(rows.join(""))
+        }
+        else {
+        	tableRows = $(this.root).append(rows.join(""));
+        }
+        tableRows.find(this.selector).draggable({
         	// thanks to David Petersen
         	helper: function(event, ui) {
         		var originalRow = $(event.target).closest('tr');
@@ -40,6 +46,9 @@ SearchResultsView.prototype = {
         		.append(originalRow.find('.uploader-cell').html() + ' &mdash; ' + originalRow.find('.title-cell').html()).appendTo('body');
         	}
         }).disableSelection();
+        if (rows.length == 0) {
+        	searchResultsPage--;
+        }
     }
 };
 

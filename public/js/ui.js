@@ -38,6 +38,17 @@ $("#play-all").click(function() {
 	}
 });
 
+$("#load-more-search-results").click(function() {
+	if ($(searchResultsView.selector).size() > 0) {
+		searchResultsPage++;
+		var value = $('#search-query').val();
+	    var site = $("#search-site").val();
+	    if (value) {
+	        searchForTracks(value, searchResultsPage, site);
+	    }
+    }
+});
+
 $("#clear").click(function() {
 	playlist.clear();
 });
@@ -104,6 +115,7 @@ var searchForTracks = function(query, page, site) {
 }
 
 $('#search-site-dropdown a').click(function() {
+	searchResultsPage = 0;
     var site = $(this).html();
     var oldSiteName = $("#search-site").val();
     var newSiteName = siteCodeFromSiteName(site);
@@ -117,6 +129,7 @@ $('#search-site-dropdown a').click(function() {
 
 $('#search-form').submit(function(e){
     e.preventDefault();
+    searchResultsPage = 0;
     var value = $('#search-query').val();
     var site = $("#search-site").val();
     if (value) {

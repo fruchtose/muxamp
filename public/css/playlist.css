@@ -239,10 +239,14 @@ a {
 	height: 100%;
 	position: relative;
 }
+#search-results-pane {
+
+}
 #playlist-controls {
     height: 60px;
 }
 #search-results, #tracks {
+margin-top: 28px;
 	table-layout: fixed;
 }
 #search-results tr {
@@ -259,6 +263,8 @@ a {
 .tab-actions {
 	margin-left: 5px;
 	margin-top: 5px;
+	position: absolute;
+	top: 0;
 }
 .actions {
 	display: none;

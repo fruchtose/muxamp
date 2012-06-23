@@ -111,7 +111,7 @@ SearchManager.prototype = {
 				delete results[i].playRelevance;
 				delete results[i].plays;
 				delete results[i].querySimilarity;
-				//delete results[i].relevance;
+				delete results[i].relevance;
 			}
 			return results;
 		},
