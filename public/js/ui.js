@@ -89,8 +89,10 @@ var siteCodeFromSiteName = function(site) {
     return result;
 }
 
-var searchForTracks = function(query, site) {
-    var searchURL =  window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'search/' +site + '/'+ encodeURIComponent(query);
+var searchResultsPage = 0;
+
+var searchForTracks = function(query, page, site) {
+    var searchURL =  window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'search/' +site + '/'+ page + '/' + encodeURIComponent(query);
     $.ajax({
         url: searchURL,
         dataType: 'json',
@@ -109,7 +111,7 @@ $('#search-site-dropdown a').click(function() {
     $("#site-selector").html(site + '&nbsp;<span class="caret"></span>');
     var query = $('#search-query').val();
     if (query && newSiteName != oldSiteName) {
-        searchForTracks(query, newSiteName);
+        searchForTracks(query, searchResultsPage, newSiteName);
     }
 });
 
@@ -118,7 +120,7 @@ $('#search-form').submit(function(e){
     var value = $('#search-query').val();
     var site = $("#search-site").val();
     if (value) {
-        searchForTracks(value, site);
+        searchForTracks(value, searchResultsPage, site);
     }
     return false;
 });

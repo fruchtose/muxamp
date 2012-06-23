@@ -48,9 +48,10 @@ SearchResult.prototype = {
 };
 
 function SearchManager () {
+	this.resultCount = 25;
 	this.soundcloudKey = "2f9bebd6bcd85fa5acb916b14aeef9a4";
-	this.soundcloudSearchURI = "http://api.soundcloud.com/tracks.json?client_id=" + this.soundcloudKey + "&limit=25&offset=0&filter=streamable&order=hotness&q=";
-	this.youtubeSearchURI = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=25&orderby=relevance&alt=json&q=";
+	this.soundcloudSearchURI = "http://api.soundcloud.com/tracks.json?client_id=" + this.soundcloudKey + "&limit=" + this.resultCount + "&filter=streamable&order=hotness";
+	this.youtubeSearchURI = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=" + this.resultCount + "&orderby=relevance&alt=json";
 	this.reset();
 }
 
@@ -69,15 +70,16 @@ SearchManager.prototype = {
 		this.maxFavorites = 0;
 		this.maxPlays = 0;
 	},
-	search: function(query, site) {
+	search: function(query, page, site) {
 		this.reset();
+		page = Math.max(parseInt(page || '0'), 0);
 		var deferred, searchManager = this;
 		switch(site) {
 			case 'sct':
-				deferred = this.searchSoundCloudTracks(query);
+				deferred = this.searchSoundCloudTracks(query, page);
 				break;
 			case 'ytv':
-				deferred = this.searchYouTubeVideos(query);
+				deferred = this.searchYouTubeVideos(query, page);
 				break;
 		}
 		return deferred.pipe(function(results) {
@@ -117,7 +119,7 @@ SearchManager.prototype = {
 			return [];
 		});
 	},
-	searchSoundCloudTracks: function(query) {
+	searchSoundCloudTracks: function(query, page) {
 		var soundcloudConsumerKey = '2f9bebd6bcd85fa5acb916b14aeef9a4';
 		var searchManager = this;
 		var deferred = $.Deferred();
@@ -127,7 +129,7 @@ SearchManager.prototype = {
 			json: true,
 			method: 'GET',
 			timeout: 5000,
-			url: searchManager.soundcloudSearchURI + encodeURIComponent(query)
+			url: searchManager.soundcloudSearchURI + '&offset=' + (searchManager.resultCount * page + 1) + '&q=' + encodeURIComponent(query)
 		}, function(error, response, body) {
 			if (error || response.statusCode != 200) {
 				deferred.reject();
@@ -155,7 +157,7 @@ SearchManager.prototype = {
 		});
 		return deferred.promise();
 	},
-	searchYouTubeVideos: function(query, deferred) {
+	searchYouTubeVideos: function(query, page) {
 		var searchManager = this;
 		var deferred = $.Deferred();
 		var words = getSeparatedWords(query);
@@ -163,7 +165,7 @@ SearchManager.prototype = {
 			json: true,
 			method: 'GET',
 			timeout: 5000,
-			url: searchManager.youtubeSearchURI + encodeURIComponent(query)
+			url: searchManager.youtubeSearchURI + '&start-index='  + (searchManager.resultCount * page + 1) + '&q=' + encodeURIComponent(query)
 		}, function(error, response, body) {
 			if (error || response.statusCode != 200) {
 				deferred.reject();
