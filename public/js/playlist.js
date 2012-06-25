@@ -504,7 +504,7 @@ $(document).ready(function() {
     var startPos;
     $(playlist.playlistDOM.parentTable).sortable({
         axis: 'y',
-        containment: $(playlist.playlistDOM.parentTable).parent(),
+        containment: 'document',
         helper: function(event, ui) {
     		var children = ui.children();
     		var helper = ui.clone();
@@ -517,14 +517,8 @@ $(document).ready(function() {
             startPos = $(event.target).parent(playlist.playlistDOM.allRowsInTable).index();
         },
         tolerance: 'pointer',
-        update: function(event, ui) {
-            var pos = -1;
-            if ($(event.target).attr('id') && '#' + $(event.target).attr('id') == playlist.playlistDOM.container) {
-            	pos = playlist.list.length - 1;
-            }
-            else {
-            	pos = Math.max(0, Math.min(playlist.list.length - 1, $(event.target).parent(playlist.playlistDOM.allRowsInTable).index()));
-            }
+        stop: function(event, ui) {
+            var pos = ui.item.index();
             playlist.moveTrack(startPos, pos);
         }
     });
