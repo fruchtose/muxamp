@@ -78,20 +78,20 @@ SearchManager.prototype = {
 	saveSearchResults: function(searchResults) {
 		var result, i;
 		
-		var queryString = ["INSERT INTO KnownMedia (site, mediaid) VALUES "];
-		for (i in searchResults) {
-			result = searchResults[i];
-			queryString.push("('" + result.siteCode.toLowerCase() + "','" + result.siteMediaID + "')");
-			if (parseInt(i) < searchResults.length - 1) {
-				queryString.push(",");
-			}
-			else {
-				queryString.push(" ON DUPLICATE KEY UPDATE id=id;");
-			}
-		}
-		if (queryString.length > 1) {
+		if (searchResults.length) {
 			dbConnectionPool.acquire(function(acquireError, connection) {
 				if (!acquireError) {
+					var queryString = ["INSERT INTO KnownMedia (site, mediaid) VALUES "];
+					for (i in searchResults) {
+						result = searchResults[i];
+						queryString.push("(" + connection.escape(result.siteCode.toLowerCase()) + "," + connection.escape(result.siteMediaID) + ")");
+						if (parseInt(i) < searchResults.length - 1) {
+							queryString.push(",");
+						}
+						else {
+							queryString.push(" ON DUPLICATE KEY UPDATE id=id;");
+						}
+					}
 					connection.query(queryString.join(""), function(queryError, rows) {
 						dbConnectionPool.release(connection);
 					});

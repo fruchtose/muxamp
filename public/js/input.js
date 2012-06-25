@@ -34,7 +34,11 @@ var fetchTracksFromString = function(str) {
     return $.ajax({
     	url: queryLink,
     	dataType: 'json'
-    }).done(function(searchResults) {
+    }).done(function(data) {
+    	if (data.id) {
+    		window.location.hash = data.id;
+    	}
+    	var searchResults = data.results;
     	if (searchResults.length) {
     		var i, mediaObjects = [];
     		for (i in searchResults) {

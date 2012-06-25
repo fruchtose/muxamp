@@ -4,6 +4,7 @@ var mediaRouterBase = require('./server/router');
 var mediaRouter = mediaRouterBase.getRouter();
 var url = require('url');
 var $ = require('./server/jquery.whenall');
+var playlist = require('./server/playlist');
 
 app.use(express.static(__dirname + '/public'));
 var fs = require('fs');
@@ -27,8 +28,20 @@ app.get('/search\/:site/:page([0-9]+)/:query?', function(req, res) {
 app.get('/fetch', function(req, res) {
 	var urlParts = url.parse(req.url, false);
 	var query = urlParts.query;
+	var existing = playlist.getID(query);
+	var savedID = false;
+	existing.done(function(doesExist) {
+		if (!doesExist) {
+			playlist.save(query).then(function(result) {
+				savedID = result;
+			});
+		}
+		else {
+			savedID = doesExist;
+		}
+	});
 	var urlParams = mediaRouterBase.getURLParams(query, true);
-	var responses = [], results = [];
+	var responses = [existing], results = [];
 	var i;
 	for (i in urlParams) {
 		responses.push(mediaRouter.addResource(urlParams[i], function(searchResults) {
@@ -36,7 +49,7 @@ app.get('/fetch', function(req, res) {
 		}));
 	}
 	$.whenAll.apply(null, responses).always(function() {
-		res.json(results);
+		res.json({id: savedID, results: results});
 	});
 });
 
