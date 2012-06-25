@@ -1,5 +1,10 @@
-var $ = require('jquery-deferred'),
-	request = require('request');
+var $ 		= require('jquery-deferred'),
+	request = require('request'),
+	db		= require('./db'),
+	cacher	= require('node-dummy-cache');
+	
+var dbConnectionPool 	= db.getConnectionPool(),
+	searchResultsCache	= cacher.create(cacher.ONE_SECOND * 30, cacher.ONE_SECOND * 10);
 
 // Thanks to Jeffrey To http://www.falsepositives.com/index.php/2009/12/01/javascript-function-to-get-the-intersect-of-2-arrays/
 var getIntersection = function(arr1, arr2) {
@@ -70,48 +75,91 @@ SearchManager.prototype = {
 		this.maxFavorites = 0;
 		this.maxPlays = 0;
 	},
+	saveSearchResults: function(searchResults) {
+		var result, i;
+		
+		var queryString = ["INSERT INTO KnownMedia (site, mediaid) VALUES "];
+		for (i in searchResults) {
+			result = searchResults[i];
+			queryString.push("('" + result.siteCode.toLowerCase() + "','" + result.siteMediaID + "')");
+			if (parseInt(i) < searchResults.length - 1) {
+				queryString.push(",");
+			}
+			else {
+				queryString.push(" ON DUPLICATE KEY UPDATE id=id;");
+			}
+		}
+		if (queryString.length > 1) {
+			dbConnectionPool.acquire(function(acquireError, connection) {
+				if (!acquireError) {
+					connection.query(queryString.join(""), function(queryError, rows) {
+						dbConnectionPool.release(connection);
+					});
+				}
+				else {
+					dbConnectionPool.release(connection);
+				}
+			});
+		}
+	},
 	search: function(query, page, site) {
 		this.reset();
 		page = Math.max(parseInt(page || '0'), 0);
 		var deferred, searchManager = this;
-		switch(site) {
-			case 'sct':
-				deferred = this.searchSoundCloudTracks(query, page);
-				break;
-			case 'ytv':
-				deferred = this.searchYouTubeVideos(query, page);
-				break;
+		var cacheKey = {query: query, page: page, site: site};
+		var cachedResults = searchResultsCache.get(cacheKey);
+		if (!cachedResults) {
+			switch(site) {
+				case 'sct':
+					deferred = this.searchSoundCloudTracks(query, page);
+					break;
+				case 'ytv':
+					deferred = this.searchYouTubeVideos(query, page);
+					break;
+			}
+		}
+		else {
+			deferred = $.Deferred();
+			deferred.resolve(cachedResults);
+			deferred = deferred.promise();
 		}
 		return deferred.pipe(function(results) {
-			var i;
-			for (i in results) {
-				if (results[i].plays < 0) {
-					var newPlays = 0, newFavorites = 0, j;
-					for (j = -1 * results[i].plays; j < results.length; j++) {
-						if (results[j].plays >= 0) {
-							newPlays = results[j].plays;
-							newFavorites = results[j].plays;
-							break;
+			searchManager.saveSearchResults(results);
+			if (!cachedResults) {
+				var i;
+				for (i in results) {
+					if (results[i].plays < 0) {
+						var newPlays = 0, newFavorites = 0, j;
+						for (j = -1 * results[i].plays; j < results.length; j++) {
+							if (results[j].plays >= 0) {
+								newPlays = results[j].plays;
+								newFavorites = results[j].plays;
+								break;
+							}
 						}
+						results[i].plays = newPlays;
+						results[i].favorites = newFavorites;
 					}
-					results[i].plays = newPlays;
-					results[i].favorites = newFavorites;
+					var plays = results[i].plays, favs = results[i].favorites;
+					results[i].playRelevance = Math.log(plays + 1) / Math.log(searchManager.maxPlays + 1);
+					results[i].favoriteRelevance = Math.log(favs + 1) / Math.log(searchManager.maxFavorites + 1);
+					results[i].calculateRelevance();
 				}
-				var plays = results[i].plays, favs = results[i].favorites;
-				results[i].playRelevance = Math.log(plays + 1) / Math.log(searchManager.maxPlays + 1);
-				results[i].favoriteRelevance = Math.log(favs + 1) / Math.log(searchManager.maxFavorites + 1);
-				results[i].calculateRelevance();
+				results.sort(function(a, b) {
+					return b.relevance - a.relevance;
+				});
+				for (i in results) {
+					delete results[i].favoriteRelevance;
+					delete results[i].favorites;
+					delete results[i].playRelevance;
+					delete results[i].plays;
+					delete results[i].querySimilarity;
+					delete results[i].relevance;
+				}
 			}
-			results.sort(function(a, b) {
-				return b.relevance - a.relevance;
-			});
-			for (i in results) {
-				delete results[i].favoriteRelevance;
-				delete results[i].favorites;
-				delete results[i].playRelevance;
-				delete results[i].plays;
-				delete results[i].querySimilarity;
-				delete results[i].relevance;
+			else {
+				results = cachedResults;
+				searchResultsCache.put(cacheKey, results);
 			}
 			return results;
 		},
