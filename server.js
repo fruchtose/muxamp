@@ -56,7 +56,6 @@ app.post('/fetchid', function(req, res) {
 	var responses = [existing], results = [];
 	var savedID = false;
 	existing.done(function(doesExist) {
-		console.log(doesExist);
 		if (!doesExist && query.length) {
 			var saveQuery = playlist.save(query);
 			saveQuery.done(function(result) {
@@ -71,7 +70,6 @@ app.post('/fetchid', function(req, res) {
 			res.json({id: savedID});
 		});
 	}).fail(function() {
-		console.log("fail");
 		res.json({id: savedID});
 	});
 });
