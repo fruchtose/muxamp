@@ -1,12 +1,13 @@
-var express = require('express'), app = express.createServer();
+var express = require('express'), app = express.createServer(
+	express.static(__dirname + '/public'),
+	express.bodyParser()
+);
 var search = require('./server/search').search();
 var mediaRouterBase = require('./server/router');
 var mediaRouter = mediaRouterBase.getRouter();
 var url = require('url');
 var $ = require('./server/jquery.whenall');
 var playlist = require('./server/playlist');
-
-app.use(express.static(__dirname + '/public'));
 var fs = require('fs');
 
 app.get('/', function(req, res) {
@@ -25,31 +26,53 @@ app.get('/search\/:site/:page([0-9]+)/:query?', function(req, res) {
 	});
 });
 
-app.get('/fetch', function(req, res) {
-	var urlParts = url.parse(req.url, false);
-	var query = urlParts.query;
+app.post('/fetchplaylist', function(req, res) {
+	var queryID = req.body.query;
+	var exists = playlist.getString(queryID);
+	var playlistString = false;
+	var responses = [exists], results = [];
+	var queriesResolved = $.Deferred();
+	exists.done(function(doesExist) {
+		playlistString = doesExist;
+		var urlParams = mediaRouterBase.getURLParams(playlistString, true);
+		var i;
+		for (i in urlParams) {
+			responses.push(mediaRouter.addResource(urlParams[i], function(searchResults) {
+				results = results.concat(searchResults);
+			}));
+		}
+		$.when.apply(null, responses).always(function() {
+			res.json({id: queryID, results: results});
+		});
+	}).fail(function() {
+		queryID = false;
+		res.json({id: queryID, results: results});
+	});
+});
+
+app.post('/fetchid', function(req, res) {
+	var query = req.body.query;
 	var existing = playlist.getID(query);
+	var responses = [existing], results = [];
 	var savedID = false;
 	existing.done(function(doesExist) {
-		if (!doesExist) {
-			playlist.save(query).then(function(result) {
+		console.log(doesExist);
+		if (!doesExist && query.length) {
+			var saveQuery = playlist.save(query);
+			saveQuery.done(function(result) {
 				savedID = result;
 			});
+			responses.push(saveQuery);
 		}
 		else {
 			savedID = doesExist;
 		}
-	});
-	var urlParams = mediaRouterBase.getURLParams(query, true);
-	var responses = [existing], results = [];
-	var i;
-	for (i in urlParams) {
-		responses.push(mediaRouter.addResource(urlParams[i], function(searchResults) {
-			results = results.concat(searchResults);
-		}));
-	}
-	$.whenAll.apply(null, responses).always(function() {
-		res.json({id: savedID, results: results});
+		$.whenAll.apply(null, responses).always(function() {
+			res.json({id: savedID});
+		});
+	}).fail(function() {
+		console.log("fail");
+		res.json({id: savedID});
 	});
 });
 

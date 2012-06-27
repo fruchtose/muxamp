@@ -1,6 +1,7 @@
 var dbConnectionPool	= require('./db').getConnectionPool(),
 	mediaRouterBase		= require('./router'),
-	$					= require('./jquery.whenall');
+	$					= require('./jquery.whenall'),
+	crypto				= require('crypto');
 
 var verifyPlaylist = function(playlistString) {
 	var result = $.Deferred(), i, pair;
@@ -53,8 +54,11 @@ var getPlaylistID = function(playlistString) {
 			dbConnectionPool.release(connection);
 			return;
 		}
-		var queryString = "SELECT id FROM Playlists WHERE playliststring=?;";
-		connection.query(queryString, [playlistString], function(queryError, rows) {
+		var sha256 = crypto.createHash('sha256');
+		sha256.update(playlistString, 'utf8');
+		var hash = sha256.digest('hex');
+		var queryString = "SELECT id FROM Playlists WHERE sha256=?;";
+		connection.query(queryString, [hash], function(queryError, rows) {
 			
 			if (!queryError && rows) {
 				if (rows[0]) {
@@ -73,18 +77,50 @@ var getPlaylistID = function(playlistString) {
 	return result.promise();
 };
 
+var getPlaylistString = function(id) {
+	var result = $.Deferred();
+	dbConnectionPool.acquire(function(acquireError, connection) {
+		if (acquireError) {
+			result.reject();
+			dbConnectionPool.release(connection);
+			return;
+		}
+		var queryString = "SELECT playliststring FROM Playlists WHERE id=?;";
+		connection.query(queryString, [id], function(queryError, rows) {
+			
+			if (!queryError && rows) {
+				if (rows[0]) {
+					result.resolve(rows[0]["playliststring"]);
+				}
+				else {
+					result.reject(false);
+				}
+			}
+			else {
+				result.reject();
+			}
+			dbConnectionPool.release(connection);
+		});
+	});
+	return result.promise();
+};
+
 var savePlaylist = function(playlistString) {
 	var result = $.Deferred(), verified = verifyPlaylist(playlistString);
-	$.when(verified).fail({
-	}).then(function() {
+	$.when(verified).fail(function() {
+		result.reject();
+	}).done(function() {
 		dbConnectionPool.acquire(function(acquireError, connection) {
 			if (acquireError) {
 				result.reject();
 				dbConnectionPool.release(connection);
 				return;
 			}
-			var queryString = "INSERT INTO Playlists SET ?";
-			connection.query(queryString, {playliststring: playlistString}, function(queryError, rows) {
+			var sha256 = crypto.createHash('sha256');
+			sha256.update(playlistString, 'utf8');
+			var hash = sha256.digest('hex');
+			var queryString = "INSERT IGNORE INTO Playlists SET ?";
+			connection.query(queryString, {sha256: hash, playliststring: playlistString}, function(queryError, rows) {
 				if (!queryError) {
 					result.resolve(rows.insertId);
 				}
@@ -101,5 +137,6 @@ var savePlaylist = function(playlistString) {
 
 module.exports = {
 	getID: getPlaylistID,
+	getString: getPlaylistString,
 	save: savePlaylist                
 };

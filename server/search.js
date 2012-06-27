@@ -184,22 +184,27 @@ SearchManager.prototype = {
 				return;
 			}
 			var i, results = [];
-			for (i in body) {
-				var result = body[i];
-				if (undefined == result.playback_count) {
-                			result.playback_count = -1 * parseInt(i) - 1;
-                			result.favoritings_count = -1 * parseInt(i) - 1;
+			try {
+				for (i in body) {
+					var result = body[i];
+					if (undefined == result.playback_count) {
+	                			result.playback_count = -1 * parseInt(i) - 1;
+	                			result.favoritings_count = -1 * parseInt(i) - 1;
+					}
+					if (undefined == result.stream_url) {
+						continue;
+					}
+					var searchResult = new SearchResult(result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", "img/soundcloud_orange_white_16.png", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
+					var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
+					var intersection = getIntersection(words, resultWords);
+					searchResult.querySimilarity = intersection.length / words.length;
+					searchManager.checkMaxPlays(searchResult.plays);
+					searchManager.checkMaxFavorites(searchResult.favorites);
+					results.push(searchResult);
 				}
-				if (undefined == result.stream_url) {
-					continue;
-				}
-				var searchResult = new SearchResult(result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", "img/soundcloud_orange_white_16.png", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
-				var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
-				var intersection = getIntersection(words, resultWords);
-				searchResult.querySimilarity = intersection.length / words.length;
-				searchManager.checkMaxPlays(searchResult.plays);
-				searchManager.checkMaxFavorites(searchResult.favorites);
-				results.push(searchResult);
+			}
+			catch(err) {
+				console.log("Error reading SoundCloud results");
 			}
 			deferred.resolve(results);
 		});
@@ -228,23 +233,28 @@ SearchManager.prototype = {
 			if (!videos) {
 				return results;
 			}
-			for (i in videos) {
-				var entry = videos[i];
-				var id = entry['id']['$t'].split(':').pop();
-				var permalink = 'http://www.youtube.com/watch?v=' + id;
-				var authorObj = entry.author[0];
-	            var author = authorObj.name.$t;
-				var title = entry.title.$t;
-	            var duration = parseInt(entry.media$group.yt$duration.seconds);
-	            var viewCount = entry['yt$statistics']['viewCount'];
-	            var favoriteCount = entry['yt$statistics']['favoriteCount'];
-				var searchResult = new SearchResult(permalink, permalink, id, "ytv", "img/youtube.png", author, title, duration, "video", viewCount, favoriteCount);
-				var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
-				var intersection = getIntersection(words, resultWords);
-				searchResult.querySimilarity = intersection.length / words.length;
-				searchManager.checkMaxPlays(searchResult.plays);
-				searchManager.checkMaxFavorites(searchResult.favorites);
-				results.push(searchResult);
+			try {
+				for (i in videos) {
+					var entry = videos[i];
+					var id = entry['id']['$t'].split(':').pop();
+					var permalink = 'http://www.youtube.com/watch?v=' + id;
+					var authorObj = entry.author[0];
+		            var author = authorObj.name.$t;
+					var title = entry.title.$t;
+		            var duration = parseInt(entry.media$group.yt$duration.seconds);
+		            var viewCount = entry['yt$statistics']['viewCount'];
+		            var favoriteCount = entry['yt$statistics']['favoriteCount'];
+					var searchResult = new SearchResult(permalink, permalink, id, "ytv", "img/youtube.png", author, title, duration, "video", viewCount, favoriteCount);
+					var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
+					var intersection = getIntersection(words, resultWords);
+					searchResult.querySimilarity = intersection.length / words.length;
+					searchManager.checkMaxPlays(searchResult.plays);
+					searchManager.checkMaxFavorites(searchResult.favorites);
+					results.push(searchResult);
+				}
+			}
+			catch(err) {
+				console.log("Error reading YouTube results");
 			}
 			deferred.resolve(results);
 		});

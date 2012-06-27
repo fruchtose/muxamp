@@ -30,13 +30,18 @@ var addHashParam = function(key, value) {
 }
 
 var fetchTracksFromString = function(str) {
-	var queryLink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'fetch?' + str;
+	var queryLink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'fetchplaylist';
     return $.ajax({
     	url: queryLink,
-    	dataType: 'json'
+    	dataType: 'json',
+    	type: 'POST',
+    	data: {query: str}
     }).done(function(data) {
     	if (data.id) {
     		window.location.hash = data.id;
+    	}
+    	else {
+    		window.location.hash = '';
     	}
     	var searchResults = data.results;
     	if (searchResults.length) {
@@ -63,12 +68,12 @@ var loadFunction = function() {
     //var urlParams = getURLParams(window.location.hash, true);
     //var inputCount = urlParams.length;
     if (window.location.hash.length) {
-        playlist.updateSettings({
-            updateURLOnAdd: false
+        playlist.setSetting({
+            updateLocationOnAdd: false
         });
         fetchTracksFromString(window.location.hash.substring(1)).always(function() {
-        	playlist.updateSettings({
-                updateURLOnAdd: true
+        	playlist.setSetting({
+                updateLocationOnAdd: true
             });
         	$.unblockUI();
         });

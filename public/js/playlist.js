@@ -28,12 +28,13 @@ function Playlist(soundManager) {
     this.currentTrack = 0;
     this.currentVolumePercent = 50; // Start at 50% so users can increase/decrease volume if they want to
     this.list = [];
+    this.locationUpdatesWaiting = 0;
     this.playlistDOM = new PlaylistDOMInformation();
+    this.settings = {
+    	updateLocationOnAdd: true
+    };
     this.soundManager = soundManager;
     this.totalDuration = 0; // Duration in seconds
-    this.settings = {
-        updateURLOnAdd: true
-    };
 }
 
 Playlist.prototype = {
@@ -119,8 +120,8 @@ Playlist.prototype = {
             var mediaObject = mediaObjects[i];
             addedDuration += mediaObject.getDuration();
         }
-        if (this.settings.updateURLOnAdd) {
-            this.refreshWindowLocationHash();
+        if (this.getSetting('updateLocationOnAdd')) {
+        	this.setWindowLocation();
         }
         if ($.isNumeric(currentTrack)) {
             this.setCurrentTrack(currentTrack);
@@ -143,14 +144,53 @@ Playlist.prototype = {
             }
             this.list = [];
             $(this.playlistDOM.allRowsInTable).remove();
-            this.refreshWindowLocationHash();
+            this.setWindowLocation();
             this.setCurrentTrack(0);
             this.setPlayButton(this.isEmpty());
             $('#track-count').text(this.list.length.toString());
             this.totalDuration = 0;
             $('#playlist-duration').text(secondsToString(this.totalDuration));
             this.updateTrackEnumeration();
+            
         }
+    },
+    getID: function() {
+    	var hash = this.getHash();
+    	var result = $.Deferred();
+    	if (!hash.length) {
+    		result.reject();
+    	}
+    	else {
+    		var queryLink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'fetchid';
+    		$.ajax({
+    			url: queryLink,
+        	dataType: 'json',
+        	type: 'POST',
+        	data: {query: hash}
+    		}).done(function(data) {
+    			if (data.id) {
+    				result.resolve(data.id);
+    			}
+    			else {
+    				result.reject();
+    			}
+    		});
+    	}
+    	return result.promise();
+    },
+    getHash: function() {
+        var newHash = '', slicedList = [];
+        if (!this.isEmpty()) {
+            newHash = this.list[0].siteCode + '=' + this.list[0].siteMediaID;
+            slicedList = this.list.slice(1);
+        }
+        for (var i in slicedList) {
+            newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
+        }
+        return newHash;
+    },
+    getSetting: function(option) {
+    	return this.settings[option];
     },
     getVolume: function() {
         return this.currentVolumePercent;
@@ -228,7 +268,7 @@ Playlist.prototype = {
         else {
             this.renumberTracks();
         }
-        this.refreshWindowLocationHash();
+        this.setWindowLocation();
     },
     nextTrack: function(autostart) {
         var trackInt = parseInt(this.currentTrack), next = trackInt + 1 >= this.list.length ? 0 : trackInt + 1;
@@ -313,23 +353,6 @@ Playlist.prototype = {
         var trackInt = parseInt(this.currentTrack), next = trackInt - 1 >= 0 ? trackInt - 1 : (this.isEmpty() ? 0 : this.list.length - 1);
         this.goToTrack(next, autostart);
     },
-    refreshWindowLocationHash: function() {
-        var newHash = '', slicedList = [];
-        if (!this.isEmpty()) {
-            newHash = this.list[0].siteCode + '=' + this.list[0].siteMediaID;
-            slicedList = this.list.slice(1);
-        }
-        for (var i in slicedList) {
-            newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
-        }
-        // Making sure user cannot create huuuuuuuge URL by default
-        if (newHash.length < 2083 && window.location.hostname.length + window.location.pathname.length + newHash.length < 2083){
-            window.location.hash = newHash;
-        }
-        else {
-            alert("Your playlist URL will not be appended because it is too long.");
-        }
-    },
     removeTrack: function(index) {
         if (index >= 0) {
             var wasPlaying = this.isPlaying() && index == this.currentTrack;
@@ -343,7 +366,7 @@ Playlist.prototype = {
             
             $($(this.playlistDOM.allRowsInTable).get(index)).remove();
             this.renumberTracks(Math.max(0, Math.min(this.list.length - 1, index)));
-            this.refreshWindowLocationHash();
+            this.setWindowLocation();
             if (index == this.currentTrack) {
                 this.setCurrentTrack(Math.min(this.list.length - 1, index));
             }
@@ -355,6 +378,7 @@ Playlist.prototype = {
             this.totalDuration -= trackDuration;
             $('#playlist-duration').text(secondsToString(this.totalDuration));
             this.updateTrackEnumeration();
+            
         }
     },
     renumberTracks: function(startingIndex) {
@@ -387,6 +411,9 @@ Playlist.prototype = {
             this.setVolume(this.currentVolumePercent);
         }
     },
+    setSetting: function(option, value) {
+    	this.settings[option] = value;
+    },
     setVolume: function(intPercent) {
         intPercent = Math.round(intPercent);
         if (this.isPlaying() || this.isPaused()) {
@@ -415,6 +442,27 @@ Playlist.prototype = {
             $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-down").addClass("icon-volume-off");
         }
     },
+    setWindowLocation: function() {
+    	var playlist = this, currentHash = this.getHash();
+    	var updateID = function() {
+    		var idGetter = playlist.getID();
+	    	idGetter.done(function(id) {
+	    		window.location.hash = id;
+	    		this.locationUpdatesWaiting--;
+	    	});
+    	};
+    	var waitToUpdate = 0;
+    	if (this.locationUpdatesWaiting > 0) {
+    		waitToUpdate = 450;
+    	}
+    	setTimeout(function() {
+    		var nowHash = playlist.getHash();
+    		if (currentHash == nowHash) {
+    			updateID();
+	    	}
+    	}, waitToUpdate);
+    	this.locationUpdatesWaiting++;
+    },
     shuffle: function() {
         if (this.isEmpty()) {
             return false;
@@ -442,16 +490,15 @@ Playlist.prototype = {
         this.totalDuration = 0;
         $(this.playlistDOM.parentTable).html('');
         this.list = [];
-        this.settings.updateURLOnAdd = false;
         this.addTracks(newList, newCurrentTrack);
-        this.refreshWindowLocationHash();
-        this.settings.updateURLOnAdd = true;
+        this.setWindowLocation();
         for (i in newList) {
             if (this.list[i].siteMediaID == currentSiteMediaID) {
                 this.setCurrentTrack(parseInt(i));
                 break;
             }
         }
+        
     },
     stop: function () {
         if (!this.isEmpty()) {
@@ -483,11 +530,6 @@ Playlist.prototype = {
         }
         else {
             $('#play').find('i').removeClass('icon-play').addClass('icon-pause');
-        }
-    },
-    updateSettings: function(options) {
-        if (options) {
-            this.settings = $.extend({}, this.settings, options);
         }
     },
     updateTrackEnumeration: function() {
