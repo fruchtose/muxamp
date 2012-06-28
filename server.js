@@ -9,12 +9,14 @@ var url = require('url');
 var $ = require('./server/jquery.whenall');
 var playlist = require('./server/playlist');
 var fs = require('fs');
+var util = require('util');
+var cacher = require('node-dummy-cache');
+var playlistFetchCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
 
-app.get('/', function(req, res) {
+app.get(/^\/([1-9][0-9]*)?$/, function(req, res) {
 	var file = __dirname + '/public/playlist.html';
-	fs.readFile(file, 'utf8', function(err, text) {
-		res.send(text);
-	});
+	var readStream = fs.createReadStream(file);
+	util.pump(readStream, res);
 });
 
 app.get('/search\/:site/:page([0-9]+)/:query?', function(req, res) {
@@ -34,14 +36,23 @@ app.post('/fetchplaylist', function(req, res) {
 	var queriesResolved = $.Deferred();
 	exists.done(function(doesExist) {
 		playlistString = doesExist;
-		var urlParams = mediaRouterBase.getURLParams(playlistString, true);
-		var i;
-		for (i in urlParams) {
-			responses.push(mediaRouter.addResource(urlParams[i], function(searchResults) {
-				results = results.concat(searchResults);
-			}));
+		var cached = playlistFetchCache.get(queryID);
+		if (cached) {
+			results = cached;
+		}
+		else {
+			var urlParams = mediaRouterBase.getURLParams(playlistString, true);
+			var i;
+			for (i in urlParams) {
+				responses.push(mediaRouter.addResource(urlParams[i], function(searchResults) {
+					results = results.concat(searchResults);
+				}));
+			}
 		}
 		$.when.apply(null, responses).always(function() {
+			if (!cached && results.length >= 5) {
+				playlistFetchCache.put(queryID, results);
+			}
 			res.json({id: queryID, results: results});
 		});
 	}).fail(function() {

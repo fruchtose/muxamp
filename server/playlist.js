@@ -1,7 +1,10 @@
 var dbConnectionPool	= require('./db').getConnectionPool(),
 	mediaRouterBase		= require('./router'),
 	$					= require('./jquery.whenall'),
-	crypto				= require('crypto');
+	crypto				= require('crypto'),
+	cacher				= require('node-dummy-cache');
+	
+var playlistCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
 
 var verifyPlaylist = function(playlistString) {
 	var result = $.Deferred(), i, pair;
@@ -47,33 +50,40 @@ var verifyPlaylist = function(playlistString) {
 };
 
 var getPlaylistID = function(playlistString) {
-	var result = $.Deferred();
-	dbConnectionPool.acquire(function(acquireError, connection) {
-		if (acquireError) {
-			result.reject();
-			dbConnectionPool.release(connection);
-			return;
-		}
-		var sha256 = crypto.createHash('sha256');
-		sha256.update(playlistString, 'utf8');
-		var hash = sha256.digest('hex');
-		var queryString = "SELECT id FROM Playlists WHERE sha256=?;";
-		connection.query(queryString, [hash], function(queryError, rows) {
-			
-			if (!queryError && rows) {
-				if (rows[0]) {
-					result.resolve(parseInt(rows[0]["id"]));
+	var result = $.Deferred(), cached = playlistCache.get(playlistString);
+	if (cached) {
+		result.resolve(cached);
+	}
+	else {
+		dbConnectionPool.acquire(function(acquireError, connection) {
+			if (acquireError) {
+				result.reject();
+				dbConnectionPool.release(connection);
+				return;
+			}
+			var sha256 = crypto.createHash('sha256');
+			sha256.update(playlistString, 'utf8');
+			var hash = sha256.digest('hex');
+			var queryString = "SELECT id FROM Playlists WHERE sha256=?;";
+			connection.query(queryString, [hash], function(queryError, rows) {
+				
+				if (!queryError && rows) {
+					if (rows[0]) {
+						var id = parseInt(rows[0]["id"]);
+						playlistCache.put(playlistString, id);
+						result.resolve(id);
+					}
+					else {
+						result.resolve(false);
+					}
 				}
 				else {
-					result.resolve(false);
+					result.reject();
 				}
-			}
-			else {
-				result.reject();
-			}
-			dbConnectionPool.release(connection);
+				dbConnectionPool.release(connection);
+			});
 		});
-	});
+	}
 	return result.promise();
 };
 

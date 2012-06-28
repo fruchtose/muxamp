@@ -447,7 +447,7 @@ Playlist.prototype = {
     	var updateID = function() {
     		var idGetter = playlist.getID();
 	    	idGetter.done(function(id) {
-	    		window.location.hash = id;
+	    		History.pushState({id: id}, "Muxamp", id);
 	    		this.locationUpdatesWaiting--;
 	    	});
     	};

@@ -5,6 +5,24 @@ var counter = (function() {
 	};
 })();
 
+var getWindowLocation = (function() {
+	if ($.isFunction(history.pushState)) {
+		return function() {
+			if (window.location.pathname.length) {
+				return window.location.pathname.substring(1);
+			}
+			else {
+				return window.location.hash.substring(1);
+			}
+		}
+	}
+	else {
+		return function() {
+			return window.location.hash.substring(1);
+		};
+	}
+})();
+
 var getMediaObject = function(searchResult) {
     var mediaObject = null;
     if (searchResult) {
@@ -21,14 +39,6 @@ var getMediaObject = function(searchResult) {
     return mediaObject;
 };
 
-var addHashParam = function(key, value) {
-    var currentHash = window.location.hash;
-    if (!currentHash.length) {
-        return key + "=" + value;
-    }
-    else return currentHash + "&" + key + "=" + value;
-}
-
 var fetchTracksFromString = function(str) {
 	var queryLink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'fetchplaylist';
     return $.ajax({
@@ -37,11 +47,8 @@ var fetchTracksFromString = function(str) {
     	type: 'POST',
     	data: {query: str}
     }).done(function(data) {
-    	if (data.id) {
-    		window.location.hash = data.id;
-    	}
-    	else {
-    		window.location.hash = '';
+    	if (!data.id) {
+    		History.pushState({id: null}, "Muxamp", "");
     	}
     	var searchResults = data.results;
     	if (searchResults.length) {
@@ -67,11 +74,12 @@ var fetchTracksFromString = function(str) {
 var loadFunction = function() {
     //var urlParams = getURLParams(window.location.hash, true);
     //var inputCount = urlParams.length;
-    if (window.location.hash.length) {
+	var loc = getWindowLocation();
+    if (loc.length) {
         playlist.setSetting({
             updateLocationOnAdd: false
         });
-        fetchTracksFromString(window.location.hash.substring(1)).always(function() {
+        fetchTracksFromString(loc).always(function() {
         	playlist.setSetting({
                 updateLocationOnAdd: true
             });
