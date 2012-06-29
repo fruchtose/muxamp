@@ -91,9 +91,10 @@ Playlist.prototype = {
     	var play = '<a href onclick="return false;" class="btn action play"><i class="icon-play"></i></a>';
     	var actions = '<div class="actions">' + remove + play + '</div>';
     	var actionsCell = '<td class="action-cell">' + actions + '</td>';
-    	var uploader = '<td class="uploader-cell">' + mediaObject.artist + '</td>';
-    	var title = '<td class="title-cell">' + mediaObject.mediaName + '</td>';
-    	var duration = '<td class="duration-cell">' + secondsToString(mediaObject.duration) + '</td>';
+    	var uploader = '<td class="uploader-cell" ' + getAttribute('title', mediaObject.artist) + '>' + mediaObject.artist + '</td>';
+    	var title = '<td class="title-cell" ' + getAttribute('title', mediaObject.mediaName) + '>' + mediaObject.mediaName + '</td>';
+    	var seconds = secondsToString(mediaObject.duration);
+    	var duration = '<td class="duration-cell" ' + getAttribute('title', seconds) + '>' + seconds + '</td>';
     	var link = '<td class="link-cell"><a href="' + mediaObject.permalink + '"><img src="' + mediaObject.icon + '" /></a></td>';
     	return actionsCell + uploader + title + duration + link;
     	//var remove = '<a href onclick="return false;" class="action remove close">&times;</a>';

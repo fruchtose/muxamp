@@ -229,3 +229,7 @@ $("#about-button").click(function() {
         backdrop: true
     })
 });
+
+var getAttribute = function(name, value) {
+	return name + '="' + value + '"';
+};
