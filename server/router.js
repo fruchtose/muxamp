@@ -1,6 +1,7 @@
+var SearchResult = require('./searchresult').SearchResult;
 var $ = require('./jquery.whenall');
-var search = require('./search');
 var request = require('request');
+var urlParser = require('url');
 
 function KeyValuePair(key, value) {
     this.key = key;
@@ -217,6 +218,7 @@ Router.prototype = {
         var failure = function() {
             console.log("Unable to fetch content from " + url + ".");
         }
+        mediaHandler = mediaHandler || function() {};
         var deferredAction = $.Deferred();
         var isString = typeof url == "string";
         if (isString)
@@ -259,11 +261,12 @@ Router.prototype = {
         var deferredAction = this.actionQueue.shift();
         if (deferredAction) {
             deferredAction.action.always(function(resolveData) {
-                if (deferredAction.mediaHandler) {
-                    deferredAction.mediaHandler(resolveData.tracks);
+            	var handledMedia = null;
+            	if (deferredAction.mediaHandler) {
+                    handledMedia = deferredAction.mediaHandler(resolveData.tracks);
                 }
                 router.requestsInProgress = Math.max(0, router.requestsInProgress - 1);
-                deferredAction.finish.resolve();
+                deferredAction.finish.resolve(handledMedia || resolveData.tracks);
                 router.executeActionQueueItems();
             });
         }
@@ -487,7 +490,7 @@ Router.prototype = {
                 //Tracks have stream URL
                 if (data.stream_url) {
                     var id = router.getNewTrackID();
-                    var trackObject = new search.searchResult(data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.id, "sct", "img/soundcloud_orange_white_16.png",data.user.username, data.title, data.duration / 1000, "audio");
+                    var trackObject = new SearchResult(data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.id, "sct", "img/soundcloud_orange_white_16.png",data.user.username, data.title, data.duration / 1000, "audio");
                     //var trackObject = new SoundCloudObject(id, data.id, data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.user.username, data.title, data.duration / 1000, router.soundManager);
                     deferred.resolve($.extend({}, params, {
                         tracks: [trackObject]
@@ -555,7 +558,7 @@ Router.prototype = {
             var duration = parseInt(entry.media$group.yt$duration.seconds);
             var id = router.getNewTrackID();
             var url = 'http://www.youtube.com/watch?v=' + youtubeID;
-            var trackObject = new search.searchResult(url, url, youtubeID, "ytv", "img/youtube.png", author, title, duration, "video");
+            var trackObject = new SearchResult(url, url, youtubeID, "ytv", "img/youtube.png", author, title, duration, "video");
             //var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
             deferred.resolve($.extend({}, params, {
                 tracks: [trackObject]
@@ -718,11 +721,13 @@ Router.prototype = {
         }
         return result;
     },
-    // Diego Perini's URL regex
-    // https://gist.github.com/729294
     verifyURL: function(url) {
-        return typeof url == "string" && /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i.test(url);
-    }
+    	if (typeof url != 'string') {
+    		return false;
+    	}
+    	var parsed = urlParser.parse(url);
+    	return (parsed && parsed.href);
+        }
 };
 
 module.exports = {

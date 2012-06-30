@@ -1,7 +1,10 @@
-var $ 		= require('jquery-deferred'),
-	request = require('request'),
-	db		= require('./db'),
-	cacher	= require('node-dummy-cache');
+var $ 			= require('jquery-deferred'),
+	request 	= require('request'),
+	db			= require('./db'),
+	cacher		= require('node-dummy-cache'),
+	mediaRouter	= require('./router').getRouter(),
+	url			= require('url'),
+	SearchResult= require('./searchresult').SeachResult;
 	
 var dbConnectionPool 	= db.getConnectionPool(),
 	searchResultsCache	= cacher.create(cacher.ONE_SECOND * 30, cacher.ONE_SECOND * 10);
@@ -24,32 +27,6 @@ var getIntersection = function(arr1, arr2) {
 
 var getSeparatedWords = function(query) {
 	return query.replace(/[^\w\s]|_/g, ' ').toLowerCase().split(' ');
-};
-
-function SearchResult(url, permalink, siteMediaID, siteCode, icon, author, mediaName, duration, type, plays, favorites) {
-	this.url = url;
-	this.permalink = permalink;
-	this.siteMediaID = siteMediaID;
-	this.siteCode = siteCode;
-	this.icon = icon;
-	this.author = author;
-	this.mediaName = mediaName;
-	this.duration = duration;
-	this.type = type;
-	if (undefined != plays) {
-		this.plays = plays;
-	}
-	if (undefined != favorites) {
-		this.favorites = favorites;
-	}
-}
-
-SearchResult.prototype = {
-	calculateRelevance: function() {
-    	var lambdaPlays = 0.70;
-    	var lambdaFavorites = 0.30;
-    	this.relevance = (lambdaPlays * this.playRelevance + lambdaFavorites * this.favoriteRelevance) * this.querySimilarity;	
-	}
 };
 
 function SearchManager () {
@@ -78,7 +55,7 @@ SearchManager.prototype = {
 	saveSearchResults: function(searchResults) {
 		var result, i;
 		
-		if (searchResults.length) {
+		if (searchResults && searchResults.length) {
 			dbConnectionPool.acquire(function(acquireError, connection) {
 				if (!acquireError) {
 					var queryString = ["INSERT INTO KnownMedia (site, mediaid) VALUES "];
@@ -109,13 +86,19 @@ SearchManager.prototype = {
 		var cacheKey = {query: query, page: page, site: site};
 		var cachedResults = searchResultsCache.get(cacheKey);
 		if (!cachedResults) {
-			switch(site) {
-				case 'sct':
-					deferred = this.searchSoundCloudTracks(query, page);
-					break;
-				case 'ytv':
-					deferred = this.searchYouTubeVideos(query, page);
-					break;
+			var parsedURL = url.parse(query);
+			if (parsedURL && parsedURL.href) {
+				deferred = mediaRouter.addResource(query);
+			}
+			else {
+				switch(site) {
+					case 'sct':
+						deferred = this.searchSoundCloudTracks(query, page);
+						break;
+					case 'ytv':
+						deferred = this.searchYouTubeVideos(query, page);
+						break;
+				}
 			}
 		}
 		else {
