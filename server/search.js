@@ -1,10 +1,10 @@
-var $ 			= require('jquery-deferred'),
+var SearchResult = require('./searchresult').SearchResult,
+	$ 			= require('jquery-deferred'),
 	request 	= require('request'),
 	db			= require('./db'),
 	cacher		= require('node-dummy-cache'),
-	mediaRouter	= require('./router').getRouter(),
-	url			= require('url'),
-	SearchResult= require('./searchresult').SeachResult;
+	//mediaRouter	= require('./router').getRouter(),
+	url			= require('url');
 	
 var dbConnectionPool 	= db.getConnectionPool(),
 	searchResultsCache	= cacher.create(cacher.ONE_SECOND * 30, cacher.ONE_SECOND * 10);
@@ -87,7 +87,7 @@ SearchManager.prototype = {
 		var cachedResults = searchResultsCache.get(cacheKey);
 		if (!cachedResults) {
 			var parsedURL = url.parse(query);
-			if (parsedURL && parsedURL.href) {
+			if (parsedURL && parsedURL.href && parsedURL.href.indexOf('http') >= 0) {
 				deferred = mediaRouter.addResource(query);
 			}
 			else {
@@ -188,7 +188,7 @@ SearchManager.prototype = {
 				}
 			}
 			catch(err) {
-				console.log("Error reading SoundCloud results");
+				console.log("Error reading SoundCloud results: " + err);
 			}
 			deferred.resolve(results);
 		});
@@ -228,7 +228,7 @@ SearchManager.prototype = {
 		            var duration = parseInt(entry.media$group.yt$duration.seconds);
 		            var viewCount = entry['yt$statistics']['viewCount'];
 		            var favoriteCount = entry['yt$statistics']['favoriteCount'];
-					var searchResult = new SearchResult(permalink, permalink, id, "ytv", "img/youtube.png", author, title, duration, "video", viewCount, favoriteCount);
+		            var searchResult = new SearchResult(permalink, permalink, id, "ytv", "img/youtube.png", author, title, duration, "video", viewCount, favoriteCount);
 					var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
 					var intersection = getIntersection(words, resultWords);
 					searchResult.querySimilarity = intersection.length / words.length;
@@ -238,7 +238,7 @@ SearchManager.prototype = {
 				}
 			}
 			catch(err) {
-				console.log("Error reading YouTube results");
+				console.log("Error reading YouTube results: " + err);
 			}
 			deferred.resolve(results);
 		});
