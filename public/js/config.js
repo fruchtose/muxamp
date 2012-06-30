@@ -1,4 +1,4 @@
-soundManager.flashVersion = 9;
-soundManager.url = 'swf/';
-soundManager.useFlaskBlock = false;
 soundManager.debugMode = false;
+soundManager.flashVersion = 9;
+soundManager.preferFlash = false;
+soundManager.url = 'swf/';

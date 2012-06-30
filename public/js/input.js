@@ -70,8 +70,12 @@ var fetchTracksFromString = function(str) {
     	}
     });
 }
+var loaded = false;
 
 var loadFunction = function() {
+	if (loaded) {
+		return;
+	}
     //var urlParams = getURLParams(window.location.hash, true);
     //var inputCount = urlParams.length;
 	var loc = getWindowLocation();
@@ -87,11 +91,19 @@ var loadFunction = function() {
         });
     }
     else {
-        $.unblockUI();
+        $.unblockUI({
+        
+        });
     }
+    loaded = true;
 };
 
 $(document).ready(function() {
+	if ($.browser.mobile === true) {
+		$.blockUI({message: "Sorry, Muxamp currently does not support mobile browsers. :("});
+		return;
+	}
     $.blockUI();
     soundManager.onready(loadFunction);
+    soundManager.ontimeout(loadFunction);
 });
