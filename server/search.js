@@ -159,7 +159,9 @@ SearchManager.prototype = {
 			}
 			else {
 				results = cachedResults;
-				searchResultsCache.put(cacheKey, results);
+				if (results.length) {
+					searchResultsCache.put(cacheKey, results);
+				}
 			}
 			return results;
 		},
