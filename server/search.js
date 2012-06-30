@@ -3,7 +3,7 @@ var SearchResult = require('./searchresult').SearchResult,
 	request 	= require('request'),
 	db			= require('./db'),
 	cacher		= require('node-dummy-cache'),
-	//mediaRouter	= require('./router').getRouter(),
+	mediaRouter	= require('./router').getRouter(),
 	url			= require('url');
 	
 var dbConnectionPool 	= db.getConnectionPool(),
