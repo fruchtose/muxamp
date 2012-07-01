@@ -103,6 +103,7 @@ var getPlaylistString = function(id) {
 					result.resolve(rows[0]["playliststring"]);
 				}
 				else {
+					console.log(queryError);
 					result.reject(false);
 				}
 			}
@@ -135,6 +136,7 @@ var savePlaylist = function(playlistString) {
 					result.resolve(rows.insertId);
 				}
 				else {
+					console.log(queryError);
 					result.reject();
 				}
 				dbConnectionPool.release(connection);

@@ -17,7 +17,7 @@ module.exports = {
 			destroy: function(connection) {
 				connection.end();
 			},
-			max: 5
+			max: 1
 		});
 		return (function() {
 			return pool;
