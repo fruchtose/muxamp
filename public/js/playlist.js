@@ -466,6 +466,7 @@ Playlist.prototype = {
     	idGetter.done(function(id) {
     		playlist.isChangingState = true;
     		History.pushState({id: id, current: playlist.currentTrack}, "Muxamp", id);
+    		gaq.push(['_trackPageview', '/' + id]);
     		playlist.isChangingState = false;
     	});
     },
