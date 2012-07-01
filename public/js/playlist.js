@@ -470,6 +470,8 @@ Playlist.prototype = {
     			_gaq.push(['_trackPageview', '/' + id]);
     		}
     		playlist.isChangingState = false;
+    	}).fail(function() {
+    		History.pushState({id: null, current: null}, "Muxamp", "/");
     	});
     },
     shuffle: function() {

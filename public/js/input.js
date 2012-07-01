@@ -51,7 +51,7 @@ var fetchTracksFromString = function(str) {
     	data: {query: str}
     }).done(function(data) {
     	if (!data.id) {
-    		History.pushState({id: null, current: null}, "Muxamp", "");
+    		History.pushState({id: null, current: null}, "Muxamp", "/");
     	}
     	var searchResults = data.results;
     	if (searchResults.length) {

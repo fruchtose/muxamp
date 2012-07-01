@@ -21,7 +21,6 @@ app.get(/^\/([1-9][0-9]*)?$/, function(req, res) {
 
 app.get('/search\/:site/:page([0-9]+)/:query?', function(req, res) {
 	var site = req.params.site, page = req.params.page, query = req.params.query;
-	console.log('Request for search results.');
 	query = decodeURIComponent(query || "");
 	search.search(query, page, site).done(function(results) {
 		res.json(results);

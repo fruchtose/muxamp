@@ -103,7 +103,9 @@ var getPlaylistString = function(id) {
 					result.resolve(rows[0]["playliststring"]);
 				}
 				else {
-					console.log(queryError);
+					if (queryError) {
+						console.log(queryError);
+					}
 					result.reject(false);
 				}
 			}
