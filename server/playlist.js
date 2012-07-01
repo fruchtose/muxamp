@@ -130,7 +130,7 @@ var savePlaylist = function(playlistString) {
 			var sha256 = crypto.createHash('sha256');
 			sha256.update(playlistString, 'utf8');
 			var hash = sha256.digest('hex');
-			var queryString = "INSERT IGNORE INTO Playlists SET ?";
+			var queryString = "INSERT INTO Playlists SET ? ON DUPLICATE KEY UPDATE id=id";
 			connection.query(queryString, {sha256: hash, playliststring: playlistString}, function(queryError, rows) {
 				if (!queryError) {
 					result.resolve(rows.insertId);

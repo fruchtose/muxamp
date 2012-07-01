@@ -29,10 +29,8 @@ function Playlist(soundManager) {
     this.currentVolumePercent = 50; // Start at 50% so users can increase/decrease volume if they want to
     this.isChangingState = false,
     this.list = [];
-    this.locationUpdatesWaiting = 0;
     this.playlistDOM = new PlaylistDOMInformation();
     this.settings = {
-    	updateLocationOnAdd: true
     };
     this.soundManager = soundManager;
     this.totalDuration = 0; // Duration in seconds
@@ -122,9 +120,7 @@ Playlist.prototype = {
             var mediaObject = mediaObjects[i];
             addedDuration += mediaObject.getDuration();
         }
-        if (this.getSetting('updateLocationOnAdd')) {
-        	this.setWindowLocation();
-        }
+        this.setWindowLocation();
         if ($.isNumeric(currentTrack)) {
             this.setCurrentTrack(currentTrack);
         }
@@ -403,7 +399,6 @@ Playlist.prototype = {
             $('.playing').removeClass('playing');
             var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
             $(rowDOM).addClass('playing');
-            this.setWindowLocation();
         }
     },
     setMute: function(mute) {
@@ -429,9 +424,7 @@ Playlist.prototype = {
 	        var mediaObject = mediaObjects[i];
 	        addedDuration += mediaObject.getDuration();
 	    }
-	    if (this.getSetting('updateLocationOnAdd')) {
-	    	this.setWindowLocation();
-	    }
+	    this.setWindowLocation();
 	    this.setCurrentTrack(currentTrack || 0);
 	    $('#track-count').text(this.list.length.toString());
 	    this.totalDuration = addedDuration;
@@ -469,26 +462,12 @@ Playlist.prototype = {
     },
     setWindowLocation: function() {
     	var playlist = this, currentHash = this.getHash();
-    	var updateID = function() {
-    		var idGetter = playlist.getID();
-	    	idGetter.done(function(id) {
-	    		playlist.isChangingState = true;
-	    		History.pushState({id: id, current: playlist.currentTrack}, "Muxamp", id);
-	    		playlist.isChangingState = false;
-	    		this.locationUpdatesWaiting--;
-	    	});
-    	};
-    	var waitToUpdate = 0;
-    	if (this.locationUpdatesWaiting > 0) {
-    		waitToUpdate = 450;
-    	}
-    	setTimeout(function() {
-    		var nowHash = playlist.getHash();
-    		if (currentHash == nowHash) {
-    			updateID();
-	    	}
-    	}, waitToUpdate);
-    	this.locationUpdatesWaiting++;
+    	var idGetter = playlist.getID();
+    	idGetter.done(function(id) {
+    		playlist.isChangingState = true;
+    		History.pushState({id: id, current: playlist.currentTrack}, "Muxamp", id);
+    		playlist.isChangingState = false;
+    	});
     },
     shuffle: function() {
         if (this.isEmpty()) {
@@ -511,21 +490,10 @@ Playlist.prototype = {
             return array;
         }
         
-        var newList = this.list.slice(0);
+        var newList = this.list.slice(0), i;
         newList = arrayShuffle(newList);
         // Rewrites the DOM for the new playlist
-        this.totalDuration = 0;
-        $(this.playlistDOM.parentTable).html('');
-        this.list = [];
-        this.addTracks(newList, newCurrentTrack);
-        this.setWindowLocation();
-        for (i in newList) {
-            if (this.list[i].siteMediaID == currentSiteMediaID) {
-                this.setCurrentTrack(parseInt(i));
-                break;
-            }
-        }
-        
+        this.setTracks(newList, newCurrentTrack);
     },
     stop: function () {
         if (!this.isEmpty()) {

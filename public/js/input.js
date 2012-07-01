@@ -50,9 +50,8 @@ var fetchTracksFromString = function(str) {
     	type: 'POST',
     	data: {query: str}
     }).done(function(data) {
-    	var id = null, address = "";
     	if (!data.id) {
-    		History.pushState({id: null, current: null}, "Muxamp", "/");
+    		History.pushState({id: null, current: null}, "Muxamp", "");
     	}
     	var searchResults = data.results;
     	if (searchResults.length) {
@@ -81,12 +80,6 @@ var loadFunction = function() {
 		return;
 	}
 	isLoading = true;
-	History.Adapter.bind(window, 'statechange', function() {
-    	var state = History.getState();
-    	fetchTracksFromString(state.data.id.toString());
-    });
-    //var urlParams = getURLParams(window.location.hash, true);
-    //var inputCount = urlParams.length;
 	var loc = getWindowLocation();
     if (loc.length) {
         playlist.setSetting({
@@ -112,6 +105,10 @@ $(document).ready(function() {
 		return;
 	}
     $.blockUI();
+    History.Adapter.bind(window, 'statechange', function() {
+    	var state = History.getState();
+    	fetchTracksFromString(state.data.id);
+    });
     soundManager.onready(loadFunction);
     soundManager.ontimeout(loadFunction);
 });
