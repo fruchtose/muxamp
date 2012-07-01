@@ -27,6 +27,7 @@ var PlaylistDOMInformation = function() {
 function Playlist(soundManager) {
     this.currentTrack = 0;
     this.currentVolumePercent = 50; // Start at 50% so users can increase/decrease volume if they want to
+    this.isChangingState = false,
     this.list = [];
     this.locationUpdatesWaiting = 0;
     this.playlistDOM = new PlaylistDOMInformation();
@@ -402,6 +403,7 @@ Playlist.prototype = {
             $('.playing').removeClass('playing');
             var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
             $(rowDOM).addClass('playing');
+            this.setWindowLocation();
         }
     },
     setMute: function(mute) {
@@ -414,6 +416,28 @@ Playlist.prototype = {
     },
     setSetting: function(option, value) {
     	this.settings[option] = value;
+    },
+    setTracks: function(mediaObjects, currentTrack) {
+    	if ( !(mediaObjects instanceof Array) ) {
+	        mediaObjects = [mediaObjects];
+	    }
+	    var addedDuration = 0;
+	    this.list = mediaObjects;
+	    $(this.playlistDOM.allRowsInTable).remove();
+	    this._addPlaylistDOMRows(mediaObjects, 0);
+	    for (var i in mediaObjects) {
+	        var mediaObject = mediaObjects[i];
+	        addedDuration += mediaObject.getDuration();
+	    }
+	    if (this.getSetting('updateLocationOnAdd')) {
+	    	this.setWindowLocation();
+	    }
+	    this.setCurrentTrack(currentTrack || 0);
+	    $('#track-count').text(this.list.length.toString());
+	    this.totalDuration = addedDuration;
+	    $('#playlist-duration').text(secondsToString(this.totalDuration));
+	    $(this.playlistDOM.parentTable).sortable('refresh');
+	    this.updateTrackEnumeration();
     },
     setVolume: function(intPercent) {
         intPercent = Math.round(intPercent);
@@ -448,7 +472,9 @@ Playlist.prototype = {
     	var updateID = function() {
     		var idGetter = playlist.getID();
 	    	idGetter.done(function(id) {
-	    		History.pushState({id: id}, "Muxamp", id);
+	    		playlist.isChangingState = true;
+	    		History.pushState({id: id, current: playlist.currentTrack}, "Muxamp", id);
+	    		playlist.isChangingState = false;
 	    		this.locationUpdatesWaiting--;
 	    	});
     	};

@@ -41,14 +41,18 @@ var getMediaObject = function(searchResult) {
 
 var fetchTracksFromString = function(str) {
 	var queryLink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'fetchplaylist';
-    return $.ajax({
+    if (playlist.isChangingState) {
+    	return;
+    }
+	return $.ajax({
     	url: queryLink,
     	dataType: 'json',
     	type: 'POST',
     	data: {query: str}
     }).done(function(data) {
+    	var id = null, address = "";
     	if (!data.id) {
-    		History.pushState({id: null}, "Muxamp", "");
+    		History.pushState({id: null, current: null}, "Muxamp", "/");
     	}
     	var searchResults = data.results;
     	if (searchResults.length) {
@@ -60,7 +64,7 @@ var fetchTracksFromString = function(str) {
     			}
     		}
     		if (mediaObjects.length) {
-    			playlist.addTracks(mediaObjects);
+    			playlist.setTracks(mediaObjects, History.getState().data['current']);
     		}
     		else {
     			alertError("Unable to load playlist", "The tracks you want to load " +
@@ -70,12 +74,17 @@ var fetchTracksFromString = function(str) {
     	}
     });
 }
-var loaded = false;
+var isLoading = false;
 
 var loadFunction = function() {
-	if (loaded) {
+	if (isLoading) {
 		return;
 	}
+	isLoading = true;
+	History.Adapter.bind(window, 'statechange', function() {
+    	var state = History.getState();
+    	fetchTracksFromString(state.data.id.toString());
+    });
     //var urlParams = getURLParams(window.location.hash, true);
     //var inputCount = urlParams.length;
 	var loc = getWindowLocation();
@@ -88,14 +97,13 @@ var loadFunction = function() {
                 updateLocationOnAdd: true
             });
         	$.unblockUI();
+        	isLoading = false;
         });
     }
     else {
-        $.unblockUI({
-        
-        });
+        $.unblockUI();
+        isLoading = false;
     }
-    loaded = true;
 };
 
 $(document).ready(function() {
