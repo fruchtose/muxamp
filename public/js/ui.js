@@ -96,6 +96,9 @@ var siteCodeFromSiteName = function(site) {
         case "SoundCloud (Tracks)":
             result = "sct";
             break;
+        case "URL":
+        	result = "url";
+        	break;
     }
     return result;
 }
