@@ -31,6 +31,7 @@ var getSeparatedWords = function(query) {
 
 function SearchManager () {
 	this.resultCount = 25;
+	this.retryCount = 2;
 	this.soundcloudKey = "2f9bebd6bcd85fa5acb916b14aeef9a4";
 	this.soundcloudSearchURI = "http://api.soundcloud.com/tracks.json?client_id=" + this.soundcloudKey + "&limit=" + this.resultCount + "&filter=streamable&order=hotness";
 	this.youtubeSearchURI = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=" + this.resultCount + "&orderby=relevance&alt=json";
@@ -157,10 +158,17 @@ SearchManager.prototype = {
 			return [];
 		});
 	},
-	searchSoundCloudTracks: function(query, page) {
+	searchSoundCloudTracks: function(query, page, attempt) {
+		if (attempt == undefined || attempt == null) {
+			attempt = 0;
+		}
 		var soundcloudConsumerKey = '2f9bebd6bcd85fa5acb916b14aeef9a4';
 		var searchManager = this;
 		var deferred = $.Deferred();
+		if (attempt >= this.retryCount) {
+			deferred.resolve([]);
+			return deferred.promise();
+		}
 		var words = getSeparatedWords(query);
 		request({
 			json: true,
@@ -193,15 +201,25 @@ SearchManager.prototype = {
 				}
 			}
 			catch(err) {
-				console.log("Error reading SoundCloud results: " + err);
+				console.log("Error reading SoundCloud results (attempt " + attempt + "): " + err);
+				deferred.resolve([]);
+				attempt++;
+				return searchManager.searchSoundCloudTracks(query, page, attempt);
 			}
 			deferred.resolve(results);
 		});
 		return deferred.promise();
 	},
-	searchYouTubeVideos: function(query, page) {
+	searchYouTubeVideos: function(query, page, attempt) {
+		if (attempt == undefined || attempt == null) {
+			attempt = 0;
+		}
 		var searchManager = this;
 		var deferred = $.Deferred();
+		if (attempt >= this.retryCount) {
+			deferred.resolve([]);
+			return deferred.promise();
+		}
 		var words = getSeparatedWords(query);
 		request({
 			json: true,
@@ -243,7 +261,10 @@ SearchManager.prototype = {
 				}
 			}
 			catch(err) {
-				console.log("Error reading YouTube results: " + err);
+				console.log("Error reading YouTube results (attempt " + attempt + "): " + err);
+				deferred.resolve([]);
+				attempt++;
+				return searchManager.searchYouTubeVideos(query, page, attempt);
 			}
 			deferred.resolve(results);
 		});
