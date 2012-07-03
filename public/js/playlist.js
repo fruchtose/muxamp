@@ -120,13 +120,13 @@ Playlist.prototype = {
             var mediaObject = mediaObjects[i];
             addedDuration += mediaObject.getDuration();
         }
-        this.setWindowLocation();
         if ($.isNumeric(currentTrack)) {
             this.setCurrentTrack(currentTrack);
         }
         else {
             this.setCurrentTrack(this.currentTrack);
         }
+        this.setWindowLocation();
         $('#track-count').text(this.list.length.toString());
         this.totalDuration += addedDuration;
         $('#playlist-duration').text(secondsToString(this.totalDuration));
@@ -142,8 +142,8 @@ Playlist.prototype = {
             }
             this.list = [];
             $(this.playlistDOM.allRowsInTable).remove();
-            this.setWindowLocation();
             this.setCurrentTrack(0);
+            this.setWindowLocation();
             this.setPlayButton(this.isEmpty());
             $('#track-count').text(this.list.length.toString());
             this.totalDuration = 0;
@@ -364,10 +364,10 @@ Playlist.prototype = {
             
             $($(this.playlistDOM.allRowsInTable).get(index)).remove();
             this.renumberTracks(Math.max(0, Math.min(this.list.length - 1, index)));
-            this.setWindowLocation();
             if (index == this.currentTrack) {
                 this.setCurrentTrack(Math.min(this.list.length - 1, index));
             }
+            this.setWindowLocation();
             if (!this.isEmpty() && wasPlaying) {
                 this.play();
             }
@@ -399,6 +399,7 @@ Playlist.prototype = {
             $('.playing').removeClass('playing');
             var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
             $(rowDOM).addClass('playing');
+            this.updateState('current', this.currentTrack);
         }
     },
     setMute: function(mute) {
@@ -424,8 +425,8 @@ Playlist.prototype = {
 	        var mediaObject = mediaObjects[i];
 	        addedDuration += mediaObject.getDuration();
 	    }
-	    this.setWindowLocation();
 	    this.setCurrentTrack(currentTrack || 0);
+	    this.setWindowLocation();
 	    $('#track-count').text(this.list.length.toString());
 	    this.totalDuration = addedDuration;
 	    $('#playlist-duration').text(secondsToString(this.totalDuration));
@@ -539,6 +540,14 @@ Playlist.prototype = {
         else if (!$("#multiple-tracks").text().length) {
         	$("#multiple-tracks").text("s");
         }
+    },
+    updateState: function(key, value) {
+    	var currentState = History.getState();
+    	var currentData = currentState.data || {};
+    	currentData[key] = value;
+    	var title = currentState.title;
+    	var url = currentState.url;
+    	History.replaceState(currentData, title, url);
     }
 };
 var playlist = new Playlist(soundManager);
