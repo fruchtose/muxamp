@@ -542,12 +542,18 @@ Playlist.prototype = {
         }
     },
     updateState: function(key, value) {
+    	this.isChangingState = true;
     	var currentState = History.getState();
-    	var currentData = currentState.data || {};
+    	var currentData = currentState.data;
+    	if (!currentData['id']) {
+    		this.isChangingState = false;
+    		return;
+    	}
     	currentData[key] = value;
     	var title = currentState.title;
     	var url = currentState.url;
     	History.replaceState(currentData, title, url);
+    	this.isChangingState = false;
     }
 };
 var playlist = new Playlist(soundManager);
