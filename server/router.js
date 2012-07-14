@@ -1,7 +1,8 @@
-var SearchResult = require('./searchresult').SearchResult;
-var $ = require('./jquery.whenall');
-var request = require('request');
-var urlParser = require('url');
+var SearchResult = require('./searchresult').SearchResult,
+	_ = require('underscore')._;
+	$ = require('./jquery.whenall'),
+	request = require('request'),
+	urlParser = require('url');
 
 function KeyValuePair(key, value) {
     this.key = key;
@@ -17,10 +18,10 @@ var hashTableToFlatList = function(table) {
     var hash;
     for (hash in table) {
         var list = table[hash];
-        if (list && $.isArray(list)) {
+        if (list && _.isArray(list)) {
             list = hashTableToFlatList(list);
         }
-        if ($.isArray(list)) {
+        if (_.isArray(list)) {
             flatList = flatList.concat(list);
         }
         else flatList.push(list);
@@ -372,7 +373,7 @@ Router.prototype = {
             
             var entries = $.grep(data.data.children, function(element) {
                 var link = element.data.url;
-                return $.isFunction(router.testResource(link, ["Reddit"]));
+                return _.isFunction(router.testResource(link, ["Reddit"]));
             });
             var multiLevelTracks = new MultilevelTable();
             var deferredArray = [];
@@ -695,7 +696,7 @@ Router.prototype = {
         this.opts[option] = value;
     },
     testResource: function(input, exclusions) {
-        if (exclusions != null && exclusions != undefined && !$.isArray(exclusions)) {
+        if (exclusions != null && exclusions != undefined && !_.isArray(exclusions)) {
             exclusions = [exclusions];
         }
         var result = null, possibleRoutes = [], i, j;
