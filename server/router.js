@@ -15,22 +15,6 @@ KeyValuePair.prototype.toString = function() {
     return "(" + this.key.toString() + "=" + this.value.toString() + ")";
 }
 
-var hashTableToFlatList = function(table) {
-    var flatList = [];
-    var hash;
-    for (hash in table) {
-        var list = table[hash];
-        if (list && _.isArray(list)) {
-            list = hashTableToFlatList(list);
-        }
-        if (_.isArray(list)) {
-            flatList = flatList.concat(list);
-        }
-        else flatList.push(list);
-    }
-    return flatList;
-};
-
 // 
 // // Original code by Andy E of Stack Overflow
 // http://stackoverflow.com/a/7676115/959934
@@ -106,7 +90,7 @@ MultilevelTable.prototype = {
     },
     getFlatTable: function() {
         if (this.dirty) {
-            this.flat = hashTableToFlatList(this.table);
+            this.flat = _.flatten(this.table);
             this.dirty = false;
         }
         return this.flat;
