@@ -1,29 +1,14 @@
-var SearchResult = require('./searchresult').SearchResult,
-	$ 			= require('jquery-deferred'),
-	request 	= require('request'),
-	db			= require('./db'),
-	cacher		= require('node-dummy-cache'),
-	mediaRouter	= require('./router').getRouter(),
-	url			= require('url');
+var SearchResult	= require('./searchresult').SearchResult,
+	_				= require('underscore')._,
+	$ 				= require('jquery-deferred'),
+	request 		= require('request'),
+	db				= require('./db'),
+	cacher			= require('node-dummy-cache'),
+	mediaRouter		= require('./router').getRouter(),
+	url				= require('url');
 	
 var dbConnectionPool 	= db.getConnectionPool(),
 	searchResultsCache	= cacher.create(cacher.ONE_SECOND * 30, cacher.ONE_SECOND * 10);
-
-// Thanks to Jeffrey To http://www.falsepositives.com/index.php/2009/12/01/javascript-function-to-get-the-intersect-of-2-arrays/
-var getIntersection = function(arr1, arr2) {
-    var r = [], o = {}, l = arr2.length, i, v;
-    for (i = 0; i < l; i++) {
-        o[arr2[i]] = true;
-    }
-    l = arr1.length;
-    for (i = 0; i < l; i++) {
-        v = arr1[i];
-        if (v in o) {
-            r.push(v);
-        }
-    }
-    return r;
-}
 
 var getSeparatedWords = function(query) {
 	return query.replace(/[^\w\s]|_/g, ' ').toLowerCase().split(' ');
@@ -193,7 +178,7 @@ SearchManager.prototype = {
 					}
 					var searchResult = new SearchResult(result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", "img/soundcloud_orange_white_16.png", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
 					var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
-					var intersection = getIntersection(words, resultWords);
+					var intersection = _.intersection(words, resultWords);
 					searchResult.querySimilarity = intersection.length / words.length;
 					searchManager.checkMaxPlays(searchResult.plays);
 					searchManager.checkMaxFavorites(searchResult.favorites);
@@ -253,7 +238,7 @@ SearchManager.prototype = {
 		            var favoriteCount = entry['yt$statistics']['favoriteCount'];
 		            var searchResult = new SearchResult(permalink, permalink, id, "ytv", "img/youtube.png", author, title, duration, "video", viewCount, favoriteCount);
 					var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
-					var intersection = getIntersection(words, resultWords);
+					var intersection = _.intersection(words, resultWords);
 					searchResult.querySimilarity = intersection.length / words.length;
 					searchManager.checkMaxPlays(searchResult.plays);
 					searchManager.checkMaxFavorites(searchResult.favorites);

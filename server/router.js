@@ -1,8 +1,10 @@
 var SearchResult = require('./searchresult').SearchResult,
-	_ = require('underscore')._;
+	_ = require('underscore')._
 	$ = require('./jquery.whenall'),
 	request = require('request'),
 	urlParser = require('url');
+	
+_.str = require('underscore.string');
 
 function KeyValuePair(key, value) {
     this.key = key;
@@ -118,7 +120,7 @@ function Router (soundcloudConsumerKey, youtubeKey) {
     var defaults = { 
     };
     
-    this.opts = $.extend({}, defaults);
+    this.opts = _.extend({}, defaults);
     this.actionQueue = [];
     this.soundcloudConsumerKey = soundcloudConsumerKey != "" ? soundcloudConsumerKey : "";
     this.youtubeKey = youtubeKey != null ? youtubeKey : "";
@@ -223,7 +225,7 @@ Router.prototype = {
         var deferredAction = $.Deferred();
         var isString = typeof url == "string";
         if (isString)
-            url = $.trim(url.toString());
+            url = _.str.trim(url.toString());
         var isURL = this.verifyURL(url);
         if (url) {
             if ((isString && this.verifyURL(url)) || url instanceof KeyValuePair) {
@@ -281,7 +283,7 @@ Router.prototype = {
     },
     processInternetLink: function(url, failure, deferred, params) {
         var router = this;
-        var deferredReject = $.extend({}, params, {
+        var deferredReject = _.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
         });
@@ -298,7 +300,7 @@ Router.prototype = {
             timeout: 5000,
             success: function(response) {
                 var links = response.results;
-                var actions =  $.map(links, function(element) {
+                var actions =  _.map(links, function(element) {
                     var func = router.testResource(element, ['Internet']);
                     if (func != null) {
                         return {
@@ -325,7 +327,7 @@ Router.prototype = {
                 
                 $.whenAll.apply(null, deferredActions).always(function() {
                     var tracks = multiLevelTracks.getFlatTable();
-                    deferred.resolve($.extend({}, params, {
+                    deferred.resolve(_.extend({}, params, {
                         tracks: tracks
                     }));
                 });
@@ -346,7 +348,7 @@ Router.prototype = {
             url = link;
         }
         var resolveURL = url + ".json?limit=25&jsonp=?";
-        var deferredReject = $.extend({}, params, {
+        var deferredReject = _.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
         });
@@ -371,7 +373,7 @@ Router.prototype = {
                 return;
             }
             
-            var entries = $.grep(data.data.children, function(element) {
+            var entries = _.find(data.data.children, function(element) {
                 var link = element.data.url;
                 return _.isFunction(router.testResource(link, ["Reddit"]));
             });
@@ -397,7 +399,7 @@ Router.prototype = {
             var tracks = [];
             $.whenAll.apply(null, deferredArray).always(function() {
                 tracks = multiLevelTracks.getFlatTable();
-                deferred.resolve($.extend({}, params, {
+                deferred.resolve(_.extend({}, params, {
                     tracks: tracks
                 }));
             });
@@ -417,7 +419,7 @@ Router.prototype = {
         if (playlistID instanceof KeyValuePair) {
             playlistID = playlistID.value;
         }
-        var deferredReject = $.extend({}, params, {
+        var deferredReject = _.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
         });
@@ -442,7 +444,7 @@ Router.prototype = {
                     }
                     $.whenAll.apply(null, tracksDeferred).always(function() {
                         tracks = multilevelTracks.getFlatTable();
-                        deferred.resolve($.extend({}, params, {
+                        deferred.resolve(_.extend({}, params, {
                             tracks: tracks
                         }));
                     });
@@ -477,7 +479,7 @@ Router.prototype = {
         if (trackID instanceof KeyValuePair) {
             trackID = trackID.value;
         }
-        var deferredReject = $.extend({}, params, {
+        var deferredReject = _.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
         });
@@ -493,7 +495,7 @@ Router.prototype = {
                     var id = router.getNewTrackID();
                     var trackObject = new SearchResult(data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.id, "sct", "img/soundcloud_orange_white_16.png",data.user.username, data.title, data.duration / 1000, "audio");
                     //var trackObject = new SoundCloudObject(id, data.id, data.stream_url + '?client_id=' + router.soundcloudConsumerKey, data.permalink_url, data.user.username, data.title, data.duration / 1000, router.soundManager);
-                    deferred.resolve($.extend({}, params, {
+                    deferred.resolve(_.extend({}, params, {
                         tracks: [trackObject]
                     }));
                 }
@@ -532,7 +534,7 @@ Router.prototype = {
         if (youtubeID instanceof KeyValuePair) {
             youtubeID = youtubeID.value;
         }
-        var deferredReject = $.extend({}, params, {
+        var deferredReject = _.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
         });
@@ -561,7 +563,7 @@ Router.prototype = {
             var url = 'http://www.youtube.com/watch?v=' + youtubeID;
             var trackObject = new SearchResult(url, url, youtubeID, "ytv", "img/youtube.png", author, title, duration, "video");
             //var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
-            deferred.resolve($.extend({}, params, {
+            deferred.resolve(_.extend({}, params, {
                 tracks: [trackObject]
             }));
         });
@@ -607,7 +609,7 @@ Router.prototype = {
         if (!params) {
             params = {};
         }
-        var deferredReject = $.extend({}, params, {
+        var deferredReject = _.extend({}, params, {
             success: false,
             error: "SoundCloud track could not be used."
         });
@@ -685,7 +687,7 @@ Router.prototype = {
         else {
             if (failure)
                 failure();
-            deferred.reject($.extend({}, params, {
+            deferred.reject(_.extend({}, params, {
                 success: false,
                 error: "YouTube video was not present in URL."
             }));
