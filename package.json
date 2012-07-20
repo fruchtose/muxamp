@@ -1,13 +1,13 @@
 {
   "name":"muxamp",
-  "node":"0.6.17",
+  "node":"0.8.1",
   "author":"Robert Fruchtman",
   "dependencies" : {
-    "location"        : "0.0.x",
-    "navigator"       : "1.0.x",
-    "contextify"      : "0.1.x",
-    "express"         : "2.5.x",
-    "jquery-deferred" : "0.2.x",
-    "request"         : "2.9.x"
+    "location"        : ">=0.0.0",
+    "navigator"       : ">=1.0.0",
+    "contextify"      : ">=0.1.0",
+    "express"         : ">=2.5.0",
+    "jquery-deferred" : ">=0.2.0",
+    "request"         : ">=2.9.0"
   }
 }
