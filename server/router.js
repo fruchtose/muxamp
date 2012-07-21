@@ -446,7 +446,7 @@ Router.prototype = {
                 json: true
             };
             request(options, function(error, response, body) {
-            	if (error) {
+            	if (error || response.statusCode != 200) {
             		errorFunction();
             		return;
             	}
@@ -496,7 +496,7 @@ Router.prototype = {
                 json: true
             };
             request(options, function(error, response, body) {
-            	if (error) {
+            	if (error || response.statusCode != 200) {
             		errorFunction();
             		return;
             	}
@@ -534,22 +534,29 @@ Router.prototype = {
             strictSSL: false
         };
         request(options, function(error, response, body) {
-        	if (error) {
+        	if (error || response.statusCode != 200) {
         		errorFunction();
         		return;
         	}
-        	var entry = body.entry;
-            var authorObj = entry.author[0];
-            var author = authorObj.name.$t;
-            var title = entry.title.$t;
-            var duration = parseInt(entry.media$group.yt$duration.seconds);
-            var id = router.getNewTrackID();
-            var url = 'http://www.youtube.com/watch?v=' + youtubeID;
-            var trackObject = new SearchResult(url, url, youtubeID, "ytv", "img/youtube.png", author, title, duration, "video");
-            //var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
-            deferred.resolve(_.extend({}, params, {
-                tracks: [trackObject]
-            }));
+        	try {
+	        	var entry = body.entry;
+	            var authorObj = entry.author[0];
+	            var author = authorObj.name.$t;
+	            var title = entry.title.$t;
+	            var duration = parseInt(entry.media$group.yt$duration.seconds);
+	            var id = router.getNewTrackID();
+	            var url = 'http://www.youtube.com/watch?v=' + youtubeID;
+	            var trackObject = new SearchResult(url, url, youtubeID, "ytv", "img/youtube.png", author, title, duration, "video");
+	            //var trackObject = new YouTubeObject(id, youtubeID, author, title, duration);
+	            deferred.resolve(_.extend({}, params, {
+	                tracks: [trackObject]
+	            }));
+            }
+        	catch(e) {
+        		deferred.resolve(_.extend({}, params, {
+	                tracks: []
+	            }));
+        	}
         });
         return deferred.promise();
     },
@@ -607,7 +614,7 @@ Router.prototype = {
     		json: true
         };
         request(requestOptions, function(error, response, body) {
-        	if (error) {
+        	if (error || response.statusCode != 200) {
         		errorFunction();
         		return;
         	}
