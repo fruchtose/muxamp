@@ -72,16 +72,30 @@ SearchManager.prototype = {
 		var cacheKey = {query: query, page: page, site: site};
 		var cachedResults = searchResultsCache.get(cacheKey);
 		if (!cachedResults) {
+			var isURL = false;
+			var parsedURL = url.parse(query);
+			if (parsedURL && parsedURL.href && parsedURL.href.indexOf('http') >= 0) {
+				isURL = true;
+			}
 			switch(site) {
 				case 'sct':
-					deferred = this.searchSoundCloudTracks(query, page);
+					if (isURL) {
+						deferred = mediaRouter.addResource(query, false, ['YouTube', 'Internet']);
+					}
+					else {
+						deferred = this.searchSoundCloudTracks(query, page);
+					}
 					break;
 				case 'ytv':
-					deferred = this.searchYouTubeVideos(query, page);
+					if (isURL) {
+						deferred = mediaRouter.addResource(query, false, ['SoundCloud', 'Internet']);
+					}
+					else {
+						deferred = this.searchYouTubeVideos(query, page);
+					}
 					break;
 				case 'url':
-					var parsedURL = url.parse(query);
-					if (parsedURL && parsedURL.href && parsedURL.href.indexOf('http') >= 0) {
+					if (isURL) {
 						deferred = mediaRouter.addResource(query);
 					}
 					else {
