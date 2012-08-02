@@ -134,7 +134,6 @@ $(document).ready(function() {
 				iphone: true,
 				msie7: true,
 				msie8: true,
-				msie9: true,
 				opera7: true,
 				safari1: true,
 				safari2: true,
