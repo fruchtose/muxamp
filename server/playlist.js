@@ -6,6 +6,16 @@ var dbConnectionPool	= require('./db').getConnectionPool(),
 	
 var playlistCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
 
+var setTimeoutReject = function(deferred, time) {
+	time = time || 30000; // default timeout is 30 ms
+	setTimeout(function() {
+		if (deferred.state() == 'pending') {
+			deferred.reject("Timeout after " + time + " ms");
+		}
+		console.log("Timing out promise");
+	}, time);
+}
+
 var verifyPlaylist = function(playlistString) {
 	var result = $.Deferred(), i, pair;
 	if (!playlistString.length) {
@@ -56,6 +66,7 @@ var getPlaylistID = function(playlistString) {
 	}
 	else {
 		dbConnectionPool.acquire(function(acquireError, connection) {
+			//console.log(acquireError);
 			if (acquireError) {
 				result.reject();
 				dbConnectionPool.release(connection);
@@ -90,6 +101,7 @@ var getPlaylistID = function(playlistString) {
 var getPlaylistString = function(id) {
 	var result = $.Deferred();
 	dbConnectionPool.acquire(function(acquireError, connection) {
+		console.log(acquireError);
 		if (acquireError) {
 			result.reject();
 			dbConnectionPool.release(connection);
