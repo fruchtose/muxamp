@@ -1,7 +1,10 @@
-var express = require('express'), app = express.createServer(
-	express.static(__dirname + '/public'),
-	express.bodyParser()
-);
+var express = require('express'), app = express();
+
+app.configure(function() {
+	app.use(express.static(__dirname + '/public/'));
+	app.use(express.bodyParser());
+});
+
 var search = require('./server/search').search();
 var mediaRouterBase = require('./server/router');
 var mediaRouter = mediaRouterBase.getRouter();
@@ -9,14 +12,13 @@ var url = require('url');
 var $ = require('./server/jquery.whenall');
 var playlist = require('./server/playlist');
 var fs = require('fs');
-var util = require('util');
 var cacher = require('node-dummy-cache');
 var playlistFetchCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
 
 app.get(/^\/([1-9][0-9]*)?$/, function(req, res) {
 	var file = __dirname + '/public/playlist.html';
 	var readStream = fs.createReadStream(file);
-	util.pump(readStream, res);
+	readStream.pipe(res);
 });
 
 app.get('/search\/:site/:page([0-9]+)/:query?', function(req, res) {
