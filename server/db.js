@@ -9,15 +9,12 @@ module.exports = {
 				name: 'mysql',
 				create: function(callback) {
 					var connection = mysql.createConnection({
-						debug: true,
 						host: process.env['muxamphost'],
 						database: process.env['muxampdb'],
 						user: process.env['muxampuser'],
 						password: process.env['muxamppassword']
 					});
 					connection.connect(function(err) {
-						console.log("Error?");
-						console.log(err);
 						callback(err, connection);
 					});
 				},
