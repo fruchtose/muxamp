@@ -20,6 +20,9 @@ function SearchManager () {
 	this.soundcloudKey = "2f9bebd6bcd85fa5acb916b14aeef9a4";
 	this.soundcloudSearchURI = "http://api.soundcloud.com/tracks.json?client_id=" + this.soundcloudKey + "&limit=" + this.resultCount + "&filter=streamable&order=hotness";
 	this.youtubeSearchURI = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=" + this.resultCount + "&orderby=relevance&alt=json";
+	this.youtubeCheckedProperties = [
+	'author', 'title', 'yt$statistics', 'media$group'
+	];
 	this.reset();
 }
 
@@ -239,31 +242,40 @@ SearchManager.prototype = {
 			if (!videos) {
 				return results;
 			}
-			try {
-				for (i in videos) {
-					var entry = videos[i];
-					var id = entry['id']['$t'].split(':').pop();
-					var permalink = 'http://www.youtube.com/watch?v=' + id;
-					var authorObj = entry.author[0];
-		            var author = authorObj.name.$t;
-					var title = entry.title.$t;
-		            var duration = parseInt(entry.media$group.yt$duration.seconds);
-		            var viewCount = entry['yt$statistics']['viewCount'];
-		            var favoriteCount = entry['yt$statistics']['favoriteCount'];
-		            var searchResult = new SearchResult(permalink, permalink, id, "ytv", "img/youtube.png", author, title, duration, "video", viewCount, favoriteCount);
-					var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
-					var intersection = _.intersection(words, resultWords);
-					searchResult.querySimilarity = intersection.length / words.length;
-					searchManager.checkMaxPlays(searchResult.plays);
-					searchManager.checkMaxFavorites(searchResult.favorites);
-					results.push(searchResult);
+			var validEntry, prop;
+			for (i in videos) {
+				var entry = videos[i];
+				validEntry = true;
+				for (var propNum in searchManager.youtubeCheckedProperties) {
+					prop = searchManager.youtubeCheckedProperties[propNum];
+					if (!entry[prop]) {
+						validEntry = false;
+						var tryID = 'null';
+						if (entry && entry['id'] && entry['id']['$t']) {
+							tryID = entry['id']['$t'].split(':').pop();
+						}
+						console.log("YouTube entry " + tryID + ' has no property ' + prop);
+					}
 				}
-			}
-			catch(err) {
-				console.log("Error reading YouTube results (attempt " + attempt + "): " + err);
-				deferred.resolve([]);
-				attempt++;
-				return searchManager.searchYouTubeVideos(query, page, attempt);
+				if (!validEntry) {
+					continue;
+				}
+				var id = entry['id']['$t'].split(':').pop();
+				var permalink = 'http://www.youtube.com/watch?v=' + id;
+				var authorObj = entry.author[0];
+	            var author = authorObj.name.$t;
+				var title = entry.title.$t;
+	            var duration = parseInt(entry.media$group.yt$duration.seconds);
+	            var viewCount = entry['yt$statistics']['viewCount'];
+	            var favoriteCount = entry['yt$statistics']['favoriteCount'];
+	            
+	            var searchResult = new SearchResult(permalink, permalink, id, "ytv", "img/youtube.png", author, title, duration, "video", viewCount, favoriteCount);
+				var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
+				var intersection = _.intersection(words, resultWords);
+				searchResult.querySimilarity = intersection.length / words.length;
+				searchManager.checkMaxPlays(searchResult.plays);
+				searchManager.checkMaxFavorites(searchResult.favorites);
+				results.push(searchResult);
 			}
 			deferred.resolve(results);
 		});
