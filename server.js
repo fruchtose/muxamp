@@ -77,7 +77,7 @@ app.post('/fetchid', function(req, res) {
 		}
 		else {
 			savedID = doesExist;
-		}
+			}
 		$.whenAll.apply(null, responses).always(function() {
 			res.json({id: savedID});
 		});

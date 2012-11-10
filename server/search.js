@@ -14,14 +14,24 @@ var getSeparatedWords = function(query) {
 	return query.replace(/[^\w\s]|_/g, ' ').toLowerCase().split(' ');
 };
 
+var allPropertiesExist = function(object, expected) {
+	return _.all(expected, function (element) {
+		var value = object[element];
+		return !(value == null || value == undefined);
+	});
+}
+
 function SearchManager () {
 	this.resultCount = 25;
 	this.retryCount = 2;
+	this.soundcloudCheckedProperties = [
+		'stream_url', 'permalink_url'
+	];
 	this.soundcloudKey = "2f9bebd6bcd85fa5acb916b14aeef9a4";
 	this.soundcloudSearchURI = "http://api.soundcloud.com/tracks.json?client_id=" + this.soundcloudKey + "&limit=" + this.resultCount + "&filter=streamable&order=hotness";
 	this.youtubeSearchURI = "https://gdata.youtube.com/feeds/api/videos?v=2&format=5&max-results=" + this.resultCount + "&orderby=relevance&alt=json";
 	this.youtubeCheckedProperties = [
-	'author', 'title', 'yt$statistics', 'media$group'
+		'author', 'title', 'yt$statistics', 'media$group'
 	];
 	this.reset();
 }
@@ -119,6 +129,9 @@ SearchManager.prototype = {
 			if (!cachedResults) {
 				var i;
 				for (i in results) {
+					// If negative plays, searches list for next instance of positive plays
+					// and punishes the result by giving it the number of plays of whatever 
+					// track meets the criteria
 					if (results[i].plays < 0) {
 						var newPlays = 0, newFavorites = 0, j;
 						for (j = -1 * results[i].plays; j < results.length; j++) {
@@ -183,30 +196,27 @@ SearchManager.prototype = {
 				return;
 			}
 			var i, results = [];
-			try {
-				for (i in body) {
-					var result = body[i];
-					if (undefined == result.playback_count) {
-	                			result.playback_count = -1 * parseInt(i) - 1;
-	                			result.favoritings_count = -1 * parseInt(i) - 1;
+			for (i in body) {
+				var tryID, result = body[i], validEntry = allPropertiesExist(result, searchManager.soundcloudCheckedProperties);
+				if (!validEntry) {
+					tryID = 'unknown';
+					if (result && result.id) {
+						tryID = result.id;
 					}
-					if (undefined == result.stream_url) {
-						continue;
-					}
-					var searchResult = new SearchResult(result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", "img/soundcloud_orange_white_16.png", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
-					var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
-					var intersection = _.intersection(words, resultWords);
-					searchResult.querySimilarity = intersection.length / words.length;
-					searchManager.checkMaxPlays(searchResult.plays);
-					searchManager.checkMaxFavorites(searchResult.favorites);
-					results.push(searchResult);
+					console.log("SoundCloud entry " + tryID + ' is missing an essential property');
+					continue;
 				}
-			}
-			catch(err) {
-				console.log("Error reading SoundCloud results (attempt " + attempt + "): " + err);
-				deferred.resolve([]);
-				attempt++;
-				return searchManager.searchSoundCloudTracks(query, page, attempt);
+				if (undefined == result.playback_count) {
+                			result.playback_count = -1 * parseInt(i) - 1;
+                			result.favoritings_count = -1 * parseInt(i) - 1;
+				}
+				var searchResult = new SearchResult(result.stream_url + "?client_id=" + soundcloudConsumerKey, result.permalink_url, result.id, "sct", "img/soundcloud_orange_white_16.png", result.user.username, result.title, result.duration / 1000, "audio", result.playback_count, result.favoritings_count);
+				var resultWords = getSeparatedWords(searchResult.author + ' ' + searchResult.mediaName);
+				var intersection = _.intersection(words, resultWords);
+				searchResult.querySimilarity = intersection.length / words.length;
+				searchManager.checkMaxPlays(searchResult.plays);
+				searchManager.checkMaxFavorites(searchResult.favorites);
+				results.push(searchResult);
 			}
 			deferred.resolve(results);
 		});
@@ -242,22 +252,16 @@ SearchManager.prototype = {
 			if (!videos) {
 				return results;
 			}
-			var validEntry, prop;
+			var validEntry, prop, tryID;
 			for (i in videos) {
 				var entry = videos[i];
-				validEntry = true;
-				for (var propNum in searchManager.youtubeCheckedProperties) {
-					prop = searchManager.youtubeCheckedProperties[propNum];
-					if (!entry[prop]) {
-						validEntry = false;
-						var tryID = 'null';
-						if (entry && entry['id'] && entry['id']['$t']) {
-							tryID = entry['id']['$t'].split(':').pop();
-						}
-						console.log("YouTube entry " + tryID + ' has no property ' + prop);
-					}
-				}
+				validEntry = allPropertiesExist(entry, searchManager.youtubeCheckedProperties);
 				if (!validEntry) {
+					tryID = 'unknown';
+					if (entry && entry['id'] && entry['id']['$t']) {
+						tryID = entry['id']['$t'].split(':').pop();
+					}
+					console.log("YouTube entry " + tryID + ' is missing an essential property');
 					continue;
 				}
 				var id = entry['id']['$t'].split(':').pop();
