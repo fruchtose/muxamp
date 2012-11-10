@@ -66,7 +66,6 @@ var getPlaylistID = function(playlistString) {
 	}
 	else {
 		dbConnectionPool.acquire(function(acquireError, connection) {
-			//console.log(acquireError);
 			if (acquireError) {
 				result.reject();
 				dbConnectionPool.release(connection);
@@ -101,7 +100,6 @@ var getPlaylistID = function(playlistString) {
 var getPlaylistString = function(id) {
 	var result = $.Deferred();
 	dbConnectionPool.acquire(function(acquireError, connection) {
-		console.log(acquireError);
 		if (acquireError) {
 			result.reject();
 			dbConnectionPool.release(connection);
@@ -109,7 +107,6 @@ var getPlaylistString = function(id) {
 		}
 		var queryString = "SELECT playliststring FROM Playlists WHERE id=?;";
 		connection.query(queryString, [id], function(queryError, rows) {
-			
 			if (!queryError && rows) {
 				if (rows[0]) {
 					result.resolve(rows[0]["playliststring"]);
