@@ -23,7 +23,6 @@ var allPropertiesExist = function(object, expected) {
 
 function SearchManager () {
 	this.resultCount = 25;
-	this.retryCount = 2;
 	this.soundcloudCheckedProperties = [
 		'stream_url', 'permalink_url'
 	];
@@ -173,17 +172,10 @@ SearchManager.prototype = {
 			return [];
 		});
 	},
-	searchSoundCloudTracks: function(query, page, attempt) {
-		if (attempt == undefined || attempt == null) {
-			attempt = 0;
-		}
+	searchSoundCloudTracks: function(query, page) {
 		var soundcloudConsumerKey = '2f9bebd6bcd85fa5acb916b14aeef9a4';
 		var searchManager = this;
 		var deferred = $.Deferred();
-		if (attempt >= this.retryCount) {
-			deferred.resolve([]);
-			return deferred.promise();
-		}
 		var words = getSeparatedWords(query);
 		request({
 			json: true,
@@ -221,17 +213,10 @@ SearchManager.prototype = {
 			deferred.resolve(results);
 		});
 		return deferred.promise();
-	},
-	searchYouTubeVideos: function(query, page, attempt) {
-		if (attempt == undefined || attempt == null) {
-			attempt = 0;
-		}
+	},	
+	searchYouTubeVideos: function(query, page) {	
 		var searchManager = this;
 		var deferred = $.Deferred();
-		if (attempt >= this.retryCount) {
-			deferred.resolve([]);
-			return deferred.promise();
-		}
 		var words = getSeparatedWords(query);
 		request({
 			json: true,
