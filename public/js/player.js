@@ -1,20 +1,23 @@
 var MediaObject = new JS.Class({
-    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, icon, artist, mediaName, type) {
+    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, icon, uploader, mediaName, type) {
         this.id = id.toString() != "" ? id.toString() : "";
         this.siteMediaID = siteMediaID != "" ? siteMediaID.toString() : "";
         this.siteCode = siteCode != "" ? siteCode.toString() : "";
         this.icon = icon != "" ? icon.toString() : "";
         this.permalink = permalink != "" ? permalink : "";
         this.url = url;
-        this.artist = artist != "" ? artist : "";
+        this.uploader = uploader != "" ? uploader : "";
         this.siteName = siteName != "" ? siteName : "";
         this.mediaName = mediaName != "" ? mediaName : "";
         this.type = type != "" ? type : "";
+    },
+    get: function(property) {
+        return this[property];
     }
 });
 
 var SoundObject = new JS.Class(MediaObject, {
-    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, soundManager, artist, soundName, duration) {
+    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, soundManager, uploader, soundName, duration) {
         this.soundManager = (soundManager != undefined && soundManager != null) ? soundManager : null;
         this.duration = duration;
         this.sound = soundManager.createSound({
@@ -24,15 +27,11 @@ var SoundObject = new JS.Class(MediaObject, {
         if (this.sound == false) {
             alert("Unable to play sound.");
         }
-        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, "img/soundcloud_orange_white_16.png", artist, soundName, "audio");
+        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, "img/soundcloud_orange_white_16.png", uploader, soundName, "audio");
     },
     
     destruct: function() {
         return this.sound.destruct();
-    },
-    
-    getDuration: function() {
-        return this.duration;
     },
     
     isMuted: function() {
@@ -87,14 +86,14 @@ var SoundObject = new JS.Class(MediaObject, {
 });
 
 var SoundCloudObject = new JS.Class(SoundObject, {
-    initialize: function(id, trackID, url, permalink, artist, title, duration, soundManager) {
-        this.callSuper("SoundCloud", url, permalink, id, trackID, 'sct',soundManager, artist, title, duration);
+    initialize: function(id, trackID, url, permalink, uploader, title, duration, soundManager) {
+        this.callSuper("SoundCloud", url, permalink, id, trackID, 'sct',soundManager, uploader, title, duration);
     }
 });
 
 var VideoObject = new JS.Class(MediaObject, {
-    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, icon, artist, videoName, duration) {
-        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, icon, artist, videoName, "video");
+    initialize: function(siteName, url, permalink, id, siteMediaID, siteCode, icon, uploader, videoName, duration) {
+        this.callSuper(siteName, url, permalink, id, siteMediaID, siteCode, icon, uploader, videoName, "video");
         this.duration = duration;
     }
 });
@@ -104,6 +103,7 @@ var YouTubeObject = new JS.Class(VideoObject, {
         var permalink = 'http://www.youtube.com/watch?v=' + youtubeID;
         this.callSuper("YouTube", permalink, permalink, id, youtubeID, 'ytv', "img/youtube.png", uploader, title, duration);
         this.playState = 0;
+        this.interval = 0;
     },
    
     destruct: function() {

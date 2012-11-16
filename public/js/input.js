@@ -29,7 +29,17 @@ var getMediaObject = function(searchResult) {
 	    var id = counter();
 	    switch (searchResult.siteCode) {
 	        case 'sct':
-	            mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, searchResult.author, searchResult.mediaName, searchResult.duration, soundManager);
+	        	mediaObject = new SoundCloudTrack({
+	        		id: id,
+	        		siteMediaID: searchResult.siteMediaID,
+	        		url: searchResult.url,
+	        		permalink: searchResult.permalink,
+	        		artist: searchResult.author,
+	        		mediaName: searchResult.mediaName,
+	        		duration: searchResult.duration,
+	        		soundManager: soundManager
+	        	});
+	            //mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, searchResult.author, searchResult.mediaName, searchResult.duration, soundManager);
 	            break;
 	        case 'ytv':
 	            mediaObject = new YouTubeObject(id, searchResult.siteMediaID, searchResult.author, searchResult.mediaName, searchResult.duration);

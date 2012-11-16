@@ -41,7 +41,7 @@ Playlist.prototype = {
         var obj = this;
         var appendedHTML = this._getDOMRowForMediaObject(mediaObject, index);
         $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
-        var id = mediaObject.id;
+        var id = mediaObject.get('id');
         $(this.playlistDOM.getActionForID(id, 'remove')).live('click', function() {
             obj.removeTrack(id);
         });
@@ -69,40 +69,33 @@ Playlist.prototype = {
             $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
         }
         for (index in mediaObjects){
-        	var row = $(this.playlistDOM.getRowForID(mediaObjects[index].id));
+        	var row = $(this.playlistDOM.getRowForID(mediaObjects[index].get('id')));
             row.find(this.playlistDOM.trackName).width(row.find(this.playlistDOM.content).width() - row.find(this.playlistDOM.trackDurationBox).width());
         	row.dblclick(function() {
                 playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
             });
-            $(this.playlistDOM.getActionForID(mediaObjects[index].id, 'remove')).live('click', function() {
+            $(this.playlistDOM.getActionForID(mediaObjects[index].get('id'), 'remove')).live('click', function() {
                 playlist.removeTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index());
             });
-            $(this.playlistDOM.getActionForID(mediaObjects[index].id, 'play')).live('click', function() {
+            $(this.playlistDOM.getActionForID(mediaObjects[index].get('id'), 'play')).live('click', function() {
                 playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
             });
         }
     },
     _getDOMRowForMediaObject: function(mediaObject, index) {
-        return '<tr class=' + mediaObject.id + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</tr>';
+        return '<tr class=' + mediaObject.get('id') + '>' + this._getDOMTableCellsForMediaObject(mediaObject, index) + '</tr>';
     },
     _getDOMTableCellsForMediaObject: function(mediaObject, index) {
     	var remove = '<a href onclick="return false;" class="btn action remove"><i class="icon-remove""></i></a>';
     	var play = '<a href onclick="return false;" class="btn action play"><i class="icon-play"></i></a>';
     	var actions = '<div class="actions">' + remove + play + '</div>';
     	var actionsCell = '<td class="action-cell">' + actions + '</td>';
-    	var uploader = '<td class="uploader-cell" ' + getAttribute('title', mediaObject.artist) + '>' + mediaObject.artist + '</td>';
-    	var title = '<td class="title-cell" ' + getAttribute('title', mediaObject.mediaName) + '>' + mediaObject.mediaName + '</td>';
-    	var seconds = secondsToString(mediaObject.duration);
+    	var uploader = '<td class="uploader-cell" ' + getAttribute('title', mediaObject.get('uploader')) + '>' + mediaObject.get('uploader') + '</td>';
+    	var title = '<td class="title-cell" ' + getAttribute('title', mediaObject.get('mediaName')) + '>' + mediaObject.get('mediaName') + '</td>';
+    	var seconds = secondsToString(mediaObject.get('duration'));
     	var duration = '<td class="duration-cell" ' + getAttribute('title', seconds) + '>' + seconds + '</td>';
-    	var link = '<td class="link-cell"><a href="' + mediaObject.permalink + '"><img src="' + mediaObject.icon + '" /></a></td>';
+    	var link = '<td class="link-cell"><a href="' + mediaObject.get('permalink') + '"><img src="' + mediaObject.get('icon') + '" /></a></td>';
     	return actionsCell + uploader + title + duration + link;
-    	//var remove = '<a href onclick="return false;" class="action remove close">&times;</a>';
-    	/*var remove = '<a href onclick="return false;" class="btn action remove"><i class="icon-remove""></i></a>';
-    	var extLink = '<a href="' + mediaObject.permalink +'" target="_blank"><img src="' + mediaObject.icon + '"/></a>';
-        var links = '<div class="thin-button link">' + extLink + '</div>';
-        var left = '<div class ="left">' + links + '</div>';
-        var trackInfo = '<div class="track"><div class="name">' + mediaObject.mediaName + '</div>' + '<div class="dur-box">[<span class="duration">' + secondsToString(mediaObject.duration) + '</span>]</div></div>' + '<div class="artist">' + mediaObject.artist + '</div>';
-        return '<div class="actions">' + remove + '</div><div class=content>' + trackInfo + '</div>';*/
     },
     addTracks: function(mediaObjects, currentTrack, insertLocation) {
         if ( !(mediaObjects instanceof Array) ) {
@@ -118,7 +111,7 @@ Playlist.prototype = {
         this._addPlaylistDOMRows(mediaObjects, insertLocation);
         for (var i in mediaObjects) {
             var mediaObject = mediaObjects[i];
-            addedDuration += mediaObject.getDuration();
+            addedDuration += mediaObject.get('duration');
         }
         if ($.isNumeric(currentTrack)) {
             this.setCurrentTrack(currentTrack);
@@ -137,7 +130,7 @@ Playlist.prototype = {
         if (!this.isEmpty()) {
             this.stop();
             var media = this.list[this.currentTrack];
-            if (media.type == "video") {
+            if (media.get('type') == "video") {
                 clearVideo();
             }
             this.list = [];
@@ -179,11 +172,11 @@ Playlist.prototype = {
     getHash: function() {
         var newHash = '', slicedList = [];
         if (!this.isEmpty()) {
-            newHash = this.list[0].siteCode + '=' + this.list[0].siteMediaID;
+            newHash = this.list[0].get('siteCode') + '=' + this.list[0].get('siteMediaID');
             slicedList = this.list.slice(1);
         }
         for (var i in slicedList) {
-            newHash += '&' + slicedList[i].siteCode + '=' + slicedList[i].siteMediaID;
+            newHash += '&' + slicedList[i].get('siteCode') + '=' + slicedList[i].get('siteMediaID');
         }
         return newHash;
     },
@@ -197,7 +190,7 @@ Playlist.prototype = {
         var wasPlaying = this.isPlaying();
         this.stop();
         var media = this.list[this.currentTrack];
-        if (media.type == "video") {
+        if (media.get('type') == "video") {
             clearVideo();
         }
         this.setCurrentTrack(parseInt(index));
@@ -214,7 +207,7 @@ Playlist.prototype = {
     indexOfTrackID: function(trackID) {
         var pos = -1;
         for (track in this.list) {
-            if (this.list[track].id == trackID) {
+            if (this.list[track].get('id') == trackID) {
                 pos = track;
                 break;
             }
@@ -276,7 +269,7 @@ Playlist.prototype = {
         if (!this.isEmpty()) {
             var playlist = this;
             var media = this.list[this.currentTrack];
-            if (media.type == 'audio') {
+            if (media.get('type') == 'audio') {
                 media.play({
                     volume: (playlist.isMuted() ? 0 : playlist.currentVolumePercent),
                     onfinish: function() {
@@ -295,20 +288,20 @@ Playlist.prototype = {
                     }
                 });
             }
-            else if (media.type == 'video') {
-                if (media.siteName == 'YouTube') {
-                    if (media.interval != undefined) {
-                        window.clearInterval(media.interval);
+            else if (media.get('type') == 'video') {
+                if (media.get('siteName') == 'YouTube') {
+                    if (media.get('interval')) {
+                        window.clearInterval(media.get('interval'));
                     }
                     var clearMediaInterval = function() {
-                        if (media.interval != undefined) {
-                            window.clearInterval(media.interval);
+                        if (media.get('interval')) {
+                            window.clearInterval(media.get('interval'));
                         }
                     };
                     media.play({
                         showControls: false,
                         autoPlay: true,
-                        initialVideo: media.siteMediaID,
+                        initialVideo: media.get('siteMediaID'),
                         loadSWFObject: false,
                         width: $("#video").width(),
                         height: $("#video").height(),
@@ -318,14 +311,14 @@ Playlist.prototype = {
                         volume: playlist.isMuted() ? 0 : playlist.getVolume(),
                         onPlayerPlaying: function() {
                             playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
-                            media.interval = window.setInterval(function() {
+                            media.set('interval', window.setInterval(function() {
                                 var data = $("#video").tubeplayer('data');
                                 if (data && data.hasOwnProperty('currentTime') && data.hasOwnProperty('duration')) {
                                     var percent =  (data.currentTime / data.duration) * 100;
                                     timeElapsed.text(secondsToString(data.currentTime));
                                     updateTimebar(percent);
                                 }
-                            }, 333);
+                            }, 333));
                         },
                         onPlayerEnded: function() {
                             clearMediaInterval();
@@ -358,7 +351,7 @@ Playlist.prototype = {
                 this.stop();
             }
             
-            var trackDuration = this.list[index].getDuration();
+            var trackDuration = this.list[index].get('duration');
             this.list[index].destruct();
             this.list.splice(index, 1);
             
@@ -397,7 +390,7 @@ Playlist.prototype = {
         this.currentTrack = trackNumber;
         if (!this.isEmpty() && trackNumber >= 0 && trackNumber < this.list.length) {
             $('.playing').removeClass('playing');
-            var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].id);
+            var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].get('id'));
             $(rowDOM).addClass('playing');
             this.updateState('current', this.currentTrack);
         }
@@ -423,7 +416,7 @@ Playlist.prototype = {
 	    this._addPlaylistDOMRows(mediaObjects, 0);
 	    for (var i in mediaObjects) {
 	        var mediaObject = mediaObjects[i];
-	        addedDuration += mediaObject.getDuration();
+	        addedDuration += mediaObject.get('duration');
 	    }
 	    this.setCurrentTrack(currentTrack || 0);
 	    this.setWindowLocation();
@@ -482,7 +475,7 @@ Playlist.prototype = {
         
         // Fisher-Yates shuffle implementation by Cristoph (http://stackoverflow.com/users/48015/christoph),
         // some changes by me
-        var currentSiteMediaID = this.list[this.currentTrack].siteMediaID;
+        var currentSiteMediaID = this.list[this.currentTrack].get('siteMediaID');
         var newCurrentTrack = this.currentTrack, arrayShuffle = function(array) {
             var tmp, current, top = array.length;
 
