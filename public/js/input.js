@@ -34,7 +34,7 @@ var getMediaObject = function(searchResult) {
 	        		siteMediaID: searchResult.siteMediaID,
 	        		url: searchResult.url,
 	        		permalink: searchResult.permalink,
-	        		artist: searchResult.author,
+	        		uploader: searchResult.author,
 	        		mediaName: searchResult.mediaName,
 	        		duration: searchResult.duration,
 	        		soundManager: soundManager
@@ -42,7 +42,14 @@ var getMediaObject = function(searchResult) {
 	            //mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, searchResult.author, searchResult.mediaName, searchResult.duration, soundManager);
 	            break;
 	        case 'ytv':
-	            mediaObject = new YouTubeObject(id, searchResult.siteMediaID, searchResult.author, searchResult.mediaName, searchResult.duration);
+	        	mediaObject = new YouTubeTrack({
+	        		id: id,
+	        		siteMediaID: searchResult.siteMediaID,
+	        		uploader: searchResult.author,
+	        		mediaName: searchResult.mediaName,
+	        		duration: searchResult.duration,
+	        	});
+	            //mediaObject = new YouTubeObject(id, searchResult.siteMediaID, searchResult.author, searchResult.mediaName, searchResult.duration);
 	            break;
 	    }
     }
