@@ -57,15 +57,14 @@ var getMediaObject = function(searchResult) {
 };
 
 var fetchTracksFromString = function(str) {
-	var queryLink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'fetchplaylist';
+	var queryLink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'fetchplaylist?query=' + encodeURIComponent(str);
     if (playlist.isChangingState) {
     	return;
     }
 	return $.ajax({
     	url: queryLink,
     	dataType: 'json',
-    	type: 'POST',
-    	data: {query: str}
+    	type: 'GET',
     }).done(function(data) {
     	if (!data.id) {
     		History.pushState({id: null, current: null}, "Muxamp", "/");

@@ -29,8 +29,8 @@ app.get('/search\/:site/:page([0-9]+)/:query?', function(req, res) {
 	});
 });
 
-app.post('/fetchplaylist', function(req, res) {
-	var queryID = req.body.query;
+app.get('/fetchplaylist', function(req, res) {
+	var queryID = req.query.query;
 	var exists = playlist.getString(queryID);
 	var playlistString = false;
 	var responses = [exists], results = [];
