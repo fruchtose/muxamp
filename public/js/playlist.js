@@ -24,11 +24,11 @@ var PlaylistDOMInformation = function() {
     this.trackDurationBox = "div.dur-box";
 };
 
-function Playlist(soundManager) {
+function Playlist() {
     this.currentTrack = 0;
     this.currentVolumePercent = 50; // Start at 50% so users can increase/decrease volume if they want to
     this.isChangingState = false,
-    this.list = [];
+    this.models = [];
     this.playlistDOM = new PlaylistDOMInformation();
     this.settings = {};
     this.totalDuration = 0; // Duration in seconds
@@ -107,10 +107,10 @@ Playlist.prototype = {
         }
         var addedDuration = 0;
         if ($.isNumeric(insertLocation)) {
-            this.set("list", this.get("list").slice(0, insertLocation + 1).concat(mediaObjects).concat(this.get("list").slice(insertLocation + 1)));
+            this.models = this.models.slice(0, insertLocation + 1).concat(mediaObjects).concat(this.models.slice(insertLocation + 1));
         }
         else {
-            this.set("list", this.get("list").concat(mediaObjects));
+            this.models = this.models.concat(mediaObjects);
         }
         this._addPlaylistDOMRows(mediaObjects, insertLocation);
         for (var i in mediaObjects) {
@@ -124,7 +124,7 @@ Playlist.prototype = {
             this.setCurrentTrack(this.get("currentTrack"));
         }
         this.setWindowLocation();
-        $('#track-count').text(this.get("list").length.toString());
+        $('#track-count').text(this.models.length.toString());
         this.set("totalDuration", this.get("totalDuration") + addedDuration);
         $('#playlist-duration').text(secondsToString(this.get("totalDuration")));
         $(this.get("playlistDOM").parentTable).sortable('refresh');
@@ -133,16 +133,16 @@ Playlist.prototype = {
     clear: function() {
         if (!this.isEmpty()) {
             this.stop();
-            var media = this.get("list")[this.get("currentTrack")];
+            var media = this.models[this.get("currentTrack")];
             if (media.get('type') == "video") {
                 clearVideo();
             }
-            this.set("list", []);
+            this.models = [];
             $(this.get("playlistDOM").allRowsInTable).remove();
             this.setCurrentTrack(0);
             this.setWindowLocation();
             this.setPlayButton(this.isEmpty());
-            $('#track-count').text(this.get("list").length.toString());
+            $('#track-count').text(this.models.length.toString());
             this.set("totalDuration", 0);
             $('#playlist-duration').text(secondsToString(this.get("totalDuration")));
             this.updateTrackEnumeration();
@@ -176,8 +176,8 @@ Playlist.prototype = {
     getHash: function() {
         var newHash = '', slicedList = [];
         if (!this.isEmpty()) {
-            newHash = this.get("list")[0].get('siteCode') + '=' + this.get("list")[0].get('siteMediaID');
-            slicedList = this.get("list").slice(1);
+            newHash = this.models[0].get('siteCode') + '=' + this.models[0].get('siteMediaID');
+            slicedList = this.models.slice(1);
         }
         for (var i in slicedList) {
             newHash += '&' + slicedList[i].get('siteCode') + '=' + slicedList[i].get('siteMediaID');
@@ -193,7 +193,7 @@ Playlist.prototype = {
     goToTrack: function(index, autostart) {
         var wasPlaying = this.isPlaying();
         this.stop();
-        var media = this.get("list")[this.get("currentTrack")];
+        var media = this.models[this.get("currentTrack")];
         if (media.get('type') == "video") {
             clearVideo();
         }
@@ -203,13 +203,13 @@ Playlist.prototype = {
         }
     },
     hasNext: function() {
-        return !this.isEmpty() && this.get("list").length > this.get("currentTrack") + 1;
+        return !this.isEmpty() && this.models.length > this.get("currentTrack") + 1;
     },
     hasPrevious: function() {
         return !this.isEmpty() && this.get("currentTrack") - 1 >= 0;
     },
     indexOfTrackID: function(trackID) {
-        var pos = -1, tracks = this.get("list");
+        var pos = -1, tracks = this.models;
         for (track in tracks) {
             if (tracks[track].get('id') == trackID) {
                 pos = track;
@@ -219,19 +219,19 @@ Playlist.prototype = {
         return pos;
     },
     isEmpty: function() {
-        return this.get("list").length == 0;
+        return this.models.length == 0;
     },
     isMuted: function() {
         var result = false;
         if (!this.isEmpty()) {
-            result = this.get("list")[this.get("currentTrack")].isMuted();
+            result = this.models[this.get("currentTrack")].isMuted();
         }
         return result;
     },
     isPaused: function() {
         var status = false;
         if (!this.isEmpty()) {
-            status = this.get("list")[this.get("currentTrack")].isPaused();
+            status = this.models[this.get("currentTrack")].isPaused();
         }
         return status;
     },
@@ -239,15 +239,15 @@ Playlist.prototype = {
     isPlaying: function() {
         var status = false;
         if (!this.isEmpty()) {
-            status = this.get("list")[this.get("currentTrack")].isPlaying() || this.get("list")[this.get("currentTrack")].isPaused();
+            status = this.models[this.get("currentTrack")].isPlaying() || this.models[this.get("currentTrack")].isPaused();
         }
         return status;
     },
     moveTrack: function(originalIndex, newIndex) {
         if (!this.isEmpty() && originalIndex != newIndex) {
-            if (originalIndex >= 0 && newIndex >= 0 && originalIndex < this.get("list").length && newIndex < this.get("list").length) {
-                var mediaObject = this.get("list").splice(originalIndex, 1)[0];
-                this.get("list").splice(newIndex, 0, mediaObject);
+            if (originalIndex >= 0 && newIndex >= 0 && originalIndex < this.models.length && newIndex < this.models.length) {
+                var mediaObject = this.models.splice(originalIndex, 1)[0];
+                this.models.splice(newIndex, 0, mediaObject);
                 if (this.get("currentTrack") == originalIndex) {
                     this.setCurrentTrack(newIndex);
                 }
@@ -266,13 +266,13 @@ Playlist.prototype = {
         this.setWindowLocation();
     },
     nextTrack: function(autostart) {
-        var trackInt = parseInt(this.get("currentTrack")), next = trackInt + 1 >= this.get("list").length ? 0 : trackInt + 1;
+        var trackInt = parseInt(this.get("currentTrack")), next = trackInt + 1 >= this.models.length ? 0 : trackInt + 1;
         this.goToTrack(next, autostart);
     },
     play: function() {
         if (!this.isEmpty()) {
             var playlist = this;
-            var media = this.get("list")[this.get("currentTrack")];
+            var media = this.models[this.get("currentTrack")];
             if (media.get('type') == 'audio') {
                 media.play({
                     volume: (playlist.isMuted() ? 0 : playlist.get("currentVolumePercent")),
@@ -345,7 +345,7 @@ Playlist.prototype = {
         }
     },
     previousTrack: function(autostart) {
-        var trackInt = parseInt(this.get("currentTrack")), next = trackInt - 1 >= 0 ? trackInt - 1 : (this.isEmpty() ? 0 : this.get("list").length - 1);
+        var trackInt = parseInt(this.get("currentTrack")), next = trackInt - 1 >= 0 ? trackInt - 1 : (this.isEmpty() ? 0 : this.models.length - 1);
         this.goToTrack(next, autostart);
     },
     removeTrack: function(index) {
@@ -354,22 +354,22 @@ Playlist.prototype = {
             if (wasPlaying){
                 this.stop();
             }
-            var trackDuration = this.get("list")[index].get('duration');
-            this.get("list")[index].destruct();
-            this.get("list").splice(index, 1);
+            var trackDuration = this.models[index].get('duration');
+            this.models[index].destruct();
+            this.models.splice(index, 1);
             
             $($(this.get("playlistDOM").allRowsInTable).get(index)).remove();
             this.set("currentTrack", ($(".playing").index()));
-            this.renumberTracks(Math.max(0, Math.min(this.get("list").length - 1, index)));
+            this.renumberTracks(Math.max(0, Math.min(this.models.length - 1, index)));
             if (index == this.get("currentTrack")) {
-                this.setCurrentTrack(Math.min(this.get("list").length - 1, index));
+                this.setCurrentTrack(Math.min(this.models.length - 1, index));
             }
             this.setWindowLocation();
             if (!this.isEmpty() && wasPlaying) {
                 this.play();
             }
             this.setPlayButton(this.isEmpty());
-            $('#track-count').text(this.get("list").length.toString());
+            $('#track-count').text(this.models.length.toString());
             this.set("totalDuration", this.get("totalDuration") - trackDuration);
             $('#playlist-duration').text(secondsToString(this.get("totalDuration")));
             this.updateTrackEnumeration();
@@ -386,22 +386,22 @@ Playlist.prototype = {
     },
     seek: function(decimalPercent) {
         if (!this.isEmpty()) {
-            var track = this.get("list")[this.get("currentTrack")];
+            var track = this.models[this.get("currentTrack")];
             track.seek(decimalPercent);
         }
     },
     setCurrentTrack: function(trackNumber) {
         this.set("currentTrack", trackNumber);
-        if (!this.isEmpty() && trackNumber >= 0 && trackNumber < this.get("list").length) {
+        if (!this.isEmpty() && trackNumber >= 0 && trackNumber < this.models.length) {
             $('.playing').removeClass('playing');
-            var rowDOM = this.get("playlistDOM").getRowForID(this.get("list")[trackNumber].get('id'));
+            var rowDOM = this.get("playlistDOM").getRowForID(this.models[trackNumber].get('id'));
             $(rowDOM).addClass('playing');
             this.updateState('current', trackNumber);
         }
     },
     setMute: function(mute) {
         if (!this.isEmpty()) {
-            this.get("list")[this.get("currentTrack")].setMute(mute);
+            this.models[this.get("currentTrack")].setMute(mute);
         }
         if (!mute) {
             this.setVolume(this.get("currentVolumePercent"));
@@ -417,7 +417,7 @@ Playlist.prototype = {
 	        mediaObjects = [mediaObjects];
 	    }
 	    var addedDuration = 0;
-	    this.set("list", mediaObjects);
+	    this.models = mediaObjects;
 	    $(this.get("playlistDOM").allRowsInTable).remove();
 	    this._addPlaylistDOMRows(mediaObjects, 0);
 	    for (var i in mediaObjects) {
@@ -426,7 +426,7 @@ Playlist.prototype = {
 	    }
 	    this.setCurrentTrack(currentTrack || 0);
 	    this.setWindowLocation();
-	    $('#track-count').text(this.get("list").length.toString());
+	    $('#track-count').text(this.models.length.toString());
 	    this.set("totalDuration", addedDuration);
 	    $('#playlist-duration').text(secondsToString(this.get("totalDuration")));
 	    $(this.get("playlistDOM").parentTable).sortable('refresh');
@@ -435,7 +435,7 @@ Playlist.prototype = {
     setVolume: function(intPercent) {
         intPercent = Math.round(intPercent);
         if (this.isPlaying() || this.isPaused()) {
-            var media = this.get("list")[this.get("currentTrack")];
+            var media = this.models[this.get("currentTrack")];
             var setMute = intPercent == 0;
             media.setVolume(intPercent);
             if (setMute) {
@@ -479,7 +479,7 @@ Playlist.prototype = {
             return false;
         }
         // Fisher-Yates shuffle implementation by Cristoph (http://stackoverflow.com/users/48015/christoph),
-        var currentSiteMediaID = this.get("list")[this.get("currentTrack")].get('siteMediaID');
+        var currentSiteMediaID = this.models[this.get("currentTrack")].get('siteMediaID');
         var newCurrentTrack = this.get("currentTrack"), arrayShuffle = function(array) {
             var tmp, current, top = array.length;
 
@@ -498,14 +498,14 @@ Playlist.prototype = {
             return array;
         }
         
-        var newList = this.get("list").slice(0), i;
+        var newList = this.models.slice(0), i;
         newList = arrayShuffle(newList);
         // Rewrites the DOM for the new playlist
         this.setTracks(newList, newCurrentTrack);
     },
     stop: function () {
         if (!this.isEmpty()) {
-            this.get("list")[this.get("currentTrack")].stop();
+            this.models[this.get("currentTrack")].stop();
             timebar.width(0);
             $('#time-elapsed').text('0:00');
             this.setPlayButton(true);
@@ -513,8 +513,8 @@ Playlist.prototype = {
     },
     toggleMute: function() {
         if (!this.isEmpty()) {
-            var shouldUnmute = this.get("list")[this.get("currentTrack")].isMuted();
-            this.get("list")[this.get("currentTrack")].toggleMute();
+            var shouldUnmute = this.models[this.get("currentTrack")].isMuted();
+            this.models[this.get("currentTrack")].toggleMute();
             if (shouldUnmute) {
                 this.setVolume(this.get("currentVolumePercent"));
             }
@@ -525,7 +525,7 @@ Playlist.prototype = {
     },
     togglePause: function() {
         this.setPlayButton(!this.isPaused());
-        this.get("list")[this.get("currentTrack")].togglePause();
+        this.models[this.get("currentTrack")].togglePause();
     },
     setPlayButton: function(on) {
         if (on) {
@@ -536,7 +536,7 @@ Playlist.prototype = {
         }
     },
     updateTrackEnumeration: function() {
-        if (this.get("list").length == 1 && $("#multiple-tracks").text().length) {
+        if (this.models.length == 1 && $("#multiple-tracks").text().length) {
         	$("#multiple-tracks").empty();
         }
         else if (!$("#multiple-tracks").text().length) {
@@ -558,7 +558,7 @@ Playlist.prototype = {
     	this.set("isChangingState", false);
     }
 };
-var playlist = new Playlist(soundManager);
+var playlist = new Playlist();
 $(document).ready(function() {
     var startPos;
     $(playlist.get("playlistDOM").parentTable).sortable({
