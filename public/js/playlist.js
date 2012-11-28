@@ -30,19 +30,23 @@ function Playlist(soundManager) {
     this.isChangingState = false,
     this.list = [];
     this.playlistDOM = new PlaylistDOMInformation();
-    this.settings = {
-    };
-    this.soundManager = soundManager;
+    this.settings = {};
     this.totalDuration = 0; // Duration in seconds
 }
 
 Playlist.prototype = {
+    get: function(key) {
+        return this[key];
+    },
+    set: function(key, value) {
+        this[key] = value;
+    },
     _addPlaylistDOMRow: function(mediaObject, index) {
         var obj = this;
         var appendedHTML = this._getDOMRowForMediaObject(mediaObject, index);
-        $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
+        $(this.get("playlistDOM").lastElementOfParent).append(appendedHTML);
         var id = mediaObject.get('id');
-        $(this.playlistDOM.getActionForID(id, 'remove')).live('click', function() {
+        $(this.get("playlistDOM").getActionForID(id, 'remove')).live('click', function() {
             obj.removeTrack(id);
         });
     },
@@ -52,33 +56,33 @@ Playlist.prototype = {
             mediaObjects = [mediaObjects];
         }
         var playlist = this, appendedHTML = '';
-        var currentLength = $(this.playlistDOM.allRowsInTable).length;
+        var currentLength = $(this.get("playlistDOM").allRowsInTable).length;
         for (index in mediaObjects){
             var mediaObject = mediaObjects[index];
             appendedHTML += this._getDOMRowForMediaObject(mediaObject, currentLength + parseInt(index) + 1);
         }
         if ($.isNumeric(insertLocation)) {
-            if ($(this.playlistDOM.allRowsInTable).size()) {
-                $($(this.playlistDOM.allRowsInTable).get(insertLocation)).after(appendedHTML);
+            if ($(this.get("playlistDOM").allRowsInTable).size()) {
+                $($(this.get("playlistDOM").allRowsInTable).get(insertLocation)).after(appendedHTML);
             }
             else {
-                $(this.playlistDOM.parentTable).append(appendedHTML);
+                $(this.get("playlistDOM").parentTable).append(appendedHTML);
             }
         }
         else {
-            $(this.playlistDOM.lastElementOfParent).append(appendedHTML);
+            $(this.get("playlistDOM").lastElementOfParent).append(appendedHTML);
         }
         for (index in mediaObjects){
-        	var row = $(this.playlistDOM.getRowForID(mediaObjects[index].get('id')));
-            row.find(this.playlistDOM.trackName).width(row.find(this.playlistDOM.content).width() - row.find(this.playlistDOM.trackDurationBox).width());
+        	var row = $(this.get("playlistDOM").getRowForID(mediaObjects[index].get('id')));
+            row.find(this.get("playlistDOM").trackName).width(row.find(this.get("playlistDOM").content).width() - row.find(this.get("playlistDOM").trackDurationBox).width());
         	row.dblclick(function() {
-                playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
+                playlist.goToTrack($($(this).closest(playlist.get("playlistDOM").allRowsInTable)).index(), true);
             });
-            $(this.playlistDOM.getActionForID(mediaObjects[index].get('id'), 'remove')).live('click', function() {
-                playlist.removeTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index());
+            $(this.get("playlistDOM").getActionForID(mediaObjects[index].get('id'), 'remove')).live('click', function() {
+                playlist.removeTrack($($(this).closest(playlist.get("playlistDOM").allRowsInTable)).index());
             });
-            $(this.playlistDOM.getActionForID(mediaObjects[index].get('id'), 'play')).live('click', function() {
-                playlist.goToTrack($($(this).closest(playlist.playlistDOM.allRowsInTable)).index(), true);
+            $(this.get("playlistDOM").getActionForID(mediaObjects[index].get('id'), 'play')).live('click', function() {
+                playlist.goToTrack($($(this).closest(playlist.get("playlistDOM").allRowsInTable)).index(), true);
             });
         }
     },
@@ -103,10 +107,10 @@ Playlist.prototype = {
         }
         var addedDuration = 0;
         if ($.isNumeric(insertLocation)) {
-            this.list = this.list.slice(0, insertLocation + 1).concat(mediaObjects).concat(this.list.slice(insertLocation + 1));
+            this.set("list", this.get("list").slice(0, insertLocation + 1).concat(mediaObjects).concat(this.get("list").slice(insertLocation + 1)));
         }
         else {
-            this.list = this.list.concat(mediaObjects);
+            this.set("list", this.get("list").concat(mediaObjects));
         }
         this._addPlaylistDOMRows(mediaObjects, insertLocation);
         for (var i in mediaObjects) {
@@ -117,30 +121,30 @@ Playlist.prototype = {
             this.setCurrentTrack(currentTrack);
         }
         else {
-            this.setCurrentTrack(this.currentTrack);
+            this.setCurrentTrack(this.get("currentTrack"));
         }
         this.setWindowLocation();
-        $('#track-count').text(this.list.length.toString());
-        this.totalDuration += addedDuration;
-        $('#playlist-duration').text(secondsToString(this.totalDuration));
-        $(this.playlistDOM.parentTable).sortable('refresh');
+        $('#track-count').text(this.get("list").length.toString());
+        this.set("totalDuration", this.get("totalDuration") + addedDuration);
+        $('#playlist-duration').text(secondsToString(this.get("totalDuration")));
+        $(this.get("playlistDOM").parentTable).sortable('refresh');
         this.updateTrackEnumeration();
     },
     clear: function() {
         if (!this.isEmpty()) {
             this.stop();
-            var media = this.list[this.currentTrack];
+            var media = this.get("list")[this.get("currentTrack")];
             if (media.get('type') == "video") {
                 clearVideo();
             }
-            this.list = [];
-            $(this.playlistDOM.allRowsInTable).remove();
+            this.set("list", []);
+            $(this.get("playlistDOM").allRowsInTable).remove();
             this.setCurrentTrack(0);
             this.setWindowLocation();
             this.setPlayButton(this.isEmpty());
-            $('#track-count').text(this.list.length.toString());
-            this.totalDuration = 0;
-            $('#playlist-duration').text(secondsToString(this.totalDuration));
+            $('#track-count').text(this.get("list").length.toString());
+            this.set("totalDuration", 0);
+            $('#playlist-duration').text(secondsToString(this.get("totalDuration")));
             this.updateTrackEnumeration();
             
         }
@@ -172,8 +176,8 @@ Playlist.prototype = {
     getHash: function() {
         var newHash = '', slicedList = [];
         if (!this.isEmpty()) {
-            newHash = this.list[0].get('siteCode') + '=' + this.list[0].get('siteMediaID');
-            slicedList = this.list.slice(1);
+            newHash = this.get("list")[0].get('siteCode') + '=' + this.get("list")[0].get('siteMediaID');
+            slicedList = this.get("list").slice(1);
         }
         for (var i in slicedList) {
             newHash += '&' + slicedList[i].get('siteCode') + '=' + slicedList[i].get('siteMediaID');
@@ -181,15 +185,15 @@ Playlist.prototype = {
         return newHash;
     },
     getSetting: function(option) {
-    	return this.settings[option];
+    	return this.get("settings")[option];
     },
     getVolume: function() {
-        return this.currentVolumePercent;
+        return this.get("currentVolumePercent");
     },
     goToTrack: function(index, autostart) {
         var wasPlaying = this.isPlaying();
         this.stop();
-        var media = this.list[this.currentTrack];
+        var media = this.get("list")[this.get("currentTrack")];
         if (media.get('type') == "video") {
             clearVideo();
         }
@@ -199,15 +203,15 @@ Playlist.prototype = {
         }
     },
     hasNext: function() {
-        return !this.isEmpty() && this.list.length > this.currentTrack + 1;
+        return !this.isEmpty() && this.get("list").length > this.get("currentTrack") + 1;
     },
     hasPrevious: function() {
-        return !this.isEmpty() && this.currentTrack - 1 >= 0;
+        return !this.isEmpty() && this.get("currentTrack") - 1 >= 0;
     },
     indexOfTrackID: function(trackID) {
-        var pos = -1;
-        for (track in this.list) {
-            if (this.list[track].get('id') == trackID) {
+        var pos = -1, tracks = this.get("list");
+        for (track in tracks) {
+            if (tracks[track].get('id') == trackID) {
                 pos = track;
                 break;
             }
@@ -215,19 +219,19 @@ Playlist.prototype = {
         return pos;
     },
     isEmpty: function() {
-        return this.list.length == 0;
+        return this.get("list").length == 0;
     },
     isMuted: function() {
         var result = false;
         if (!this.isEmpty()) {
-            result = this.list[this.currentTrack].isMuted();
+            result = this.get("list")[this.get("currentTrack")].isMuted();
         }
         return result;
     },
     isPaused: function() {
         var status = false;
         if (!this.isEmpty()) {
-            status = this.list[this.currentTrack].isPaused();
+            status = this.get("list")[this.get("currentTrack")].isPaused();
         }
         return status;
     },
@@ -235,20 +239,20 @@ Playlist.prototype = {
     isPlaying: function() {
         var status = false;
         if (!this.isEmpty()) {
-            status = this.list[this.currentTrack].isPlaying() || this.list[this.currentTrack].isPaused();
+            status = this.get("list")[this.get("currentTrack")].isPlaying() || this.get("list")[this.get("currentTrack")].isPaused();
         }
         return status;
     },
     moveTrack: function(originalIndex, newIndex) {
         if (!this.isEmpty() && originalIndex != newIndex) {
-            if (originalIndex >= 0 && newIndex >= 0 && originalIndex < this.list.length && newIndex < this.list.length) {
-                var mediaObject = this.list.splice(originalIndex, 1)[0];
-                this.list.splice(newIndex, 0, mediaObject);
-                if (this.currentTrack == originalIndex) {
+            if (originalIndex >= 0 && newIndex >= 0 && originalIndex < this.get("list").length && newIndex < this.get("list").length) {
+                var mediaObject = this.get("list").splice(originalIndex, 1)[0];
+                this.get("list").splice(newIndex, 0, mediaObject);
+                if (this.get("currentTrack") == originalIndex) {
                     this.setCurrentTrack(newIndex);
                 }
                 else {
-                    this.setCurrentTrack(Math.max(0, $(this.playlistDOM.allRowsInTable +'.playing').index()));
+                    this.setCurrentTrack(Math.max(0, $(this.get("playlistDOM").allRowsInTable +'.playing').index()));
                 }
             
                 var minIndex = Math.min(originalIndex, newIndex);
@@ -262,16 +266,16 @@ Playlist.prototype = {
         this.setWindowLocation();
     },
     nextTrack: function(autostart) {
-        var trackInt = parseInt(this.currentTrack), next = trackInt + 1 >= this.list.length ? 0 : trackInt + 1;
+        var trackInt = parseInt(this.get("currentTrack")), next = trackInt + 1 >= this.get("list").length ? 0 : trackInt + 1;
         this.goToTrack(next, autostart);
     },
     play: function() {
         if (!this.isEmpty()) {
             var playlist = this;
-            var media = this.list[this.currentTrack];
+            var media = this.get("list")[this.get("currentTrack")];
             if (media.get('type') == 'audio') {
                 media.play({
-                    volume: (playlist.isMuted() ? 0 : playlist.currentVolumePercent),
+                    volume: (playlist.isMuted() ? 0 : playlist.get("currentVolumePercent")),
                     onfinish: function() {
                         playlist.nextTrack(true);
                     },
@@ -310,7 +314,7 @@ Playlist.prototype = {
                         onPlayerPaused: clearMediaInterval,
                         volume: playlist.isMuted() ? 0 : playlist.getVolume(),
                         onPlayerPlaying: function() {
-                            playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
+                            playlist.setVolume(playlist.isMuted() ? 0 : playlist.get("currentVolumePercent"));
                             media.set('interval', window.setInterval(function() {
                                 var data = $("#video").tubeplayer('data');
                                 if (data && data.hasOwnProperty('currentTime') && data.hasOwnProperty('duration')) {
@@ -341,39 +345,39 @@ Playlist.prototype = {
         }
     },
     previousTrack: function(autostart) {
-        var trackInt = parseInt(this.currentTrack), next = trackInt - 1 >= 0 ? trackInt - 1 : (this.isEmpty() ? 0 : this.list.length - 1);
+        var trackInt = parseInt(this.get("currentTrack")), next = trackInt - 1 >= 0 ? trackInt - 1 : (this.isEmpty() ? 0 : this.get("list").length - 1);
         this.goToTrack(next, autostart);
     },
     removeTrack: function(index) {
         if (index >= 0) {
-            var wasPlaying = this.isPlaying() && index == this.currentTrack;
+            var wasPlaying = this.isPlaying() && index == this.get("currentTrack");
             if (wasPlaying){
                 this.stop();
             }
+            var trackDuration = this.get("list")[index].get('duration');
+            this.get("list")[index].destruct();
+            this.get("list").splice(index, 1);
             
-            var trackDuration = this.list[index].get('duration');
-            this.list[index].destruct();
-            this.list.splice(index, 1);
-            
-            $($(this.playlistDOM.allRowsInTable).get(index)).remove();
-            this.renumberTracks(Math.max(0, Math.min(this.list.length - 1, index)));
-            if (index == this.currentTrack) {
-                this.setCurrentTrack(Math.min(this.list.length - 1, index));
+            $($(this.get("playlistDOM").allRowsInTable).get(index)).remove();
+            this.set("currentTrack", ($(".playing").index()));
+            this.renumberTracks(Math.max(0, Math.min(this.get("list").length - 1, index)));
+            if (index == this.get("currentTrack")) {
+                this.setCurrentTrack(Math.min(this.get("list").length - 1, index));
             }
             this.setWindowLocation();
             if (!this.isEmpty() && wasPlaying) {
                 this.play();
             }
             this.setPlayButton(this.isEmpty());
-            $('#track-count').text(this.list.length.toString());
-            this.totalDuration -= trackDuration;
-            $('#playlist-duration').text(secondsToString(this.totalDuration));
+            $('#track-count').text(this.get("list").length.toString());
+            this.set("totalDuration", this.get("totalDuration") - trackDuration);
+            $('#playlist-duration').text(secondsToString(this.get("totalDuration")));
             this.updateTrackEnumeration();
             
         }
     },
     renumberTracks: function(startingIndex) {
-        $(this.playlistDOM.allRowsInTable).filter(function(index) {
+        $(this.get("playlistDOM").allRowsInTable).filter(function(index) {
             return index >= startingIndex;
         }).each(function(index, element) {
             // Uses 1-indexed numbers for user
@@ -382,37 +386,39 @@ Playlist.prototype = {
     },
     seek: function(decimalPercent) {
         if (!this.isEmpty()) {
-            var track = this.list[this.currentTrack];
+            var track = this.get("list")[this.get("currentTrack")];
             track.seek(decimalPercent);
         }
     },
     setCurrentTrack: function(trackNumber) {
-        this.currentTrack = trackNumber;
-        if (!this.isEmpty() && trackNumber >= 0 && trackNumber < this.list.length) {
+        this.set("currentTrack", trackNumber);
+        if (!this.isEmpty() && trackNumber >= 0 && trackNumber < this.get("list").length) {
             $('.playing').removeClass('playing');
-            var rowDOM = this.playlistDOM.getRowForID(this.list[this.currentTrack].get('id'));
+            var rowDOM = this.get("playlistDOM").getRowForID(this.get("list")[trackNumber].get('id'));
             $(rowDOM).addClass('playing');
-            this.updateState('current', this.currentTrack);
+            this.updateState('current', trackNumber);
         }
     },
     setMute: function(mute) {
         if (!this.isEmpty()) {
-            this.list[this.currentTrack].setMute(mute);
+            this.get("list")[this.get("currentTrack")].setMute(mute);
         }
         if (!mute) {
-            this.setVolume(this.currentVolumePercent);
+            this.setVolume(this.get("currentVolumePercent"));
         }
     },
     setSetting: function(option, value) {
-    	this.settings[option] = value;
+        var settings = this.get("settings");
+        settings[option] = value;
+    	this.set("settings", settings);
     },
     setTracks: function(mediaObjects, currentTrack) {
     	if ( !(mediaObjects instanceof Array) ) {
 	        mediaObjects = [mediaObjects];
 	    }
 	    var addedDuration = 0;
-	    this.list = mediaObjects;
-	    $(this.playlistDOM.allRowsInTable).remove();
+	    this.set("list", mediaObjects);
+	    $(this.get("playlistDOM").allRowsInTable).remove();
 	    this._addPlaylistDOMRows(mediaObjects, 0);
 	    for (var i in mediaObjects) {
 	        var mediaObject = mediaObjects[i];
@@ -420,23 +426,23 @@ Playlist.prototype = {
 	    }
 	    this.setCurrentTrack(currentTrack || 0);
 	    this.setWindowLocation();
-	    $('#track-count').text(this.list.length.toString());
-	    this.totalDuration = addedDuration;
-	    $('#playlist-duration').text(secondsToString(this.totalDuration));
-	    $(this.playlistDOM.parentTable).sortable('refresh');
+	    $('#track-count').text(this.get("list").length.toString());
+	    this.set("totalDuration", addedDuration);
+	    $('#playlist-duration').text(secondsToString(this.get("totalDuration")));
+	    $(this.get("playlistDOM").parentTable).sortable('refresh');
 	    this.updateTrackEnumeration();
     },
     setVolume: function(intPercent) {
         intPercent = Math.round(intPercent);
         if (this.isPlaying() || this.isPaused()) {
-            var media = this.list[this.currentTrack];
+            var media = this.get("list")[this.get("currentTrack")];
             var setMute = intPercent == 0;
             media.setVolume(intPercent);
             if (setMute) {
                 intPercent = 50;
             }
         }
-        this.currentVolumePercent = intPercent;
+        this.set("currentVolumePercent", intPercent);
         this.setVolumeSymbol(setMute ? 0 : intPercent);
     },
     setVolumeSymbol: function(intPercent) {
@@ -458,12 +464,12 @@ Playlist.prototype = {
     	var playlist = this, currentHash = this.getHash();
     	var idGetter = playlist.getID();
     	idGetter.done(function(id) {
-    		playlist.isChangingState = true;
-    		History.pushState({id: id, current: playlist.currentTrack}, "Muxamp", id);
+    		playlist.set("isChangingState", true);
+    		History.pushState({id: id, current: playlist.get("currentTrack")}, "Muxamp", id);
     		if (_gaq) {
     			_gaq.push(['_trackPageview', '/' + id]);
     		}
-    		playlist.isChangingState = false;
+    		playlist.set("isChangingState", false);
     	}).fail(function() {
     		History.pushState({id: null, current: null}, "Muxamp", "/");
     	});
@@ -472,11 +478,9 @@ Playlist.prototype = {
         if (this.isEmpty()) {
             return false;
         }
-        
         // Fisher-Yates shuffle implementation by Cristoph (http://stackoverflow.com/users/48015/christoph),
-        // some changes by me
-        var currentSiteMediaID = this.list[this.currentTrack].get('siteMediaID');
-        var newCurrentTrack = this.currentTrack, arrayShuffle = function(array) {
+        var currentSiteMediaID = this.get("list")[this.get("currentTrack")].get('siteMediaID');
+        var newCurrentTrack = this.get("currentTrack"), arrayShuffle = function(array) {
             var tmp, current, top = array.length;
 
             if(top) while(--top) {
@@ -484,19 +488,24 @@ Playlist.prototype = {
                 tmp = array[current];
                 array[current] = array[top];
                 array[top] = tmp;
+                if (newCurrentTrack == current) {
+                    newCurrentTrack = top;
+                } else if (newCurrentTrack == top) {
+                    newCurrentTrack = current;
+                }
             }
 
             return array;
         }
         
-        var newList = this.list.slice(0), i;
+        var newList = this.get("list").slice(0), i;
         newList = arrayShuffle(newList);
         // Rewrites the DOM for the new playlist
         this.setTracks(newList, newCurrentTrack);
     },
     stop: function () {
         if (!this.isEmpty()) {
-            this.list[this.currentTrack].stop();
+            this.get("list")[this.get("currentTrack")].stop();
             timebar.width(0);
             $('#time-elapsed').text('0:00');
             this.setPlayButton(true);
@@ -504,10 +513,10 @@ Playlist.prototype = {
     },
     toggleMute: function() {
         if (!this.isEmpty()) {
-            var shouldUnmute = this.list[this.currentTrack].isMuted();
-            this.list[this.currentTrack].toggleMute();
+            var shouldUnmute = this.get("list")[this.get("currentTrack")].isMuted();
+            this.get("list")[this.get("currentTrack")].toggleMute();
             if (shouldUnmute) {
-                this.setVolume(this.currentVolumePercent);
+                this.setVolume(this.get("currentVolumePercent"));
             }
             else {
                 this.setVolumeSymbol(0);
@@ -516,7 +525,7 @@ Playlist.prototype = {
     },
     togglePause: function() {
         this.setPlayButton(!this.isPaused());
-        this.list[this.currentTrack].togglePause();
+        this.get("list")[this.get("currentTrack")].togglePause();
     },
     setPlayButton: function(on) {
         if (on) {
@@ -527,7 +536,7 @@ Playlist.prototype = {
         }
     },
     updateTrackEnumeration: function() {
-        if (this.list.length == 1 && $("#multiple-tracks").text().length) {
+        if (this.get("list").length == 1 && $("#multiple-tracks").text().length) {
         	$("#multiple-tracks").empty();
         }
         else if (!$("#multiple-tracks").text().length) {
@@ -535,24 +544,24 @@ Playlist.prototype = {
         }
     },
     updateState: function(key, value) {
-    	this.isChangingState = true;
+    	this.set("isChangingState", true);
     	var currentState = History.getState();
     	var currentData = currentState.data;
     	if (!currentData['id']) {
-    		this.isChangingState = false;
+    		this.set("isChangingState", false);
     		return;
     	}
     	currentData[key] = value;
     	var title = currentState.title;
     	var url = currentState.url;
     	History.replaceState(currentData, title, url);
-    	this.isChangingState = false;
+    	this.set("isChangingState", false);
     }
 };
 var playlist = new Playlist(soundManager);
 $(document).ready(function() {
     var startPos;
-    $(playlist.playlistDOM.parentTable).sortable({
+    $(playlist.get("playlistDOM").parentTable).sortable({
         axis: 'y',
         containment: 'document',
         helper: function(event, ui) {
@@ -564,7 +573,7 @@ $(document).ready(function() {
     		return helper;
     	},
         start: function(event, ui) {
-            startPos = $(event.target).parent(playlist.playlistDOM.allRowsInTable).index();
+            startPos = $(event.target).parent(playlist.get("playlistDOM").allRowsInTable).index();
         },
         tolerance: 'pointer',
         stop: function(event, ui) {
