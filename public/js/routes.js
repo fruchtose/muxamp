@@ -12,7 +12,7 @@ var PlaylistRouter = Backbone.Router.extend({
 			playlist.id = playlistID;
 			result = playlist.fetch();
 		} else {
-			result = $.Deferred().promise().reject();
+			result = $.Deferred().reject({data: null}).promise();
 		}
 		return result;
 	}

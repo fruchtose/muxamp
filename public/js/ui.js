@@ -50,7 +50,7 @@ $("#load-more-search-results").click(function() {
 });
 
 $("#clear").click(function() {
-	playlist.clear();
+	playlist.reset();
 });
 
 $('#previous').click(function() {
@@ -192,8 +192,11 @@ $(document).ready(function() {
 });
 
 var clearVideo = function() {
-    $('#video').tubeplayer('destruct');
-    $("#video").replaceWith('<div id="video"></id>');
+    var video = $("#video");
+    if (video && video.hasClass("jquery-youtube-tubeplayer")) {
+        video.tubeplayer('destruct');
+        video.replaceWith('<div id="video"></id>');
+    }
 }
 
 var secondsToString = function(duration) {
