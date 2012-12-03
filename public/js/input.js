@@ -39,7 +39,6 @@ var getMediaObject = function(searchResult) {
 	        		duration: searchResult.duration,
 	        		soundManager: soundManager
 	        	});
-	            //mediaObject = new SoundCloudObject(id, searchResult.siteMediaID, searchResult.url, searchResult.permalink, searchResult.author, searchResult.mediaName, searchResult.duration, soundManager);
 	            break;
 	        case 'ytv':
 	        	mediaObject = new YouTubeTrack({
@@ -49,7 +48,6 @@ var getMediaObject = function(searchResult) {
 	        		mediaName: searchResult.mediaName,
 	        		duration: searchResult.duration,
 	        	});
-	            //mediaObject = new YouTubeObject(id, searchResult.siteMediaID, searchResult.author, searchResult.mediaName, searchResult.duration);
 	            break;
 	    }
     }
@@ -57,35 +55,12 @@ var getMediaObject = function(searchResult) {
 };
 
 var fetchTracksFromString = function(str) {
-	var queryLink = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'fetchplaylist?query=' + encodeURIComponent(str);
-    if (playlist.isChangingState) {
+	if (playlist.isChangingState) {
     	return;
     }
-	return $.ajax({
-    	url: queryLink,
-    	dataType: 'json',
-    	type: 'GET',
-    }).done(function(data) {
+	return playlistRouter.load(str).always(function(data) {
     	if (!data.id) {
     		History.pushState({id: null, current: null}, "Muxamp", "/");
-    	}
-    	var searchResults = data.results;
-    	if (searchResults.length) {
-    		var i, mediaObjects = [];
-    		for (i in searchResults) {
-    			var mediaObject = getMediaObject(searchResults[i]);
-    			if (mediaObject) {
-    				mediaObjects.push(mediaObject);
-    			}
-    		}
-    		if (mediaObjects.length) {
-    			playlist.setTracks(mediaObjects, History.getState().data['current']);
-    		}
-    		else {
-    			alertError("Unable to load playlist", "The tracks you want to load " +
-    				"are invalid, or you are unable to connect to the Internet. " + 
-    				"Please address these issues and try again.");
-    		}
     	}
     });
 }

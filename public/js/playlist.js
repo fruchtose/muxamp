@@ -23,7 +23,7 @@ var PlaylistDOMInformation = function() {
     
     this.trackDurationBox = "div.dur-box";
 };
-
+/*
 function Playlist() {
     this.currentTrack = 0;
     this.currentVolumePercent = 50; // Start at 50% so users can increase/decrease volume if they want to
@@ -557,11 +557,11 @@ Playlist.prototype = {
     	History.replaceState(currentData, title, url);
     	this.set("isChangingState", false);
     }
-};
-var playlist = new Playlist();
+};*/
+var playlist = new TrackPlaylist();
 $(document).ready(function() {
     var startPos;
-    $(playlist.get("playlistDOM").parentTable).sortable({
+    $(playlist.playlistDOM.parentTable).sortable({
         axis: 'y',
         containment: 'document',
         helper: function(event, ui) {
@@ -573,7 +573,7 @@ $(document).ready(function() {
     		return helper;
     	},
         start: function(event, ui) {
-            startPos = $(event.target).parent(playlist.get("playlistDOM").allRowsInTable).index();
+            startPos = $(event.target).parent(playlist.playlistDOM.allRowsInTable).index();
         },
         tolerance: 'pointer',
         stop: function(event, ui) {

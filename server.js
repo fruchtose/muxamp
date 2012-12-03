@@ -29,8 +29,8 @@ app.get('/search\/:site/:page([0-9]+)/:query?', function(req, res) {
 	});
 });
 
-app.get('/fetchplaylist', function(req, res) {
-	var queryID = req.query.query;
+app.get('/playlists/:queryID', function(req, res) {
+	var queryID = req.params.queryID;
 	var exists = playlist.getString(queryID);
 	var playlistString = false;
 	var responses = [exists], results = [];
@@ -62,7 +62,7 @@ app.get('/fetchplaylist', function(req, res) {
 	});
 });
 
-app.post('/fetchid', function(req, res) {
+app.post('/playlists/save', function(req, res) {
 	var query = req.body.query;
 	var existing = playlist.getID(query);
 	var responses = [existing], results = [];
