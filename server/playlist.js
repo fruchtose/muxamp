@@ -2,7 +2,8 @@ var dbConnectionPool	= require('./db').getConnectionPool(),
 	mediaRouterBase		= require('./router'),
 	$					= require('./jquery.whenall'),
 	crypto				= require('crypto'),
-	cacher				= require('node-dummy-cache');
+	cacher				= require('node-dummy-cache'),
+	_					= require('underscore')._;
 	
 var playlistCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
 
@@ -16,13 +17,10 @@ var setTimeoutReject = function(deferred, time) {
 	}, time);
 }
 
-var verifyPlaylist = function(playlistString) {
+var verifyPlaylist = function(playlist) {
 	var result = $.Deferred(), i, pair;
-	if (!playlistString.length) {
-		return result.reject();
-	}
-	var urlParams = mediaRouterBase.getURLParams(playlistString, true);
-	var playlistLength = urlParams.length;
+	playlist = _.uniq(playlist);
+	var playlistLength = playlist.length;
 	if (!playlistLength) {
 		return result.reject();
 	}
@@ -31,10 +29,10 @@ var verifyPlaylist = function(playlistString) {
 		if (!acquireError) {
 			var resultName = "count";
 			var queryString = ["SELECT COUNT(id) AS " + resultName + " FROM KnownMedia WHERE "];
-			for (i in urlParams) {
-				pair = urlParams[i];
-				queryString.push("(site=" + connection.escape(pair.key) + " AND mediaid=" + connection.escape(pair.value) + ")");
-				if (parseInt(i) < urlParams.length - 1) {
+			for (i in playlist) {
+				pair = playlist[i];
+				queryString.push("(site=" + connection.escape(pair.siteCode) + " AND mediaid=" + connection.escape(pair.siteMediaID) + ")");
+				if (parseInt(i) < playlistLength - 1) {
 					queryString.push(" OR ");
 				}
 				else {
@@ -60,6 +58,7 @@ var verifyPlaylist = function(playlistString) {
 };
 
 var getPlaylistID = function(playlistString) {
+
 	var result = $.Deferred(), cached = playlistCache.get(playlistString);
 	if (cached) {
 		result.resolve(cached);
@@ -127,8 +126,9 @@ var getPlaylistString = function(id) {
 	return result.promise();
 };
 
-var savePlaylist = function(playlistString) {
-	var result = $.Deferred(), verified = verifyPlaylist(playlistString);
+var savePlaylist = function(playlist) {
+	var playlistString = toQueryString(playlist);
+	var result = $.Deferred(), verified = verifyPlaylist(playlist);
 	$.when(verified).fail(function() {
 		result.reject();
 	}).done(function() {
@@ -158,8 +158,23 @@ var savePlaylist = function(playlistString) {
 	return result.promise();
 };
 
+var toQueryString = function(queryArray) {
+	queryArray = queryArray || [];
+	var qs = '', i = 0, elem = null;
+	if (!queryArray.length) {
+		return qs;
+	}
+	qs += queryArray[0]['siteCode'] + '=' +queryArray[0]['siteMediaID'];
+	for (i = 1; i < queryArray.length; i++) {
+		elem = queryArray[i];
+		qs += '&' + queryArray[i]['siteCode'] + '=' +queryArray[i]['siteMediaID'];
+	}
+	return qs;
+}
+
 module.exports = {
 	getID: getPlaylistID,
 	getString: getPlaylistString,
-	save: savePlaylist                
+	save: savePlaylist,
+	toQueryString: toQueryString
 };

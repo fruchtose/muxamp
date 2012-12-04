@@ -63,12 +63,13 @@ app.get('/playlists/:queryID', function(req, res) {
 });
 
 app.post('/playlists/save', function(req, res) {
-	var query = req.body.query;
-	var existing = playlist.getID(query);
+	var query = req.body;
+	var qs = playlist.toQueryString(req.body);
+	var existing = playlist.getID(qs);
 	var responses = [existing], results = [];
 	var savedID = false;
 	existing.done(function(doesExist) {
-		if (!doesExist && query.length) {
+		if (!doesExist && qs.length) {
 			var saveQuery = playlist.save(query);
 			saveQuery.done(function(result) {
 				savedID = result;

@@ -60,7 +60,7 @@ var fetchTracksFromString = function(str) {
     }
 	return playlistRouter.load(str).always(function(data) {
     	if (!data.id) {
-    		History.pushState({id: null, current: null}, "Muxamp", "/");
+    		//History.pushState({id: null, current: null}, "Muxamp", "/");
     	}
     });
 }
@@ -76,13 +76,13 @@ var loadFunction = function() {
         playlist.setSetting({
             updateLocationOnAdd: false
         });
-        fetchTracksFromString(loc).always(function() {
+        /*fetchTracksFromString(loc).always(function() {
         	playlist.setSetting({
                 updateLocationOnAdd: true
             });
         	$.unblockUI();
         	isLoading = false;
-        });
+        });*/
     }
     else {
         $.unblockUI();
@@ -138,11 +138,11 @@ $(document).ready(function() {
 		$('#header, #wrapper, #footer, #about').html('');
 		return;
 	}
-    $.blockUI();
-    History.Adapter.bind(window, 'statechange', function() {
+    //$.blockUI();
+    /*History.Adapter.bind(window, 'statechange', function() {
     	var state = History.getState();
     	fetchTracksFromString(state.data.id);
-    });
+    });*/
     soundManager.onready(loadFunction);
     soundManager.ontimeout(loadFunction);
 });
