@@ -1,23 +1,27 @@
 $("#search-results tbody tr").livequery(function() {
     var row = $(this);
+    var immediatePlayOptions = {
+        at: playlist.currentTrack,
+        currentTrack: playlist.currentTrack
+    };
     row.on('dblclick', function() {
         var resultIndex = $(this).index();
         var searchResult = searchResultsView.results[resultIndex];
         var mediaObject = getMediaObject(searchResult);
-        playlist.addTracks(mediaObject, playlist.currentTrack, playlist.currentTrack);
+        playlist.add(mediaObject, immediatePlayOptions);
         playlist.nextTrack(true);
     });
     row.find('.search-add-result').on('click', function(){
         var resultIndex = row.index();
         var searchResult = searchResultsView.results[resultIndex];
         var mediaObject = getMediaObject(searchResult);
-        playlist.addTracks(mediaObject);
+        playlist.add(mediaObject);
     });
     row.find('.search-play-result').on('click', function() {
         var resultIndex = row.index();
         var searchResult = searchResultsView.results[resultIndex];
         var mediaObject = getMediaObject(searchResult);
-        playlist.addTracks(mediaObject, playlist.currentTrack, playlist.currentTrack);
+        playlist.add(mediaObject, immediatePlayOptions);
         playlist.nextTrack(true);
     });
 }, function() {
@@ -33,7 +37,7 @@ $("#play-all").click(function() {
 		tracks.push(getMediaObject(this));
 	});
 	if (tracks.length > 0) {
-		playlist.addTracks(tracks);
+		playlist.add(tracks);
 		playlist.play();
 	}
 });
