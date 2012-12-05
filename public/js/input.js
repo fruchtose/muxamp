@@ -1,11 +1,11 @@
-var counter = (function() {
+/*var counter = (function() {
 	var val = 1;
 	return function() {
 		return val++;
 	};
-})();
+})();*/
 
-var getWindowLocation = (function() {
+/*var getWindowLocation = (function() {
 	if ($.isFunction(history.pushState)) {
 		return function() {
 			if (window.location.pathname.length) {
@@ -21,40 +21,40 @@ var getWindowLocation = (function() {
 			return window.location.hash.substring(1);
 		};
 	}
-})();
+})();*/
 
-var getMediaObject = function(searchResult) {
+/*var getMediaObject = function(mediaData) {
     var mediaObject = null;
-    if (searchResult) {
+    if (mediaData) {
 	    var id = counter();
-	    switch (searchResult.siteCode) {
+	    switch (mediaData.siteCode) {
 	        case 'sct':
 	        	mediaObject = new SoundCloudTrack({
 	        		id: id,
-	        		siteMediaID: searchResult.siteMediaID,
-	        		url: searchResult.url,
-	        		permalink: searchResult.permalink,
-	        		uploader: searchResult.author,
-	        		mediaName: searchResult.mediaName,
-	        		duration: searchResult.duration,
+	        		siteMediaID: mediaData.siteMediaID,
+	        		url: mediaData.url,
+	        		permalink: mediaData.permalink,
+	        		uploader: mediaData.author,
+	        		mediaName: mediaData.mediaName,
+	        		duration: mediaData.duration,
 	        		soundManager: soundManager
 	        	});
 	            break;
 	        case 'ytv':
 	        	mediaObject = new YouTubeTrack({
 	        		id: id,
-	        		siteMediaID: searchResult.siteMediaID,
-	        		uploader: searchResult.author,
-	        		mediaName: searchResult.mediaName,
-	        		duration: searchResult.duration,
+	        		siteMediaID: mediaData.siteMediaID,
+	        		uploader: mediaData.author,
+	        		mediaName: mediaData.mediaName,
+	        		duration: mediaData.duration,
 	        	});
 	            break;
 	    }
     }
     return mediaObject;
-};
+};*/
 
-var fetchTracksFromString = function(str) {
+/*var fetchTracksFromString = function(str) {
 	if (playlist.isChangingState) {
     	return;
     }
@@ -83,15 +83,15 @@ var loadFunction = function() {
         	$.unblockUI();
         	isLoading = false;
         });*/
-    }
+    /*}
     else {
         $.unblockUI();
         isLoading = false;
     }
-};
+};*/
 
 $(document).ready(function() {
-	var rejected = false;
+	/*var rejected = false;
 	if ($.browser.mobile === true) {
 		$.blockUI({message: "Sorry, Muxamp currently does not support mobile browsers. :("});
 		rejected = true;
@@ -137,12 +137,12 @@ $(document).ready(function() {
 	if (rejected) {
 		$('#header, #wrapper, #footer, #about').html('');
 		return;
-	}
+	}*/
     //$.blockUI();
     /*History.Adapter.bind(window, 'statechange', function() {
     	var state = History.getState();
     	fetchTracksFromString(state.data.id);
     });*/
-    soundManager.onready(loadFunction);
-    soundManager.ontimeout(loadFunction);
+    /*soundManager.onready(loadFunction);
+    soundManager.ontimeout(loadFunction);*/
 });

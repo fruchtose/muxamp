@@ -1,17 +1,59 @@
-var Track = Backbone.Model.extend({
-	defaults: {
-		id: "",
-		siteMediaID: "",
-		siteCode: "",
-		icon: "",
-		permalink: "",
-		url: "",
-		uploader: "",
-		siteName: "",
-		mediaName: "",
-		type: ""
-	}
-});
+var Track;
+
+(function(){
+    var counter = (function() {
+        var val = 1;
+        return function() {
+            return val++;
+        };
+    })();
+
+    Track = Backbone.Model.extend({
+        defaults: {
+            id: "",
+            siteMediaID: "",
+            siteCode: "",
+            icon: "",
+            permalink: "",
+            url: "",
+            uploader: "",
+            siteName: "",
+            mediaName: "",
+            type: ""
+        }
+    }, {
+        getMediaObject: function(mediaData) {
+            var mediaObject = null;
+            if (mediaData) {
+                var id = counter();
+                switch (mediaData.siteCode) {
+                    case 'sct':
+                        mediaObject = new SoundCloudTrack({
+                            id: id,
+                            siteMediaID: mediaData.siteMediaID,
+                            url: mediaData.url,
+                            permalink: mediaData.permalink,
+                            uploader: mediaData.author,
+                            mediaName: mediaData.mediaName,
+                            duration: mediaData.duration,
+                            soundManager: soundManager
+                        });
+                        break;
+                    case 'ytv':
+                        mediaObject = new YouTubeTrack({
+                            id: id,
+                            siteMediaID: mediaData.siteMediaID,
+                            uploader: mediaData.author,
+                            mediaName: mediaData.mediaName,
+                            duration: mediaData.duration,
+                        });
+                        break;
+                }
+            }
+            return mediaObject;
+        }
+    });
+})();
 
 var SoundTrack = Track.extend({
 	defaults: _.extend({}, Track.prototype.defaults, {

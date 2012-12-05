@@ -265,7 +265,7 @@ var TrackPlaylist = TrackList.extend({
 	    	if (results.length) {
 	    		var i;
 	    		for (i in results) {
-	    			var mediaObject = getMediaObject(results[i]);
+	    			var mediaObject = Track.getMediaObject(results[i]);
 	    			mediaObject && mediaObjects.push(mediaObject);
 	    		}
 	    	}
@@ -461,8 +461,8 @@ var TrackPlaylist = TrackList.extend({
         if (method == 'create') {
             options.url = 'playlists/save';
         }
-        return Backbone.sync(method, model, options).done(function(data) {
-            data = data || {};
+        return Backbone.sync(method, model, options).always(function(data) {
+            data = data || {id: false};
             model.trigger('sync', data);
         });
     },
