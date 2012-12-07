@@ -38,7 +38,6 @@ var TrackPlaylist = TrackList.extend({
 		this.currentTrack =  0,
 		this.currentVolumePercent = 50,
 		this.id = false,
-		this.isChangingState = false,
 		this.playlistDOM = new PlaylistDOMInformation(),
 		this.totalDuration = 0;
 		this.settings = {};
@@ -376,8 +375,8 @@ var TrackPlaylist = TrackList.extend({
         if (!this.isEmpty() && trackNumber >= 0 && trackNumber < this.size()) {
             $('.playing').removeClass('playing');
             var rowDOM = this.playlistDOM.getRowForID(this.at(trackNumber).get('id'));
+            this.trigger('currentTrack', trackNumber);
             $(rowDOM).addClass('playing');
-            this.updateState('current', trackNumber);
             this.currentMedia = this.at(trackNumber);
         } else {
             this.currentTrack = 0;
@@ -513,18 +512,6 @@ var TrackPlaylist = TrackList.extend({
         else if (!$("#multiple-tracks").text().length) {
         	$("#multiple-tracks").text("s");
         }
-    },
-    updateState: function(key, value) {
-    	this.isChangingState = true;
-    	var currentState = History.getState();
-    	var currentData = currentState.data;
-    	if (currentData['id']) {
-	    	currentData[key] = value;
-	    	var title = currentState.title;
-	    	var url = currentState.url;
-	    	History.replaceState(currentData, title, url);
-    	}
-    	this.isChangingState = false;
     },
 	url: function() {
 		var loc = '/', id = this.id;
