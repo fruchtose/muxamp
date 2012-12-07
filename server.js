@@ -21,22 +21,23 @@ app.get(/^\/([1-9][0-9]*)?$/, function(req, res) {
 	readStream.pipe(res);
 });
 
-app.get('/search\/:site/:page([0-9]+)/:query?', function(req, res) {
+app.get('/search/:site/:page([0-9]+)/:query?', function(req, res) {
 	var site = req.params.site, page = req.params.page, query = req.params.query;
 	query = decodeURIComponent(query || "");
 	search.search(query, page, site).done(function(results) {
 		res.json(results);
+	}).fail(function(results) {
+		res.json(results || []);
 	});
 });
 
 app.get('/playlists/:queryID', function(req, res) {
 	var queryID = req.params.queryID;
 	var exists = playlist.getString(queryID);
-	var playlistString = false;
 	var responses = [exists], results = [];
 	var queriesResolved = $.Deferred();
 	exists.done(function(doesExist) {
-		playlistString = doesExist;
+		var playlistString = doesExist;
 		var cached = playlistFetchCache.get(queryID);
 		if (cached) {
 			results = cached;
@@ -57,8 +58,7 @@ app.get('/playlists/:queryID', function(req, res) {
 			res.json({id: queryID, results: results});
 		});
 	}).fail(function() {
-		queryID = false;
-		res.json({id: queryID, results: results});
+		res.json({id: false, results: results});
 	});
 });
 

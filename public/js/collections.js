@@ -24,6 +24,10 @@ var PlaylistDOMInformation = function() {
     this.trackDurationBox = "div.dur-box";
 };
 
+var getAttribute = function(name, value) {
+    return name + '="' + value + '"';
+};
+
 var TrackList = Backbone.Collection.extend({
 	model: Track
 });
@@ -529,4 +533,41 @@ var TrackPlaylist = TrackList.extend({
 		}
 		return loc;
 	}
+});
+
+var SearchResultsProvider = TrackList.extend({
+    nextPage: function() {
+        this.page++;
+        var results = this.fetch({
+            add: true
+        });
+        return results;
+    },
+    initialize: function() {
+        this.query = '';
+        this.page = 0;
+        this.site = '';
+        this.on('add', function(models, collection) {
+            collection.trigger('results', models);
+        });
+        this.on('reset', function(collection) {
+            collection.trigger('results:new results', collection.models);
+        });
+    },
+    parse: function(data) {
+        var tracks = [];
+        _(data).each(function(result) {
+            tracks.push(Track.getMediaObject(result));
+        });
+        return tracks;
+    },
+    search: function(query, site) {
+        this.query = query;
+        this.page = 0;
+        this.site = site;
+        return this.fetch();
+    },
+    url: function() {
+        return '/search/' + this.site + '/' + this.page + '/' + encodeURIComponent(this.query);
+    }
 });

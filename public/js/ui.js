@@ -31,7 +31,7 @@ $("#search-results tbody tr").livequery(function() {
     row.find('.search-play-result').off('click');
 });
 
-$("#play-all").click(function() {
+/*$("#play-all").click(function() {
 	var tracks = [];
 	$.each(searchResultsView.results, function() {
 		tracks.push(getMediaObject(this));
@@ -51,7 +51,7 @@ $("#load-more-search-results").click(function() {
 	        searchForTracks(value, searchResultsPage, site);
 	    }
     }
-});
+});*/
 
 $("#clear").click(function() {
 	playlist.reset();
@@ -121,7 +121,7 @@ var searchForTracks = function(query, page, site) {
     });
 }
 
-$('#search-site-dropdown a').click(function() {
+/*$('#search-site-dropdown a').click(function() {
 	searchResultsPage = 0;
     var site = $(this).html();
     var oldSiteName = $("#search-site").val();
@@ -132,18 +132,7 @@ $('#search-site-dropdown a').click(function() {
     if (query && newSiteName != oldSiteName) {
         searchForTracks(query, searchResultsPage, newSiteName);
     }
-});
-
-$('#search-form').submit(function(e){
-    e.preventDefault();
-    searchResultsPage = 0;
-    var value = $('#search-query').val();
-    var site = $("#search-site").val();
-    if (value) {
-        searchForTracks(value, searchResultsPage, site);
-    }
-    return false;
-});
+});*/
 
 $(document).ready(function() {
     var volumeOuter = $("#volume-outer");
@@ -240,6 +229,6 @@ $("#about-button").click(function() {
     })
 });
 
-var getAttribute = function(name, value) {
+/*var getAttribute = function(name, value) {
 	return name + '="' + value + '"';
-};
+};*/

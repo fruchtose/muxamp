@@ -1,4 +1,4 @@
-function SearchResultsView(root, selector) {
+/*function SearchResultsView(root, selector) {
     this.results = [];
     this.root = root.toString();
     this.selector = selector;
@@ -17,11 +17,6 @@ SearchResultsView.prototype = {
 		var duration = '<td class="duration-cell" ' + getAttribute('title', seconds) + '>' + seconds + '</td>';
 		var link = '<td class="link-cell"><a href="' + result.permalink + '"><img src="' + result.icon + '" /></a></td>';
 		return '<tr>' + actionsCell + uploader + title + duration + link + '</tr>';
-        /*var add = '<a class="btn action search-add-result" href onclick="return false;"><i class="icon-plus"></i></a>';
-        var play ='<a class="btn action search-play-result" href onclick="return false;"><i class="icon-play"></i></a>';
-        var actions = '<div class="actions">' + add + play + '</div>';
-        var desc = '<div class="content">' + result.author + " - " + result.mediaName + '</div>';
-        return "<li>" + ' ' + actions + desc + "</li>";*/
     },
     setSearchResults: function(results) {
         this.results = results;
@@ -64,4 +59,4 @@ $("#playlist-tab").droppable({
 		
 	},
 	hoverClass: 'nav-hover'
-});
+});*/

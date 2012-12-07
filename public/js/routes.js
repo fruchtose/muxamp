@@ -40,7 +40,7 @@ var PlaylistRouter = Backbone.Router.extend({
 
 $(document).ready(function() {
 	var router = new PlaylistRouter();
-	var mainView = new MainView().render();
+	var mainView = new MainView().toggleBlock().render();
 	var loadUnblock = function() {
 		mainView.toggleBlock();
 		playlist.off('sync', loadUnblock);	

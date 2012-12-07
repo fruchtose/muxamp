@@ -582,3 +582,5 @@ $(document).ready(function() {
         }
     });
 });
+
+var SearchResults = new SearchResultsProvider();
