@@ -31,28 +31,6 @@ $("#search-results tbody tr").livequery(function() {
     row.find('.search-play-result').off('click');
 });
 
-/*$("#play-all").click(function() {
-	var tracks = [];
-	$.each(searchResultsView.results, function() {
-		tracks.push(getMediaObject(this));
-	});
-	if (tracks.length > 0) {
-		playlist.add(tracks);
-		playlist.play();
-	}
-});
-
-$("#load-more-search-results").click(function() {
-	if ($(searchResultsView.selector).size() > 0) {
-		searchResultsPage++;
-		var value = $('#search-query').val();
-	    var site = $("#search-site").val();
-	    if (value) {
-	        searchForTracks(value, searchResultsPage, site);
-	    }
-    }
-});*/
-
 $("#clear").click(function() {
 	playlist.reset();
 });
@@ -90,49 +68,6 @@ var alertError = function(title, body) {
 	var container = $('#alerts');
 	container.append(alert);
 }
-
-var siteCodeFromSiteName = function(site) {
-    var result = "";
-    switch(site) {
-        case "YouTube":
-            result = "ytv";
-            break;
-        case "SoundCloud (Tracks)":
-            result = "sct";
-            break;
-        case "URL":
-        	result = "url";
-        	break;
-    }
-    return result;
-}
-
-var searchResultsPage = 0;
-
-var searchForTracks = function(query, page, site) {
-    var searchURL =  window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'search/' +site + '/'+ page + '/' + encodeURIComponent(query);
-    $.ajax({
-        url: searchURL,
-        dataType: 'json',
-        success: function(searchResults) {
-            searchResultsView.setSearchResults(searchResults);
-            $("#search-nav").tab('show');
-        }
-    });
-}
-
-/*$('#search-site-dropdown a').click(function() {
-	searchResultsPage = 0;
-    var site = $(this).html();
-    var oldSiteName = $("#search-site").val();
-    var newSiteName = siteCodeFromSiteName(site);
-    $("#search-site").val(newSiteName);
-    $("#site-selector").html(site + '&nbsp;<span class="caret"></span>');
-    var query = $('#search-query').val();
-    if (query && newSiteName != oldSiteName) {
-        searchForTracks(query, searchResultsPage, newSiteName);
-    }
-});*/
 
 $(document).ready(function() {
     var volumeOuter = $("#volume-outer");
@@ -228,7 +163,3 @@ $("#about-button").click(function() {
         backdrop: true
     })
 });
-
-/*var getAttribute = function(name, value) {
-	return name + '="' + value + '"';
-};*/
