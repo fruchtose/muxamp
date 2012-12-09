@@ -69,22 +69,31 @@ var TrackPlaylist = TrackList.extend({
 		this.settings = {};
 
         this.on("add", function(mediaObjects, playlist, options) {
-            mediaObjects= $.isArray(mediaObjects) ? mediaObjects : [mediaObjects];
-            var index = options.index;
-            var currentTrack = $.isNumeric(options.currentTrack) ? options.currentTrack : this.currentTrack;
-            this._addPlaylistDOMRows(mediaObjects, index);
+            mediaObjects = _.isArray(mediaObjects) ? mediaObjects : [mediaObjects];
+            var index = options.index, playNext = false;
+            if (options.play) {
+                playNext = (options.index == undefined) ? this.indexOf(mediaObjects[0]) : options.index;
+            }
+            //this._addPlaylistDOMRows(mediaObjects, index);
             var addedDuration = 0;
             for (var i in mediaObjects) {
                 var mediaObject = mediaObjects[i];
                 addedDuration += mediaObject.get('duration');
             }
-            this.setCurrentTrack(currentTrack);
-            this.sync("create", this);
-            $('#track-count').text(this.size().toString());
             this.totalDuration += addedDuration;
+            this.trigger("tracks", mediaObjects, options);
+            // Syncs when we reach end of a batch add (or no batch was specified)
+            if (!options.batch || 1 + index - options.batch == options.start) {
+                this.sync("create", this);
+                this.setCurrentTrack(this.currentTrack);
+                if (playNext !== false) {
+                    this.goToTrack(playNext, true);
+                }
+            }
+            /*$('#track-count').text(this.size().toString());
             $('#playlist-duration').text(secondsToString(this.totalDuration));
             $(this.playlistDOM.parentTable).sortable('refresh');
-            this.updateTrackEnumeration();
+            this.updateTrackEnumeration();*/
         });
 
         this.on("remove", function(mediaObject, playlist, options) {
@@ -98,29 +107,30 @@ var TrackPlaylist = TrackList.extend({
             var trackDuration = mediaObject.get('duration');
             mediaObject.destruct();
             
-            $($(this.playlistDOM.allRowsInTable).get(index)).remove();
-            this.renumberTracks(Math.max(0, Math.min(this.size() - 1, index)));
+            //$($(this.playlistDOM.allRowsInTable).get(index)).remove();
+            //this.renumberTracks(Math.max(0, Math.min(this.size() - 1, index)));
             if (mediaObject == this.currentMedia) {
                 this.setCurrentTrack(Math.min(this.size() - 1, index));
             }
-            this.sync("create", this);
             if (!this.isEmpty() && wasPlaying) {
                 this.play();
             }
-            this.setPlayButton(this.isEmpty());
-            $('#track-count').text(this.size());
             this.totalDuration -= trackDuration;
+            this.sync("create", this);
+            /*this.setPlayButton(this.isEmpty());
+            $('#track-count').text(this.size());
             $('#playlist-duration').text(secondsToString(this.totalDuration));
-            this.updateTrackEnumeration();
+            this.updateTrackEnumeration();*/
         });
 
 		this.on("reset", function(playlist, options) {
 			var mediaObjects = this.models || [];
 			var currentTrack = (options ? options.currentTrack : 0) || 0;
 		    var duration = 0;
-            $(this.playlistDOM.allRowsInTable).remove();
+            this.trigger("tracks:new", this.models);
+            //$(this.playlistDOM.allRowsInTable).remove();
             if (mediaObjects.length) {
-                this._addPlaylistDOMRows(mediaObjects, 0);
+                //this._addPlaylistDOMRows(mediaObjects, 0);
                 for (var i in mediaObjects) {
                     var mediaObject = mediaObjects[i];
                     duration += mediaObject.get('duration');
@@ -129,14 +139,23 @@ var TrackPlaylist = TrackList.extend({
 		    	this.stop();
                 soundManager.reboot();
 		    }
-		    this.setCurrentTrack(currentTrack);
-		    this.sync("create", this);
-		    $('#track-count').text(this.size().toString());
-		    this.totalDuration = duration;
+            this.totalDuration = duration;
+            this.sync("create", this);
+            this.setCurrentTrack(currentTrack);
+            if (options.play && !this.isEmpty()) {
+                this.goToTrack(0, true);
+            }
+		    /*$('#track-count').text(this.size().toString());
 		    $('#playlist-duration').text(secondsToString(this.totalDuration));
 		    $(this.playlistDOM.parentTable).sortable('refresh');
-		    this.updateTrackEnumeration();
+		    this.updateTrackEnumeration();*/
 		});
+
+        this.on('sync', function(data) {
+            if (data.id) {
+                this.id = data.id;
+            }
+        });
 	},
 	_addPlaylistDOMRow: function(mediaObject, index) {
         var playlist = this;
@@ -401,10 +420,10 @@ var TrackPlaylist = TrackList.extend({
     setCurrentTrack: function(trackNumber) {
         this.currentTrack = trackNumber;
         if (!this.isEmpty() && trackNumber >= 0 && trackNumber < this.size()) {
-            $('.playing').removeClass('playing');
-            var rowDOM = this.playlistDOM.getRowForID(this.at(trackNumber).get('id'));
+            //$('.playing').removeClass('playing');
+            //var rowDOM = this.playlistDOM.getRowForID(this.at(trackNumber).get('id'));
             this.trigger('currentTrack', trackNumber);
-            $(rowDOM).addClass('playing');
+            //$(rowDOM).addClass('playing');
             this.currentMedia = this.at(trackNumber);
         } else {
             this.currentTrack = 0;
@@ -488,13 +507,17 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     sync: function(method, model, options) {
-        options = options || {};
+        options = options || {timeout: 20000};
         if (method == 'create') {
             options.url = 'playlists/save';
+        } else if (options.id) {
+            options.url = model.url(options.id);
         }
         return Backbone.sync(method, model, options).always(function(data) {
-            data = data || {id: false};
-            model.trigger('sync', data);
+            data = data || {};
+            if (!data.id || data.id != model.id) {
+                model.trigger('sync', data);
+            }
         });
     },
     toJSON: function() {
@@ -541,8 +564,9 @@ var TrackPlaylist = TrackList.extend({
         	$("#multiple-tracks").text("s");
         }
     },
-	url: function() {
-		var loc = '/', id = this.id;
+	url: function(id) {
+		var loc = '/';
+        id || (id = this.id);
 		if (id) {
 			loc += 'playlists/' + id;
 		}
@@ -566,7 +590,7 @@ var SearchResultsProvider = TrackList.extend({
             collection.trigger('results', models);
         });
         this.on('reset', function(collection) {
-            collection.trigger('results:new results', collection.models);
+            collection.trigger('results:new', collection.models);
         });
     },
     parse: function(data) {
