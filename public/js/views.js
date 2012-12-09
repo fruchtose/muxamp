@@ -4,13 +4,13 @@ Backbone.View.prototype.close = function() {
 		this.beforeClose();
 	}
 	this.remove();
-	this.unbind();
+	this.off();
 };
 
 var MainView = Backbone.View.extend({
 	initialize: function() {
 		this.blockUI = false;
-		this.subviews = [new SearchBarView(), new SearchResultsView()];
+		this.subviews = [new PlaylistView(), new SearchBarView(), new SearchResultsView()];
 	},
 
 	el: "body",
@@ -86,6 +86,10 @@ var TrackView;
 	};
 
 	TrackView = Backbone.View.extend({
+		beforeClose: function() {
+			this.model && this.collection.remove && this.collection.remove(this.model);
+			this.undelegateEvents();
+		},
 		initialize: function(options) {
 			this.action1 = '';
 			if (options.action1) {
@@ -98,6 +102,7 @@ var TrackView;
 				this.action2 = '<a class="btn action ' + action2.classes + '" href onclick="return false;"><i class="' + action2.icon + '"></i></a>';
 			}
 			this.model = options.model || {};
+			this.collection = options.collection || {};
 		},
 		render: function() {
 			var actions = '<div class="actions">' + this.action1 + this.action2 + '</div>';
@@ -114,6 +119,43 @@ var TrackView;
 		tagName: 'tr'
 	});
 })();
+
+var PlaylistTrackView = TrackView.extend({
+	events: {
+		'click .play': 'play',
+		'click .remove': 'removeFromPlaylist',
+		'dblclick': 'play'
+	},
+	play: function() {
+		var index = this.$el.closest('tr').index();
+		Playlist.goToTrack(index, true);
+	},
+	removeFromPlaylist: function() {
+		Playlist.remove(this.model);
+		this.close();
+	}
+});
+
+var SearchTrackView = TrackView.extend({
+	addToPlaylist: function() {
+		Playlist.add(this.getModel());
+	},
+	events: {
+		"click .search-add-result": "addToPlaylist",
+		"click .search-play-result": "playInPlaylist",
+		"dblclick": "playInPlaylist"
+	},
+	getModel: function() {
+		return this.model.clone();
+	},
+	playInPlaylist: function() {
+		var addIndex = Playlist.currentTrack + 1;
+		Playlist.add(this.getModel(), {
+			at: addIndex,
+			play: true
+		});
+	}
+});
 
 var SearchBarView = Backbone.View.extend({
 	el: $("#search-form"),
@@ -154,13 +196,120 @@ var SearchBarView = Backbone.View.extend({
 	}
 });
 
-var a = 0;
+var PlaylistView = Backbone.View.extend({
+	append: function(tracks, playlist, options) {
+		options || (options = {});
+		var playlistView = this, index = options.index;
+		_.isArray(tracks) || (tracks = [tracks]);
+		var newRows = [];
+		_(tracks).each(function(track) {
+			var view = new PlaylistTrackView({
+				model: track.clone(),
+				action1: {
+					classes: 'remove',
+					icon: 'icon-remove'
+				},
+				action2: {
+					classes: 'play',
+					icon: 'icon-play'
+				}
+			});
+			view.render();
+			newRows.push(view.$el);
+			playlistView.rows.push(view);
+		});
+		var $table = $(this.table);
+		if (index == undefined || options.index >= $table.children().length) {
+			$table.append.apply($table, newRows);
+		} else {
+			var addPoint = $table.find('tr').eq(index);
+			addPoint.before.apply(addPoint, newRows);
+		}
+	},
+	el: $("#playlist-pane"),
+	initialize: function() {
+		this.table = '#tracks tbody';
+		// Unordered list of row views, only meant for internal bookkeeping
+		this.rows = [];
+
+		var playlistView = this;
+		var startPos;
+	    $(this.table).sortable({
+	        axis: 'y',
+	        containment: 'document',
+	        helper: function(event, ui) {
+	    		var children = ui.children();
+	    		var helper = ui.clone();
+	    		helper.children().each(function(index) {
+	    			$(this).width(children.eq(index).width());
+	    		});
+	    		return helper;
+	    	},
+	        start: function(event, ui) {
+	            startPos = $(event.target).closest('tr').index();
+	        },
+	        tolerance: 'pointer',
+	        stop: function(event, ui) {
+	            var pos = ui.item.index();
+	            Playlist.moveTrack(startPos, pos);
+	        }
+	    });
+
+	    Playlist.on('reset', this.reset, this);
+		Playlist.on('add', this.append, this);
+		Playlist.on('sync', this.updateList, this);
+		Playlist.on('currentTrack', this.setCurrentTrack, this);
+	},
+	reset: function(playlist) {
+		$(this.table).empty();
+		_(this.rows).each(function(row) {
+				row.close();
+			});
+		this.rows = [];
+		if (playlist) {
+			this.append(playlist.models);
+		}
+	},
+	setCurrentTrack: function(trackNumber) {
+		$(this.table).find('tr')
+			.removeClass('playing')
+			.eq(trackNumber)
+			.addClass('playing');
+	},
+	updateList: function() {
+		var count = Playlist.size();
+		
+		$(this.table).sortable('refresh');
+
+		$('#playlist-duration').text(secondsToString(Playlist.totalDuration));
+		$('#track-count').text(count.toString());
+		if (count == 1) {
+			$("#multiple-tracks").empty();
+		} else {
+			$("#multiple-tracks").text("s");
+		}
+	},
+	show: function() {
+		$("#playlist-tab").tab('show');
+	}
+});
+
 var SearchResultsView = Backbone.View.extend({
+	addAll: function() {
+		var tracks = SearchResults.toArray().map(function(track) {
+			return track.clone();
+		});
+		Playlist.add(tracks, {
+			start: Playlist.size(),
+			batch: tracks.length,
+		});
+	},
 	append: function(searchResults) {
+		var resultsView = this;
 		_.isArray(searchResults) || (searchResults = [searchResults]);
 		var newRows = [];
 		_(searchResults).each(function(searchResult) {
-			var view = new TrackView({
+			var view = new SearchTrackView({
 				model: searchResult,
 				action1: {
 					classes: 'search-add-result',
@@ -173,35 +322,72 @@ var SearchResultsView = Backbone.View.extend({
 			});
 			view.render();
 			newRows.push(view.$el);
+			resultsView.rows.push(view);
 		});
 		var $table = $(this.table);
 		$table.append.apply($table, newRows);
+		$table.find('tr').draggable({
+        	// thanks to David Petersen
+        	helper: function(event, ui) {
+        		var row = $(event.target).closest('tr');
+        		return $('<div class="drag-search-result"></div>')
+        			.data("search-index", row.index())
+        			.append(row.find('.uploader-cell').html() + ' &mdash; ' + row.find('.title-cell').html())
+        			.appendTo('body');
+        	}
+        }).disableSelection();
 	},
 	el: $('#search-results-pane'),
 	events: {
-		'click #play-all': 'play',
+		'click #add-all': 'addAll',
+		'click #play-all': 'playAll',
 		'click #load-more-search-results': 'loadMore'
 	},
 	initialize: function() {
-		this.table = "#search-results tbody";
-		
+		this.rows = [];
+		this.table = '#search-results tbody';
 		SearchResults.on('results:new', this.reset, this);
 		SearchResults.on('results', this.append, this);
-		SearchResults.on('results', this.show, this);
+		SearchResults.on('results:new results', this.show, this);
+
+		$("#playlist-tab").droppable({
+			accept: '#search-results .ui-draggable',
+			drop: function(event, ui) {
+				//alert("Hi");
+				var index = ui.helper.data("search-index");
+				ui.helper.remove();
+				Playlist.add(SearchResults.at(index).clone());
+				
+			},
+			hoverClass: 'nav-hover'
+		});
 	},
 	loadMore: function() {
 		SearchResults.nextPage();
 	},
-	play: function() {
-		var tracks = SearchResults.toArray();
-		playlist.add(tracks);
-		playlist.play();
+	playAll: function() {
+		var tracks = SearchResults.toArray().map(function(track) {
+			return track.clone();
+		});
+		Playlist.add(tracks, {
+			start: Playlist.size(),
+			batch: tracks.length,
+			play: true
+		});
 	},
-	reset: function() {
-		$(this.table).html('');
+	reset: function(tracks) {
+		_.chain(this.rows)
+			.reverse()
+			.each(function(row) {
+				row.close();
+			});
+		this.rows = [];
+		if (tracks) {
+			this.append(tracks);
+		}
 	},
 	show: function() {
-		$("#search-nav").tab('show');
+		$("#search-tab").tab('show');
 	}
 });
 

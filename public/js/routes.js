@@ -19,19 +19,13 @@ var PlaylistRouter = Backbone.Router.extend({
 
 	load: function(playlistID) {
 		var router = this;
-		playlist.id = parseInt(playlistID) || false;
-		return playlist.fetch().always(function(data) {
-			if (data && data.id) {
-				playlist.id = data.id;
-			} else {
-				playlist.id = false;
-				router.navigate("", {trigger: true, replace: true});
-			}
+		return Playlist.fetch({
+			id: playlistID
 		});
 	},
 
 	reset: function() {
-		playlist.reset();
+		Playlist.reset();
 		var result = $.Deferred().resolve();
 		return result.promise();
 	}
@@ -43,10 +37,10 @@ $(document).ready(function() {
 	var mainView = new MainView().toggleBlock().render();
 	var loadUnblock = function() {
 		mainView.toggleBlock();
-		playlist.off('sync', loadUnblock);	
+		Playlist.off('sync', loadUnblock);	
 	};
-	playlist.on('sync', loadUnblock);
-	playlist.on('sync', function(data) {
+	Playlist.on('sync', loadUnblock);
+	Playlist.on('sync', function(data) {
 		var fragment = (data.id) ? data.id.toString() : "";
 		router.navigate(fragment, {trigger: false});
 	});

@@ -1,63 +1,63 @@
-$("#search-results tbody tr").livequery(function() {
+/*$("#search-results tbody tr").livequery(function() {
     var row = $(this);
     var immediatePlayOptions = {
         at: playlist.currentTrack,
         currentTrack: playlist.currentTrack
     };
-    row.on('dblclick', function() {
+    /*row.on('dblclick', function() {
         var resultIndex = $(this).index();
         var searchResult = searchResultsView.results[resultIndex];
         var mediaObject = getMediaObject(searchResult);
         playlist.add(mediaObject, immediatePlayOptions);
         playlist.nextTrack(true);
-    });
-    row.find('.search-add-result').on('click', function(){
+    });*/
+    /*row.find('.search-add-result').on('click', function(){
         var resultIndex = row.index();
         var searchResult = searchResultsView.results[resultIndex];
         var mediaObject = getMediaObject(searchResult);
         playlist.add(mediaObject);
-    });
-    row.find('.search-play-result').on('click', function() {
+    });*/
+    /*row.find('.search-play-result').on('click', function() {
         var resultIndex = row.index();
         var searchResult = searchResultsView.results[resultIndex];
         var mediaObject = getMediaObject(searchResult);
         playlist.add(mediaObject, immediatePlayOptions);
         playlist.nextTrack(true);
-    });
-}, function() {
-    var row = $(this);
+    });*/
+/*}, function() {
+    /*var row = $(this);
     row.off('dblclick');
     row.find('.search-add-result').off('click');
-    row.find('.search-play-result').off('click');
-});
+    row.find('.search-play-result').off('click');*/
+/*});*/
 
 $("#clear").click(function() {
-	playlist.reset();
+	Playlist.reset();
 });
 
 $('#previous').click(function() {
-    playlist.previousTrack();
+    Playlist.previousTrack();
 });
 
 $('#play').click(function() {
-    if (playlist.isPlaying() || playlist.isPaused()) {
-        playlist.togglePause();
+    if (Playlist.isPlaying() || Playlist.isPaused()) {
+        Playlist.togglePause();
     }
     else {
-        playlist.play();
+        Playlist.play();
     }
 });
 
 $('#next').click(function() {
-    playlist.nextTrack();
+    Playlist.nextTrack();
 });
 
 $('#stop').click(function() {
-    playlist.stop();
+    Playlist.stop();
 });
 
 $('#shuffle').click(function() {
-    playlist.shuffle();
+    Playlist.shuffle();
 });
 
 var alertError = function(title, body) {
@@ -78,13 +78,13 @@ $(document).ready(function() {
         max: 100,
         value: 50,
         slide: function(event, ui) {
-            playlist.setVolume(ui.value);
+            Playlist.setVolume(ui.value);
         }
     });
 });
 
 $("#volume-symbol").click(function() {
-    playlist.toggleMute();
+    Playlist.toggleMute();
 });
 
 var timebar, timebarLastUpdated = new Date(), timebarNowUpdated, timeElapsed;
@@ -114,7 +114,7 @@ $(document).ready(function() {
         max: timebarOuter.width() * timebarPrecisionFactor,
         slide: function(event, ui) {
             var fraction = ui.value/ timebarOuter.slider("option", "max");
-            playlist.seek(fraction.toFixed(4));
+            Playlist.seek(fraction.toFixed(4));
         }
     });
 });

@@ -1,5 +1,5 @@
-var playlist = new TrackPlaylist();
-$(document).ready(function() {
+var Playlist = new TrackPlaylist();
+/*$(document).ready(function() {
     var startPos;
     $(playlist.playlistDOM.parentTable).sortable({
         axis: 'y',
@@ -21,6 +21,6 @@ $(document).ready(function() {
             playlist.moveTrack(startPos, pos);
         }
     });
-});
+});*/
 
 var SearchResults = new SearchResultsProvider();
