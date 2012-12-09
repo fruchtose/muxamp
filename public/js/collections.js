@@ -28,6 +28,32 @@ var getAttribute = function(name, value) {
     return name + '="' + value + '"';
 };
 
+//Thanks to Richard Scarrott
+var fastMove = function(arr, pos1, pos2) {
+    // local variables
+    var i, tmp;
+    // cast input parameters to integers
+    // if positions are different and inside array
+    if (pos1 !== pos2 && 0 <= pos1 && pos1 <= this.length && 0 <= pos2 && pos2 <= this.length) {
+      // save element from position 1
+      tmp = arr[pos1];
+      // move element down and shift other elements up
+      if (pos1 < pos2) {
+        for (i = pos1; i < pos2; i++) {
+          arr[i] = arr[i + 1];
+        }
+      }
+      // move element up and shift other elements down
+      else {
+        for (i = pos1; i > pos2; i--) {
+          arr[i] = arr[i - 1];
+        }
+      }
+      // put element from position 1 to destination
+      this[pos2] = tmp;
+    }
+};
+
 var TrackList = Backbone.Collection.extend({
 	model: Track
 });
@@ -236,11 +262,13 @@ var TrackPlaylist = TrackList.extend({
         }
         return status;
     },
-    moveTrack: function(originalIndex, newIndex) {
-        if (!this.isEmpty() && originalIndex != newIndex) {
+    moveTrack: function(pos1, pos2) {
+        if (!this.isEmpty() && pos1 != pos2) {
         	var minIndex = 0;
-            if (originalIndex >= 0 && newIndex >= 0 && originalIndex < this.size() && newIndex < this.size()) {
-                var mediaObject = this.models.splice(originalIndex, 1)[0];
+            if (pos1 >= 0 && pos2 >= 0 && pos1 < this.size() && pos2 < this.size()) {
+                fastMove(this.models, pos1, pos2);
+                this.sync("create", this);
+                /*var mediaObject = this.models.splice(originalIndex, 1)[0];
                 this.models.splice(newIndex, 0, mediaObject);
                 if (this.currentTrack == originalIndex) {
                     this.setCurrentTrack(newIndex);
@@ -251,9 +279,9 @@ var TrackPlaylist = TrackList.extend({
             
                 minIndex = Math.min(originalIndex, newIndex);
                 // Track numbers are now inaccurate, so they are refreshed.
-                this.renumberTracks(minIndex);
+                this.renumberTracks(minIndex);*/
             }
-            this.renumberTracks(minIndex);
+            //this.renumberTracks(minIndex);
         }
         this.sync("create", this);
     },
