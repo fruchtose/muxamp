@@ -17,41 +17,67 @@ var setTimeoutReject = function(deferred, time) {
 	}, time);
 }
 
+var uniqueMedia = function(mediaList) {
+	var seen = {};
+	return _.chain(mediaList).map(function(media) {
+		var stringEquiv = media.siteCode + '=' + media.siteMediaID;
+		if (!seen[stringEquiv]) {
+			seen[stringEquiv] = true;
+			return media;
+		} else {
+			return false;
+		}
+	}).filter(function(media) {
+		return false !== media;
+	}).value();
+};
+
 var verifyPlaylist = function(playlist) {
 	var result = $.Deferred(), i, pair;
-	playlist = _.uniq(playlist);
+	playlist = uniqueMedia(playlist);
 	var playlistLength = playlist.length;
 	if (!playlistLength) {
 		return result.reject();
 	}
-	
 	dbConnectionPool.acquire(function(acquireError, connection) {
-		if (!acquireError) {
-			var resultName = "count";
-			var queryString = ["SELECT COUNT(id) AS " + resultName + " FROM KnownMedia WHERE "];
-			for (i in playlist) {
-				pair = playlist[i];
-				queryString.push("(site=" + connection.escape(pair.siteCode) + " AND mediaid=" + connection.escape(pair.siteMediaID) + ")");
-				if (parseInt(i) < playlistLength - 1) {
-					queryString.push(" OR ");
-				}
-				else {
-					queryString.push(";");
-				}
-			}
-			connection.query(queryString.join(""), function(queryError, rows) {
-				if (!queryError && rows.length) {
-					var row = rows[0];
-					if (parseInt(row[resultName]) === playlistLength) {
-						result.resolve(true);
-					}
-				}
-				dbConnectionPool.release(connection);
-			});
-		}
-		else {
+		if (acquireError) {
+			console.log(acquireError);
+			result.reject();
 			dbConnectionPool.release(connection);
+			return;
 		}
+		var resultName = "count";
+		var queryString = ["SELECT COUNT(id) AS " + resultName + " FROM KnownMedia WHERE "];
+		for (i in playlist) {
+			pair = playlist[i];
+			queryString.push("(site=" + connection.escape(pair.siteCode) + " AND mediaid=" + connection.escape(pair.siteMediaID) + ")");
+			if (parseInt(i) < playlistLength - 1) {
+				queryString.push(" OR ");
+			}
+			else {
+				queryString.push(";");
+			}
+		}
+		connection.query(queryString.join(""), function(queryError, rows) {
+			if (queryError) {
+				console.log(queryError);
+				result.reject();
+			}
+			else if (rows.length) {
+				var row = rows[0];
+				var count = row[resultName];
+				if (parseInt(count) === playlistLength) {
+					result.resolve(true);
+				} else {
+					console.log('Some media found: ' + count + ' out of ' + playlistLength + 'expected');
+					result.reject();
+				}
+			} else {
+				console.log('no results for verification');
+				result.reject();
+			}
+			dbConnectionPool.release(connection);
+		});
 	});
 	
 	return result.promise();
@@ -130,6 +156,7 @@ var savePlaylist = function(playlist) {
 	var playlistString = toQueryString(playlist);
 	var result = $.Deferred(), verified = verifyPlaylist(playlist);
 	$.when(verified).fail(function() {
+		console.log('could not verify', playlist);
 		result.reject();
 	}).done(function() {
 		dbConnectionPool.acquire(function(acquireError, connection) {

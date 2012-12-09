@@ -34,9 +34,8 @@ app.get('/search/:site/:page([0-9]+)/:query?', function(req, res) {
 app.get('/playlists/:queryID', function(req, res) {
 	var queryID = req.params.queryID;
 	var exists = playlist.getString(queryID);
-	var responses = [exists], results = [];
-	var queriesResolved = $.Deferred();
 	exists.done(function(doesExist) {
+		var responses = [], results = [];
 		var playlistString = doesExist;
 		var cached = playlistFetchCache.get(queryID);
 		if (cached) {
@@ -58,7 +57,7 @@ app.get('/playlists/:queryID', function(req, res) {
 			res.json({id: queryID, results: results});
 		});
 	}).fail(function() {
-		res.json({id: false, results: results});
+		res.json({id: false, results: []});
 	});
 });
 
@@ -66,26 +65,28 @@ app.post('/playlists/save', function(req, res) {
 	var query = req.body;
 	var qs = playlist.toQueryString(req.body);
 	var existing = playlist.getID(qs);
-	var responses = [existing], results = [];
-	var savedID = false;
 	existing.done(function(doesExist) {
+		var savedID = false;
+		var responses = [], results = [];
 		if (!doesExist && qs.length) {
 			var saveQuery = playlist.save(query);
 			saveQuery.done(function(result) {
 				savedID = result;
+			}).fail(function(result) {
+				console.log('playlist not inserted', playlist);
 			});
 			responses.push(saveQuery);
 		}
 		else {
 			savedID = doesExist;
-			}
+		}
 		$.whenAll.apply(null, responses).always(function() {
 			res.json({id: savedID});
 		});
 	}).fail(function() {
-		res.json({id: savedID});
+		res.json({id: false});
 	});
 });
 
 app.listen(process.env['app_port'] || 3000);
-console.log("Server started.");
+console.log("Server started, port", process.env['app_port'] || 3000);
