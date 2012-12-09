@@ -207,7 +207,7 @@ var TrackPlaylist = TrackList.extend({
         return this.currentVolumePercent;
     },
     goToTrack: function(index, autostart) {
-        if (!this.isEmpty()) {
+        if (this.isEmpty()) {
             return;
         }
         var wasPlaying = this.isPlaying();
