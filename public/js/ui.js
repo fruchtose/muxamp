@@ -1,36 +1,3 @@
-/*$("#search-results tbody tr").livequery(function() {
-    var row = $(this);
-    var immediatePlayOptions = {
-        at: playlist.currentTrack,
-        currentTrack: playlist.currentTrack
-    };
-    /*row.on('dblclick', function() {
-        var resultIndex = $(this).index();
-        var searchResult = searchResultsView.results[resultIndex];
-        var mediaObject = getMediaObject(searchResult);
-        playlist.add(mediaObject, immediatePlayOptions);
-        playlist.nextTrack(true);
-    });*/
-    /*row.find('.search-add-result').on('click', function(){
-        var resultIndex = row.index();
-        var searchResult = searchResultsView.results[resultIndex];
-        var mediaObject = getMediaObject(searchResult);
-        playlist.add(mediaObject);
-    });*/
-    /*row.find('.search-play-result').on('click', function() {
-        var resultIndex = row.index();
-        var searchResult = searchResultsView.results[resultIndex];
-        var mediaObject = getMediaObject(searchResult);
-        playlist.add(mediaObject, immediatePlayOptions);
-        playlist.nextTrack(true);
-    });*/
-/*}, function() {
-    /*var row = $(this);
-    row.off('dblclick');
-    row.find('.search-add-result').off('click');
-    row.find('.search-play-result').off('click');*/
-/*});*/
-
 $("#clear").click(function() {
 	Playlist.reset();
 });
