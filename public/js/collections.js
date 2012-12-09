@@ -319,7 +319,6 @@ var TrackPlaylist = TrackList.extend({
 	    			mediaObject && mediaObjects.push(mediaObject);
 	    		}
 	    	}
-            this.id = response.id;
     	}
     	return mediaObjects;
     },
