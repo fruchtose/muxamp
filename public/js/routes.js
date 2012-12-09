@@ -31,7 +31,13 @@ var PlaylistRouter = Backbone.Router.extend({
 	}
 });
 
+soundManager.debugMode = false;
+soundManager.flashVersion = 9;
+soundManager.preferFlash = false;
+soundManager.url = 'swf/';
 
+var Playlist = new TrackPlaylist();
+var SearchResults = new SearchResultsProvider();
 $(document).ready(function() {
 	var router = new PlaylistRouter();
 	var mainView = new MainView().toggleBlock().render();
