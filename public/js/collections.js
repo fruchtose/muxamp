@@ -166,7 +166,6 @@ var TrackPlaylist = TrackList.extend({
         }
         return status;
     },
-    // Function is asynchronous, because the response can be depending on the media
     isPlaying: function() {
         var status = false;
         if (!this.isEmpty()) {
@@ -208,7 +207,7 @@ var TrackPlaylist = TrackList.extend({
             var media = this.currentMedia;
             if (media.get('type') == 'audio') {
                 media.play({
-                    volume: (playlist.isMuted() ? 0 : playlist.currentVolumePercent),
+                    volume: (playlist.isMuted() ? 0 : playlist.getVolume()),
                     onfinish: function() {
                         playlist.nextTrack(true);
                     },
@@ -218,9 +217,8 @@ var TrackPlaylist = TrackList.extend({
                         }
                     },
                     whileplaying: function() {
-                        var position = this.position, seconds = position/ 1000;
-                        var percent = Math
-                        .min(100 * (position / this.duration), 100);
+                        var position = this.position, seconds = position/1000;
+                        var percent = Math.min(100 * (position / this.duration), 100);
                         timeElapsed.text(secondsToString(seconds));
                         updateTimebar(percent);
                     }
