@@ -25,38 +25,6 @@ $("#volume-symbol").click(function() {
     Playlist.toggleMute();
 });
 
-var timebar, timebarLastUpdated = new Date(), timebarNowUpdated, timeElapsed;
-var updateTimebar = function(percentage) {
-    if (percentage >= 0 && percentage <= 100) {
-        timebarNowUpdated = new Date();
-        if (timebarNowUpdated - timebarLastUpdated < 333) {
-            return;
-        }
-        timebar.width(percentage.toFixed(2) + "%");
-        timebarLastUpdated = new Date();
-    }   
-}
-
-$(function() {
-    timebar = $('#timebar-inner');
-    timeElapsed = $('#time-elapsed');
-});
-
-$(document).ready(function() {
-    var timebarOuter = $("#timebar-outer");
-    var timebarPrecisionFactor = timebarOuter.width();
-    timebarOuter.slider({
-        range: "min",
-        value: 0,
-        min: 0,
-        max: timebarOuter.width() * timebarPrecisionFactor,
-        slide: function(event, ui) {
-            var fraction = ui.value/ timebarOuter.slider("option", "max");
-            Playlist.seek(fraction.toFixed(4));
-        }
-    });
-});
-
 var clearVideo = function() {
     var video = $("#video");
     if (video && video.hasClass("jquery-youtube-tubeplayer")) {
