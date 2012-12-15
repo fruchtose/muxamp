@@ -25,14 +25,6 @@ $("#volume-symbol").click(function() {
     Playlist.toggleMute();
 });
 
-var clearVideo = function() {
-    var video = $("#video");
-    if (video && video.hasClass("jquery-youtube-tubeplayer")) {
-        video.tubeplayer('destruct');
-        video.replaceWith('<div id="video"></id>');
-    }
-}
-
 var secondsToString = function(duration) {
     var str = "";
     // The duration can be a decimal, but we want it to be an integer so the user 
