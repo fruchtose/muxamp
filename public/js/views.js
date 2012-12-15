@@ -11,7 +11,7 @@ var MainView = Backbone.View.extend({
 	initialize: function() {
 		this.blockUI = false;
 		this.subviews = [new ControlsView(), new PlaylistView(),
-			new SearchBarView(), new SearchResultsView()];
+			new SearchBarView(), new SearchResultsView(), new TimebarView()];
 	},
 
 	el: "body",
@@ -446,6 +446,42 @@ var SearchResultsView = Backbone.View.extend({
 	},
 	show: function() {
 		$("#search-tab").tab('show');
+	}
+});
+
+var TimebarView = Backbone.View.extend({
+	el: $("#timebar-row"),
+	initialize: function() {
+		this.timebar = $('#timebar-inner');
+		this.timeElapsed = $('#time-elapsed');
+		var timebarOuter = $("#timebar-outer");
+	    var precison = 100;
+	    timebarOuter.slider({
+	        range: "min",
+	        value: 0,
+	        min: 0,
+	        max: timebarOuter.width() * precison,
+	        slide: function(event, ui) {
+	            var fraction = ui.value / timebarOuter.slider("option", "max");
+	            Playlist.seek(fraction.toFixed(4));
+	        }
+	    });
+
+	    this.lastUpdate = new Date();
+
+	    Playlist.on('progress', this.onProgress, this);
+	},
+	onProgress: function(details) {
+		var percent = details.percent || 0;
+		var time = details.time || 0;
+
+		var updateTime = new Date();
+        if (updateTime - this.lastUpdate < 333) {
+            return;
+        }
+        this.lastUpdate = updateTime;
+        this.timebar.width(percent.toFixed(2) + "%");
+		this.timeElapsed.text(secondsToString(time));
 	}
 });
 

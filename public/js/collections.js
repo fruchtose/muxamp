@@ -201,6 +201,9 @@ var TrackPlaylist = TrackList.extend({
     play: function() {
         if (!this.isEmpty()) {
             var playlist = this;
+            var progress = function(details) {
+                playlist.trigger('progress', details);
+            };
             var media = this.currentMedia;
             if (media.get('type') == 'audio') {
                 media.play({
@@ -216,17 +219,12 @@ var TrackPlaylist = TrackList.extend({
                     whileplaying: function() {
                         var position = this.position, seconds = position/1000;
                         var percent = Math.min(100 * (position / this.duration), 100);
-                        timeElapsed.text(secondsToString(seconds));
-                        updateTimebar(percent);
+                        progress({percent: percent, time: seconds});
                     }
                 });
             }
             else if (media.get('type') == 'video') {
                 if (media.get('siteName') == 'YouTube') {
-                    var progress = function(options) {
-                        timeElapsed.text(secondsToString(options.time));
-                        updateTimebar(options.percent);
-                    };
                     media.play({
                         volume: playlist.isMuted() ? 0 : playlist.getVolume(),
                     });
@@ -338,7 +336,7 @@ var TrackPlaylist = TrackList.extend({
             }
             
             timebar.width(0);
-            $('#time-elapsed').text('0:00');
+            this.trigger('progress', {percent: 0, time: 0});
             this.trigger('stop', this.currentMedia);
         }
     },
