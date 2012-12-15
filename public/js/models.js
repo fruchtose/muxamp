@@ -65,6 +65,9 @@ var SoundTrack = Track.extend({
     destruct: function() {
         return this.get("sound").destruct();
     },
+    end: function() {
+        return this.get("sound").stop();
+    },
     getDuration: function() {
         return this.get("duration");
     },
@@ -148,6 +151,9 @@ var YouTubeTrack = VideoTrack.extend({
 		})
 	},
 	destruct: function() {
+        YouTube.reset();
+    },
+    end: function() {
         YouTube.reset();
     },
     isMuted: function() {

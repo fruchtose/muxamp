@@ -70,7 +70,7 @@ var TrackPlaylist = TrackList.extend({
 
             var wasPlaying = mediaObject.isPlaying() && mediaObject == this.currentMedia;
             if (wasPlaying){
-                this.stop();
+                this.stop(true);
             }
             var trackDuration = mediaObject.get('duration');
             mediaObject.destruct();
@@ -95,7 +95,7 @@ var TrackPlaylist = TrackList.extend({
                     duration += mediaObject.get('duration');
                 }
             } else {
-		    	this.stop();
+		    	this.stop(true);
                 soundManager.reboot();
 		    }
             this.totalDuration = duration;
@@ -123,11 +123,8 @@ var TrackPlaylist = TrackList.extend({
             return;
         }
         var wasPlaying = this.isPlaying();
-        this.stop();
+        this.stop(true);
         var media = this.currentMedia;
-        if (media.get('type') == "video") {
-            clearVideo();
-        }
         this.setCurrentTrack(parseInt(index));
         if (wasPlaying || autostart) {
             this.play();
@@ -330,9 +327,16 @@ var TrackPlaylist = TrackList.extend({
         // Rewrites the DOM for the new playlist
         this.reset(newList, {currentTrack: newCurrentTrack});
     },
-    stop: function () {
+    stop: function (hard) {
         if (!this.isEmpty() || this.currentMedia) {
-            this.currentMedia.stop();
+            // Hard stop is used when the current media should not be restarted until 
+            // the next time a player queues it
+            if (hard) {
+                this.currentMedia.end();
+            } else {
+                this.currentMedia.stop();
+            }
+            
             timebar.width(0);
             $('#time-elapsed').text('0:00');
             this.trigger('stop', this.currentMedia);
