@@ -41,11 +41,9 @@ var SearchResults = new SearchResultsProvider();
 $(document).ready(function() {
 	var router = new PlaylistRouter();
 	var mainView = new MainView().toggleBlock().render();
-	var loadUnblock = function() {
+	Playlist.once('sync', function() {
 		mainView.toggleBlock();
-		Playlist.off('sync', loadUnblock);	
-	};
-	Playlist.on('sync', loadUnblock);
+	});
 	Playlist.on('sync', function(data) {
 		var fragment = (data.id) ? data.id.toString() : "";
 		router.navigate(fragment, {trigger: false});
