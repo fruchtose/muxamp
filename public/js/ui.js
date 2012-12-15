@@ -2,31 +2,6 @@ $("#clear").click(function() {
 	Playlist.reset();
 });
 
-$('#previous').click(function() {
-    Playlist.previousTrack();
-});
-
-$('#play').click(function() {
-    if (Playlist.isPlaying() || Playlist.isPaused()) {
-        Playlist.togglePause();
-    }
-    else {
-        Playlist.play();
-    }
-});
-
-$('#next').click(function() {
-    Playlist.nextTrack();
-});
-
-$('#stop').click(function() {
-    Playlist.stop();
-});
-
-$('#shuffle').click(function() {
-    Playlist.shuffle();
-});
-
 var alertError = function(title, body) {
 	var header = '<h4 class="alert-heading">' + title + '</h4>'
 	var body = '<span class="body">' + body + '</span>';

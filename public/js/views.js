@@ -10,7 +10,8 @@ Backbone.View.prototype.close = function() {
 var MainView = Backbone.View.extend({
 	initialize: function() {
 		this.blockUI = false;
-		this.subviews = [new PlaylistView(), new SearchBarView(), new SearchResultsView()];
+		this.subviews = [new ControlsView(), new PlaylistView(),
+			new SearchBarView(), new SearchResultsView()];
 	},
 
 	el: "body",
@@ -76,6 +77,57 @@ var MainView = Backbone.View.extend({
 		}
 		return this;
 	}
+});
+
+var ControlsView = Backbone.View.extend({
+	el: $('#controls'),
+	events: {
+		'click #next': 'nextTrack',
+		'click #play': 'play',
+		'click #previous': 'previousTrack',
+		'click #shuffle': 'shuffle',
+		'click #stop': 'stop'
+	},
+	initialize: function() {
+		var showPause = function() {
+			this.setPlayButton(true);
+		};
+		var showPlay = function() {
+			this.setPlayButton(false);
+		}
+
+		Playlist.on('play resume', showPause, this);
+		Playlist.on('pause stop', showPlay, this);
+	},
+	nextTrack: function() {
+		Playlist.nextTrack();
+	},
+	play: function() {
+		var playing = Playlist.isPlaying(), paused = Playlist.isPaused();
+		if (playing || paused) {
+	        Playlist.togglePause();
+	    }
+	    else {
+	        Playlist.play();
+	    }
+	},
+	previousTrack: function() {
+		Playlist.previousTrack();
+	},
+	setPlayButton: function(playing) {
+        if (playing) {
+        	$('#play').find('i').removeClass('icon-play').addClass('icon-pause');
+        }
+        else {
+            $('#play').find('i').removeClass('icon-pause').addClass('icon-play');
+        }
+    },
+    shuffle: function() {
+    	Playlist.shuffle();
+    },
+    stop: function() {
+    	Playlist.stop();
+    }
 });
 
 var TrackView;
