@@ -62,7 +62,7 @@ var SoundTrack = Track.extend({
 			sound: audio
 		});
 	},
-	destruct: function() {
+    destruct: function() {
         return this.get("sound").destruct();
     },
     getDuration: function() {
@@ -109,7 +109,8 @@ var SoundTrack = Track.extend({
     },
     
     togglePause: function() {
-        return this.get("sound").togglePause();
+        var sound = this.get("sound");
+        return sound.togglePause();
     },
     
     toggleMute: function() {
@@ -144,125 +145,73 @@ var YouTubeTrack = VideoTrack.extend({
 			url: permalink,
 			permalink: permalink,
 			playState: 0,
-			interval: 0
 		})
 	},
 	destruct: function() {
-        if ($("#video").width()) {
-            var videoID = $("#video").tubeplayer('videoId');
-            if (videoID == this.get('siteMediaID')) {
-                clearVideo();
-            }
-        }
+        YouTube.reset();
     },
     isMuted: function() {
-        var muted = false;
-        try {
-            muted = $("#video").tubeplayer('isMuted');
-        }
-        catch(e) {
-            
-        }
-        return muted;
+        return YouTube.isMuted();
     },
     isPaused: function() {
-        var paused = false;
-        if (this.get('playState')) {
-            try {
-                paused = $("#video").tubeplayer('isPaused');
-            }
-            catch(e) {
-            }
-        }
-        return paused;
+        return YouTube.state == 2;
     },
     isPlaying: function() {
-        var playing = false;
-        if (this.get('playState')) {
-            try {
-                playing = $("#video").tubeplayer('isPlaying');
-            }
-            catch(e) {
-            }
-        }
-        return playing;
+        return YouTube.onload.state() == 'resolved' || YouTube.hasPlayer();
     },
     isStopped: function() {
         return this.get('playState') === 0 || ! this.isPlaying();
     },
     play: function(options) {
-        var video = this;
-        if ( $("#video").tubeplayer('isPaused')) {
-            $("#video").tubeplayer('play');
-            video.set('playState', 1);
-        }
-        else {
-            $(document).ready(function() {
-                if (options) {
-                    $("#video").tubeplayer(options);
-                }
-                else {
-                    $("#video").tubeplayer();
-                }
-                video.set('playState', 1);
-            });
+        if (this.isPaused()) {
+            YouTube.play();
+        } else {
+            YouTube.reset();
+            YouTube.load(_.extend({autoPlay: true}, options, {initialVideo: this.get('siteMediaID')}));
         }
     },
     seek: function(decimalPercent) {
         var duration = this.get('duration');
-        try {
-            // Use floor function in case rounding would otherwise result in 
-            // a value of 101% of the total time
-            $("#video").tubeplayer('seek', Math.floor(decimalPercent * duration));
-        }
-        catch(e) {
-        // Eh, don't try anything if seeking isn't possible'
-        }
+        YouTube.seek(Math.floor(decimalPercent * duration));
     },
     setMute: function(mute) {
         $(document).ready(function() {
             if (mute) {
-                $("#video").tubeplayer('mute');
+                YouTube.mute();
             }
             else {
-                $("#video").tubeplayer('unmute');
+                YouTube.unmute();
             }
         });
     },
-    setVolume: function(intPercent) {
-        $('#video').tubeplayer('volume', intPercent);
-        if (intPercent == 0) {
+    setVolume: function(percent) {
+        var muted = this.isMuted();
+        YouTube.setVolume(percent);
+        if (percent == 0 && !muted) {
             this.setMute(true);
+        } else if (percent > 0 && muted) {
+            this.setMute(false);
         }
     },
     stop: function() {
-        var video = this;
-        $(document).ready(function() {
-            $("#video").tubeplayer('pause');
-            $("#video").tubeplayer('seek', 0);
-            video.set('playState', 0);
-        });
+        YouTube.pause();
+        YouTube.seek(0);
     },
     togglePause: function() {
-        var video = this;
-        $(document).ready(function() {
-            if (video.isPlaying()) {
-                $("#video").tubeplayer('pause');
-            }
-            else if (video.isPaused()) {
-                $("#video").tubeplayer('play');
-            }
-        });
+        var state = YouTube.state;
+        var playing = state == 1 || state == 3;
+        if (playing) {
+            YouTube.pause();
+        } else {
+            YouTube.play();
+        }
     },
     toggleMute: function() {
-        var video = this;
-        $(document).ready(function() {
-            if (video.isMuted()) {
-                $("#video").tubeplayer('unmute');
-            }
-            else {
-                $("#video").tubeplayer('mute');
-            }
-        });
+        var muted = YouTube.isMuted();
+        if (muted) {
+            YouTube.unmute();
+        } else {
+            YouTube.mute();
+        }
     }
 });
