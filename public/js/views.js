@@ -443,9 +443,189 @@ var SearchResultsView = Backbone.View.extend({
 	}
 });
 
-/*var SearchResultView = Backbone.View.extend({
-	className: "",
-	el: '#search-results tbody tr',
-	tagName: "tr",
+var YouTubeInterface = Backbone.View.extend({
+	clearInterval: function() {
+		if (this.whilePlaying) {
+			window.clearInterval(this.whilePlaying);
+			this.whilePlaying = false;
+		}
+	},
+	initialize: function() {
+		var view = this;
+		this.defaults = {
+            showControls: false,
+            autoPlay: false,
+            initialVideo: "",
+            loadSWFObject: false,
+            width: view.$el.width(),
+            height: view.$el.height(),
+            onStop: function() {
+            	view.clearInterval();
+            	view.trigger('stop', view.$el.tubeplayer('data'));
+            },
+            onPlayerCued: function() {
+            	view.state = 5;
+            },
+            onPlayerBuffering: function() {
+            	view.state = 3;
+            	view.clearInterval();
+            	view.trigger('buffering', view.$el.tubeplayer('data'));
+            },
+            onPlayerPaused: function() {
+            	view.state = 2;
+            	view.clearInterval();
+            	view.trigger('pause', view.$el.tubeplayer('data'));
+            },
+            volume: 50,
+            onPlayerPlaying: function() {
+            	view.onload.resolve();
+            	view.state = 1;
+                view.setVolume(view.currentVolume);
+                view.setInterval();
+                view.trigger('play');
+            },
+            onPlayerEnded: function() {
+            	view.state = 0;
+                view.clearInterval();
+                view.stop();
+                view.trigger('end');
+            },
+            onErrorNotEmbeddable: function() {
+            	view.onload.reject();
+                view.clearInterval();
+                view.stop();
+                view.trigger('error');
+            },
+            onErrorNotFound: function() {
+            	view.onload.reject();
+                view.clearInterval();
+                view.stop();
+                view.trigger('error');
+            },
+            onErrorInvalidParameter: function() {
+            	view.onload.reject();
+                view.clearInterval();
+                view.stop();
+                view.trigger('error');
+            }
+        };
+		this.reset();
 
-});*/
+		this.on('mute', function() {
+			this.muted = true;
+		}, this);
+
+		this.on('unmute', function() {
+			this.muted = false;
+		}, this);
+	},
+	hasPlayer: function() {
+		return this.onload.state() == 'resolved';
+	},
+	isMuted: function() {
+		return this.muted;
+	},
+	load: function(options) {
+		var view = this;
+		var params = _.extend({volume: 50}, view.defaults, options);
+		view.$el.tubeplayer(params);
+		view.onload.promise();
+	},
+	mute: function() {
+		var view = this;
+		var mute = function() {
+			view.$el.tubeplayer('mute');
+			view.trigger('mute');
+		};
+		view.onload.done(mute);
+	},
+	pause: function() {
+		var view = this;
+		var pause = function() {
+			view.$el.tubeplayer('pause');
+			view.trigger('pause');
+		};
+		view.onload.done(pause);
+	},
+	play: function() {
+		var view = this;
+		var play = function() {
+			var data = view.$el.tubeplayer('data');
+			var paused = data.state === 2;
+			view.$el.tubeplayer('play');
+			if (paused) {
+				view.trigger('resume');
+			}
+		};
+		view.onload.done(play);
+	},
+	reset: function() {
+		var view = this;
+		view.clearInterval();
+		if (view.onload && view.onload.state == 'pending') {
+			view.onload.reject();
+		}
+		view.onload = $.Deferred();
+		if (view.$el.hasClass("jquery-youtube-tubeplayer")) {
+			view.$el.tubeplayer('stop');
+	        view.$el.tubeplayer('destroy');
+	    }
+		view.$el.removeAttr('class data-prev-mute-volume');
+		view.muted = false;
+		view.state = -2;
+		(view.currentVolume != null) || (view.currentVolume = 50);
+		view.trigger('reset');
+	},
+	seek: function(time) {
+		var view = this;
+		var seek = function() {
+			view.$el.tubeplayer('seek', time);
+			view.trigger('seek', time);
+		};
+		view.onload.done(seek);
+	},
+	setInterval: function() {
+		if (this.whilePlaying) {
+			this.clearInterval();
+		}
+		var view = this;
+		window.setInterval(function() {
+            var data = view.$el.tubeplayer('data');
+            if (data && data.hasOwnProperty('currentTime') && data.hasOwnProperty('duration')) {
+                var percent =  (data.currentTime / data.duration) * 100;
+                var time = data.currentTime;
+                view.trigger('progress', {
+                	percent: percent,
+                	time: time
+                });
+            }
+        }, 333);
+	},
+	setVolume: function(percent) {
+		var view = this;
+		var volumize = function() {
+			view.$el.tubeplayer('volume', percent);
+			view.currentVolume = view.$el.tubeplayer('volume');
+	        view.trigger('volume', view.currentVolume);
+		};
+		view.onload.done(volumize);
+	},
+	stop: function() {
+		var view = this;
+		var stop = function() {
+			view.$el.tubeplayer('stop');
+			view.trigger('stop');
+		};
+		view.onload.done(stop);
+	},
+	unmute: function() {
+		var view = this;
+		var unmute = function() {
+			view.$el.tubeplayer('unmute');
+			view.trigger('unmute');
+		};
+		view.onload.done(unmute);
+	},
+});
+
+var YouTube = new YouTubeInterface({el: $("#video")});
