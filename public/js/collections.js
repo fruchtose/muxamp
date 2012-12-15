@@ -226,54 +226,21 @@ var TrackPlaylist = TrackList.extend({
             }
             else if (media.get('type') == 'video') {
                 if (media.get('siteName') == 'YouTube') {
-                    if (media.get('interval')) {
-                        window.clearInterval(media.get('interval'));
-                    }
-                    var clearMediaInterval = function() {
-                        if (media.get('interval')) {
-                            window.clearInterval(media.get('interval'));
-                        }
+                    var progress = function(options) {
+                        timeElapsed.text(secondsToString(options.time));
+                        updateTimebar(options.percent);
                     };
                     media.play({
-                        showControls: false,
-                        autoPlay: true,
-                        initialVideo: media.get('siteMediaID'),
-                        loadSWFObject: false,
-                        width: $("#video").width(),
-                        height: $("#video").height(),
-                        onStop: clearMediaInterval,
-                        onPlayerBuffering: clearMediaInterval,
-                        onPlayerPaused: clearMediaInterval,
                         volume: playlist.isMuted() ? 0 : playlist.getVolume(),
-                        onPlayerPlaying: function() {
-                            playlist.setVolume(playlist.isMuted() ? 0 : playlist.currentVolumePercent);
-                            media.set('interval', window.setInterval(function() {
-                                var data = $("#video").tubeplayer('data');
-                                if (data && data.hasOwnProperty('currentTime') && data.hasOwnProperty('duration')) {
-                                    var percent =  (data.currentTime / data.duration) * 100;
-                                    timeElapsed.text(secondsToString(data.currentTime));
-                                    updateTimebar(percent);
-                                }
-                            }, 333));
-                        },
-                        onPlayerEnded: function() {
-                            clearMediaInterval();
-                            media.stop();
-                            playlist.nextTrack(true);
-                        },
-                        onErrorNotEmbeddable: function() {
-                            playlist.nextTrack(true);
-                        },
-                        onErrorNotFound: function() {
-                            playlist.nextTrack(true);
-                        },
-                        onErrorInvalidParameter: function() {
-                            playlist.nextTrack(true);
-                        }
                     });
+                    playlist.listenTo(YouTube, 'progress', progress);
+                    YouTube.once('end error', function() {
+                        playlist.stopListening(YouTube);
+                        playlist.nextTrack(true);
+                    }, this);
                 }
             }
-            this.setPlayButton(false);
+            this.trigger('play', media);
         }
     },
     previousTrack: function(autostart) {
@@ -368,7 +335,7 @@ var TrackPlaylist = TrackList.extend({
             this.currentMedia.stop();
             timebar.width(0);
             $('#time-elapsed').text('0:00');
-            this.setPlayButton(true);
+            this.trigger('stop', this.currentMedia);
         }
     },
     sync: function(method, model, options) {
@@ -408,17 +375,14 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     togglePause: function() {
-        this.setPlayButton(!this.isPaused());
         if (!this.isEmpty()) {
+            var isPaused = this.currentMedia.isPaused();
             this.currentMedia.togglePause();
-        }
-    },
-    setPlayButton: function(on) {
-        if (on) {
-            $('#play').find('i').removeClass('icon-pause').addClass('icon-play');
-        }
-        else {
-            $('#play').find('i').removeClass('icon-play').addClass('icon-pause');
+            if (isPaused) {
+                this.trigger('resume');
+            } else {
+                this.trigger('pause');
+            }
         }
     },
 	url: function(id) {
