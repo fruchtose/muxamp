@@ -278,7 +278,13 @@ var PlaylistView = Backbone.View.extend({
 			addPoint.before.apply(addPoint, newRows);
 		}
 	},
+	clearPlaylist: function() {
+		Playlist.reset();
+	},
 	el: $("#playlist-pane"),
+	events: {
+		'click #clear': 'clearPlaylist'
+	},
 	initialize: function() {
 		this.table = '#tracks tbody';
 		// Unordered list of row views, only meant for internal bookkeeping

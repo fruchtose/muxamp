@@ -1,7 +1,3 @@
-$("#clear").click(function() {
-	Playlist.reset();
-});
-
 var alertError = function(title, body) {
 	var header = '<h4 class="alert-heading">' + title + '</h4>'
 	var body = '<span class="body">' + body + '</span>';
