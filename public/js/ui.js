@@ -36,13 +36,11 @@ var secondsToString = function(duration) {
     // to be 8:42, which the user would expect intuitively.
     var secondsLeft = Math.ceil(duration);
     var hours = Math.floor(secondsLeft / 3600);
-    if (hours >= 1) {
-        secondsLeft -= hours * 3600;
-    }
+    secondsLeft -= (hours >= 1) ? hours * 3600 : 0;
+
     var minutes = Math.floor(secondsLeft / 60);
-    if (minutes >= 1) {
-        secondsLeft -= (minutes * 60);
-    }
+    secondsLeft -= (minutes >= 1) ? minutes * 60 : 0;
+
     var seconds = Math.floor(secondsLeft);
     str = (hours >= 1) ? (hours.toString() + ":") : "";
     if (minutes < 10 && hours >= 1) {
