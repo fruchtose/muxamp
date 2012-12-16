@@ -53,7 +53,7 @@ var SoundTrack = Track.extend({
 			: null;
 		if (sm) {
 			audio = sm.createSound({
-				id: this.get("id"),
+				id: this.get("siteMediaID"),
 				url: this.get("url")
 			});
 		}
@@ -86,7 +86,7 @@ var SoundTrack = Track.extend({
     },
     
     play: function(options) {
-        return this.get('soundManager').play(this.id, options);
+        return this.get('soundManager').play(this.get("siteMediaID"), options);
     },
     
     seek: function(decimalPercent) {

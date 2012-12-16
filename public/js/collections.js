@@ -136,16 +136,6 @@ var TrackPlaylist = TrackList.extend({
     hasPrevious: function() {
         return !this.isEmpty() && this.currentTrack - 1 >= 0;
     },
-    indexOfTrackID: function(trackID) {
-        var pos = -1, tracks = this.models;
-        for (track in tracks) {
-            if (tracks[track].get('id') == trackID) {
-                pos = track;
-                break;
-            }
-        }
-        return pos;
-    },
     isEmpty: function() {
         return ! this.size();
     },
@@ -320,7 +310,6 @@ var TrackPlaylist = TrackList.extend({
                 this.currentMedia.stop();
             }
             
-            timebar.width(0);
             this.trigger('progress', {percent: 0, time: 0});
             this.trigger('stop', this.currentMedia);
         }
