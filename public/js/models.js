@@ -181,14 +181,12 @@ var YouTubeTrack = VideoTrack.extend({
         YouTube.seek(Math.floor(decimalPercent * duration));
     },
     setMute: function(mute) {
-        $(document).ready(function() {
-            if (mute) {
-                YouTube.mute();
-            }
-            else {
-                YouTube.unmute();
-            }
-        });
+        if (mute) {
+            YouTube.mute();
+        }
+        else {
+            YouTube.unmute();
+        }
     },
     setVolume: function(percent) {
         var muted = this.isMuted();
