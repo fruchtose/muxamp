@@ -11,7 +11,7 @@ var MainView = Backbone.View.extend({
 	initialize: function() {
 		this.blockUI = false;
 		this.subviews = [new ControlsView(), new PlaylistView(),
-			new SearchBarView(), new SearchResultsView(), new TimebarView()];
+			new SearchBarView(), new SearchResultsView(), new TimebarView(), new VolumeView()];
 	},
 
 	el: "body",
@@ -452,6 +452,8 @@ var SearchResultsView = Backbone.View.extend({
 var TimebarView = Backbone.View.extend({
 	el: $("#timebar-row"),
 	initialize: function() {
+		this.percent = 0;
+		this.time = 0;
 		this.timebar = $('#timebar-inner');
 		this.timeElapsed = $('#time-elapsed');
 		var timebarOuter = $("#timebar-outer");
@@ -479,9 +481,53 @@ var TimebarView = Backbone.View.extend({
         if (updateTime - this.lastUpdate < 333) {
             return;
         }
+        this.percent = percent;
+        this.time = time;
         this.lastUpdate = updateTime;
-        this.timebar.width(percent.toFixed(2) + "%");
-		this.timeElapsed.text(secondsToString(time));
+        this.render();
+	},
+	render: function() {
+		this.timebar.width(this.percent.toFixed(2) + "%");
+		this.timeElapsed.text(secondsToString(this.time));
+		return this;
+	}
+});
+
+var VolumeView = Backbone.View.extend({
+	el: $("#volume"),
+	events: {
+		'click #volume-symbol': 'toggleMute'
+	},
+	initialize: function() {
+		$("#volume-outer").slider({
+	        orientation: "horizontal",
+	        range: "min",
+	        min: 0,
+	        max: 100,
+	        value: 50,
+	        slide: function(event, ui) {
+	            Playlist.setVolume(ui.value);
+	        }
+	    });
+
+	    Playlist.on('volume', this.updateSymbol, this);
+	},
+	toggleMute: function() {
+		Playlist.toggleMute();
+	},
+	updateSymbol: function(volume) {
+		var amount = parseInt(volume).toString();
+        $("#volume-inner").width(amount + "%");
+        $("#volume-number").text(amount);
+        if (volume >= 50) {
+            $("#volume-symbol").removeClass("icon-volume-down").removeClass("icon-volume-off").addClass("icon-volume-up");
+        }
+        else if (volume > 0) {
+            $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-off").addClass("icon-volume-down");
+        }
+        else if (volume == 0) {
+            $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-down").addClass("icon-volume-off");
+        }
 	}
 });
 

@@ -280,22 +280,7 @@ var TrackPlaylist = TrackList.extend({
             }
         }
         this.currentVolumePercent = intPercent;
-        this.setVolumeSymbol(setMute ? 0 : intPercent);
-    },
-    setVolumeSymbol: function(intPercent) {
-        //Update volume bar
-        var volumeBarWidth = intPercent.toString();
-        $("#volume-inner").width(volumeBarWidth + "%");
-        $("#volume-number").text(volumeBarWidth);
-        if (intPercent >= 50) {
-            $("#volume-symbol").removeClass("icon-volume-down").removeClass("icon-volume-off").addClass("icon-volume-up");
-        }
-        else if (intPercent > 0) {
-            $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-off").addClass("icon-volume-down");
-        }
-        else if (intPercent == 0) {
-            $("#volume-symbol").removeClass("icon-volume-up").removeClass("icon-volume-down").addClass("icon-volume-off");
-        }
+        this.trigger('volume', setMute ? 0 : intPercent);
     },
     shuffle: function() {
         if (this.isEmpty()) {
@@ -372,7 +357,7 @@ var TrackPlaylist = TrackList.extend({
                 this.setVolume(this.currentVolumePercent);
             }
             else {
-                this.setVolumeSymbol(0);
+                this.trigger('volume', 0);
             }
         }
     },

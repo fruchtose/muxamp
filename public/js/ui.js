@@ -7,24 +7,6 @@ var alertError = function(title, body) {
 	container.append(alert);
 }
 
-$(document).ready(function() {
-    var volumeOuter = $("#volume-outer");
-    volumeOuter.slider({
-        orientation: "horizontal",
-        range: "min",
-        min: 0,
-        max: 100,
-        value: 50,
-        slide: function(event, ui) {
-            Playlist.setVolume(ui.value);
-        }
-    });
-});
-
-$("#volume-symbol").click(function() {
-    Playlist.toggleMute();
-});
-
 var secondsToString = function(duration) {
     var str = "";
     // The duration can be a decimal, but we want it to be an integer so the user 
