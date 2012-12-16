@@ -36,6 +36,7 @@ soundManager.flashVersion = 9;
 soundManager.preferFlash = false;
 soundManager.url = 'swf/';
 
+var YouTube = new YouTubeInterface({el: $("#video")});
 var Playlist = new TrackPlaylist();
 var SearchResults = new SearchResultsProvider();
 $(document).ready(function() {
