@@ -5,12 +5,12 @@ app.configure(function() {
 	app.use(express.bodyParser());
 });
 
-var search = require('./server/search').search();
-var mediaRouterBase = require('./server/router');
+var search = require('./lib/search').search();
+var mediaRouterBase = require('./lib/router');
 var mediaRouter = mediaRouterBase.getRouter();
 var url = require('url');
-var $ = require('./server/jquery.whenall');
-var playlist = require('./server/playlist');
+var $ = require('./lib/jquery.whenall');
+var playlist = require('./lib/playlist');
 var fs = require('fs');
 var cacher = require('node-dummy-cache');
 var playlistFetchCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
