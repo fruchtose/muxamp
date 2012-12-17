@@ -392,8 +392,9 @@ var SearchResultsProvider = TrackList.extend({
     },
     parse: function(data) {
         var tracks = [];
+        var options = {silent: true};
         _(data).each(function(result) {
-            tracks.push(Track.getMediaObject(result));
+            tracks.push(Track.getMediaObject(result, options));
         });
         return tracks;
     },

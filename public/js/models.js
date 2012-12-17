@@ -11,8 +11,9 @@ var Track = Backbone.Model.extend({
         type: ""
     }
 }, {
-    getMediaObject: function(mediaData) {
+    getMediaObject: function(mediaData, options) {
         var mediaObject = null;
+        options || (options = {});
         if (mediaData) {
             switch (mediaData.siteCode) {
                 case 'sct':
@@ -24,7 +25,7 @@ var Track = Backbone.Model.extend({
                         mediaName: mediaData.mediaName,
                         duration: mediaData.duration,
                         soundManager: soundManager
-                    });
+                    }, options);
                     break;
                 case 'ytv':
                     mediaObject = new YouTubeTrack({
@@ -32,7 +33,7 @@ var Track = Backbone.Model.extend({
                         uploader: mediaData.author,
                         mediaName: mediaData.mediaName,
                         duration: mediaData.duration,
-                    });
+                    }, options);
                     break;
             }
         }
@@ -47,7 +48,12 @@ var SoundTrack = Track.extend({
 		sound: null,
 		type: "audio"
 	}),
-	initialize: function() {
+	initialize: function(options) {
+
+        if (options.silent) {
+            return;
+        }
+
 		var audio = null, sm = (soundManager != undefined && soundManager != null) 
 			? soundManager 
 			: null;

@@ -10,7 +10,7 @@ $(document).ready(function() {
 	var router = new PlaylistRouter();
 	var mainView = new MainView().toggleBlock().render();
 	Playlist.once('sync', function() {
-		mainView.toggleBlock();
+		mainView.toggleBlock().render();
 	});
 	Playlist.on('sync', function(data) {
 		var fragment = (data.id) ? data.id.toString() : "";
