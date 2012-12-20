@@ -302,7 +302,7 @@ var PlaylistView = Backbone.View.extend({
 		var newRows = [];
 		_(tracks).each(function(track) {
 			var view = new PlaylistTrackView({
-				model: track.clone(),
+				model: track,
 				action1: {
 					classes: 'remove',
 					icon: 'icon-remove'
