@@ -660,7 +660,6 @@ var YouTubeInterface = Backbone.View.extend({
 	load: function(options) {
 		var view = this;
 		var params = _.extend({}, view.defaults, options);
-		console.log(params);
 		view.$el.tubeplayer(params);
 		if (_.isNumber(options.volume)) {
     		view.setVolume(options.volume);
@@ -747,8 +746,6 @@ var YouTubeInterface = Backbone.View.extend({
 			view.$el.tubeplayer('volume', percent);
 			view.currentVolume = percent;
 	        view.trigger('volume', view.currentVolume);
-	        console.log(view.currentVolume);
-	        console.trace();
 		};
 		view.onload.done(volumize);
 	},
