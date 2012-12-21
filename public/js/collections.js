@@ -42,6 +42,7 @@ var TrackPlaylist = TrackList.extend({
 		this.settings = {};
 
         this.on("add", function(mediaObjects, playlist, options) {
+            options || (options = {});
             mediaObjects = _.isArray(mediaObjects) ? mediaObjects : [mediaObjects];
             var index = options.index, playNext = false;
             if (options.play) {
@@ -62,7 +63,6 @@ var TrackPlaylist = TrackList.extend({
                     this.goToTrack(playNext, true);
                 }
             }
-            
         });
 
         this.on("remove", function(mediaObject, playlist, options) {
@@ -73,7 +73,6 @@ var TrackPlaylist = TrackList.extend({
                 this.stop(true);
             }
             var trackDuration = mediaObject.get('duration');
-            mediaObject.destruct();
             if (mediaObject == this.currentMedia) {
                 this.setCurrentTrack(Math.min(this.size() - 1, index));
             }
