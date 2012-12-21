@@ -58,7 +58,6 @@ var TrackPlaylist = TrackList.extend({
             // Syncs when we reach end of a batch add (or no batch was specified)
             if (!options.batch || index - options.batch + 1 == options.start) {
                 this.sync("create", this);
-                this.setCurrentTrack(this.currentTrack);
                 if (playNext !== false) {
                     this.goToTrack(playNext, true);
                 }
@@ -68,41 +67,33 @@ var TrackPlaylist = TrackList.extend({
         this.on("remove", function(mediaObject, playlist, options) {
             var index = options.index;
 
-            var wasPlaying = mediaObject.isPlaying() && mediaObject == this.currentMedia;
-            if (wasPlaying){
-                this.stop(true);
+            this.totalDuration -= mediaObject.get('duration');
+            if (index == this.currentTrack) {
+                this.goToTrack(Math.min(this.size() - 1, index));
             }
-            var trackDuration = mediaObject.get('duration');
-            if (mediaObject == this.currentMedia) {
-                this.setCurrentTrack(Math.min(this.size() - 1, index));
+            if ( ! this.where({siteMediaID: mediaObject.get('siteMediaID')}).length) {
+                // Destroys media if no more instances exist in playlist
+                mediaObject.destruct();
             }
-            if (!this.isEmpty() && wasPlaying) {
-                this.play();
-            }
-            this.totalDuration -= trackDuration;
             this.sync("create", this);
         });
 
 		this.on("reset", function(playlist, options) {
-			var mediaObjects = this.models || [];
-			var currentTrack = (options ? options.currentTrack : 0) || 0;
-		    var duration = 0;
-            this.trigger("tracks:new", this.models);
-            if (mediaObjects.length) {
-                for (var i in mediaObjects) {
-                    var mediaObject = mediaObjects[i];
-                    duration += mediaObject.get('duration');
-                }
-            } else {
-		    	this.stop(true);
+            options || (options = {});
+			var currentTrack = 0 || options.currentTrack;
+            var autoplay = options.play && this.isLoaded();
+            this.totalDuration = _(this.pluck('duration'))
+                .reduce(function(memo, val) {
+                    return memo + val;
+                }, 0);
+            if (!this.size()) {
+                this.stop(true);
                 soundManager.reboot();
 		    }
-            this.totalDuration = duration;
-            this.sync("create", this);
             this.setCurrentTrack(currentTrack);
-            if (options.play && !this.isEmpty()) {
-                this.goToTrack(0, true);
-            }
+            this.trigger("tracks:new", this.models);
+            this.sync("create", this);
+            this.goToTrack(currentTrack, autoplay);
 		});
 
         this.on('id', function(data) {
@@ -118,49 +109,49 @@ var TrackPlaylist = TrackList.extend({
         return this.currentVolumePercent;
     },
     goToTrack: function(index, autostart) {
-        if (this.isEmpty()) {
+        if (!this.size()) {
+            this.setCurrentTrack(0);
             return;
         }
         var wasPlaying = this.isPlaying();
         this.stop(true);
-        var media = this.currentMedia;
-        this.setCurrentTrack(parseInt(index));
+        this.setCurrentTrack(index);
         if (wasPlaying || autostart) {
             this.play();
         }
     },
     hasNext: function() {
-        return !this.isEmpty() && this.size() > this.currentTrack + 1;
+        return this.isLoaded() && this.size() > this.currentTrack + 1;
     },
     hasPrevious: function() {
-        return !this.isEmpty() && this.currentTrack - 1 >= 0;
+        return this.isLoaded() && this.currentTrack - 1 >= 0;
     },
-    isEmpty: function() {
-        return ! this.size();
+    isLoaded: function() {
+        return this.size() && this.currentMedia;
     },
     isMuted: function() {
         var result = false;
-        if (!this.isEmpty()) {
+        if (this.isLoaded()) {
             result = this.currentMedia.isMuted();
         }
         return result;
     },
     isPaused: function() {
         var status = false;
-        if (!this.isEmpty()) {
+        if (this.isLoaded()) {
             status = this.currentMedia.isPaused();
         }
         return status;
     },
     isPlaying: function() {
         var status = false;
-        if (!this.isEmpty()) {
+        if (this.isLoaded()) {
             status = this.currentMedia.isPlaying() || this.currentMedia.isPaused();
         }
         return status;
     },
     moveTrack: function(pos1, pos2) {
-        if (!this.isEmpty() && pos1 != pos2) {
+        if (this.isLoaded() && pos1 != pos2) {
         	var minIndex = 0;
             if (pos1 >= 0 && pos2 >= 0 && pos1 < this.size() && pos2 < this.size()) {
                 fastMove(this.models, pos1, pos2);
@@ -188,7 +179,7 @@ var TrackPlaylist = TrackList.extend({
     	return mediaObjects;
     },
     play: function() {
-        if (!this.isEmpty()) {
+        if (this.isLoaded()) {
             var playlist = this;
             var progress = function(details) {
                 playlist.trigger('progress', details);
@@ -232,14 +223,14 @@ var TrackPlaylist = TrackList.extend({
         this.goToTrack(next, autostart);
     },
     seek: function(decimalPercent) {
-        if (!this.isEmpty()) {
+        if (this.isLoaded()) {
             var track = this.currentMedia;
             track.seek(decimalPercent);
         }
     },
     setCurrentTrack: function(trackNumber) {
         this.currentTrack = trackNumber;
-        if (!this.isEmpty() && trackNumber >= 0 && trackNumber < this.size()) {
+        if (this.isLoaded() && trackNumber >= 0 && trackNumber < this.size()) {
             this.currentMedia = this.at(trackNumber);
         } else {
             this.currentTrack = 0;
@@ -248,7 +239,7 @@ var TrackPlaylist = TrackList.extend({
         this.trigger('currentTrack', this.currentTrack);
     },
     setMute: function(mute) {
-        if (!this.isEmpty()) {
+        if (this.isLoaded()) {
             this.currentMedia.setMute(mute);
         }
         if (!mute) {
@@ -272,7 +263,7 @@ var TrackPlaylist = TrackList.extend({
         this.trigger('volume', setMute ? 0 : intPercent);
     },
     shuffle: function() {
-        if (this.isEmpty()) {
+        if (!this.size()) {
             return false;
         }
         // Fisher-Yates shuffle implementation by Cristoph (http://stackoverflow.com/users/48015/christoph),
@@ -300,7 +291,7 @@ var TrackPlaylist = TrackList.extend({
         this.reset(newList, {currentTrack: newCurrentTrack});
     },
     stop: function (hard) {
-        if (!this.isEmpty() || this.currentMedia) {
+        if (this.isLoaded()) {
             // Hard stop is used when the current media should not be restarted until 
             // the next time a player queues it
             if (hard) {
@@ -338,7 +329,7 @@ var TrackPlaylist = TrackList.extend({
         return playlist;
     },
     toggleMute: function() {
-        if (!this.isEmpty()) {
+        if (this.isLoaded()) {
             var shouldUnmute = this.currentMedia.isMuted();
             this.currentMedia.toggleMute();
             if (shouldUnmute) {
@@ -350,7 +341,7 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     togglePause: function() {
-        if (!this.isEmpty()) {
+        if (this.isLoaded()) {
             var isPaused = this.currentMedia.isPaused();
             this.currentMedia.togglePause();
             if (isPaused) {
