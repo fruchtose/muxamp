@@ -359,19 +359,19 @@ var PlaylistView = Backbone.View.extend({
 	        }
 	    });
 
-	    Playlist.on('reset', this.reset, this);
-		Playlist.on('add', this.append, this);
-		Playlist.on('sync', this.updateList, this);
+	    Playlist.on('tracks:new', this.reset, this);
+		Playlist.on('tracks', this.append, this);
+		Playlist.on('id', this.updateList, this);
 		Playlist.on('currentTrack', this.setCurrentTrack, this);
 	},
-	reset: function(playlist) {
+	reset: function(tracks) {
 		$(this.table).empty();
 		_(this.rows).each(function(row) {
 				row.close();
 			});
 		this.rows = [];
-		if (playlist) {
-			this.append(playlist.models);
+		if (tracks) {
+			this.append(tracks);
 		}
 	},
 	setCurrentTrack: function(trackNumber) {
