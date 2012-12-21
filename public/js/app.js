@@ -9,10 +9,10 @@ var SearchResults = new SearchResultsProvider();
 $(document).ready(function() {
 	var router = new PlaylistRouter();
 	var mainView = new MainView().toggleBlock().render();
-	Playlist.once('sync', function() {
+	Playlist.once('id', function() {
 		mainView.toggleBlock().render();
 	});
-	Playlist.on('sync', function(data) {
+	Playlist.on('id', function(data) {
 		var fragment = (data.id) ? data.id.toString() : "";
 		router.navigate(fragment, {trigger: false});
 	});

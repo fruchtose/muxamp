@@ -105,7 +105,7 @@ var TrackPlaylist = TrackList.extend({
             }
 		});
 
-        this.on('sync', function(data) {
+        this.on('id', function(data) {
             if (data.id) {
                 this.id = data.id;
             }
@@ -323,7 +323,7 @@ var TrackPlaylist = TrackList.extend({
         return Backbone.sync(method, model, options).always(function(data) {
             data = data || {};
             if (!data.id || data.id != model.id) {
-                model.trigger('sync', data);
+                model.trigger('id', data);
             }
         });
     },
