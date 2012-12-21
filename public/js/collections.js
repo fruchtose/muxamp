@@ -46,17 +46,17 @@ var TrackPlaylist = TrackList.extend({
             mediaObjects = _.isArray(mediaObjects) ? mediaObjects : [mediaObjects];
             var index = options.index, playNext = false;
             if (options.play) {
-                playNext = (options.index == undefined) ? this.indexOf(mediaObjects[0]) : options.index;
+                playNext = (options.index == null) 
+                    ? this.indexOf(mediaObjects[0])
+                    : options.index;
             }
-            var addedDuration = 0;
-            for (var i in mediaObjects) {
-                var mediaObject = mediaObjects[i];
-                addedDuration += mediaObject.get('duration');
-            }
-            this.totalDuration += addedDuration;
+            this.totalDuration += _(mediaObjects)
+                .reduce(function(memo, val) {
+                    return memo + val.get('duration');
+                }, 0);
             this.trigger("tracks", mediaObjects, options);
             // Syncs when we reach end of a batch add (or no batch was specified)
-            if (!options.batch || 1 + index - options.batch == options.start) {
+            if (!options.batch || index - options.batch + 1 == options.start) {
                 this.sync("create", this);
                 this.setCurrentTrack(this.currentTrack);
                 if (playNext !== false) {
