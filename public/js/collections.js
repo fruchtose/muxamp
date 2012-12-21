@@ -38,6 +38,7 @@ var TrackPlaylist = TrackList.extend({
 		this.currentTrack =  0,
 		this.currentVolumePercent = 50,
 		this.id = false,
+        this.muted = false,
 		this.totalDuration = 0;
 		this.settings = {};
 
@@ -129,11 +130,7 @@ var TrackPlaylist = TrackList.extend({
         return this.size() && this.currentMedia;
     },
     isMuted: function() {
-        var result = false;
-        if (this.isLoaded()) {
-            result = this.currentMedia.isMuted();
-        }
-        return result;
+        return this.muted;
     },
     isPaused: function() {
         var status = false;
@@ -241,21 +238,23 @@ var TrackPlaylist = TrackList.extend({
         if (this.isLoaded()) {
             this.currentMedia.setMute(mute);
         }
-        if (!mute) {
-            this.setVolume(this.currentVolumePercent);
-        }
+        var newVolume = (mute)
+            ? 0
+            : this.currentVolumePercent;
+        this.setVolume(newVolume);
+        this.muted = mute;
     },
     setSetting: function(option, value) {
     	this.settings[option] = value;
     },
     setVolume: function(intPercent) {
         intPercent = Math.round(intPercent);
-        if (this.isPlaying() || this.isPaused()) {
+        if (this.isLoaded()) {
             var media = this.currentMedia;
             var setMute = intPercent == 0;
             media.setVolume(intPercent);
             if (setMute) {
-                intPercent = 50;
+                intPercent = this.currentVolumePercent;
             }
         }
         this.currentVolumePercent = intPercent;
@@ -328,16 +327,7 @@ var TrackPlaylist = TrackList.extend({
         return playlist;
     },
     toggleMute: function() {
-        if (this.isLoaded()) {
-            var shouldUnmute = this.currentMedia.isMuted();
-            this.currentMedia.toggleMute();
-            if (shouldUnmute) {
-                this.setVolume(this.currentVolumePercent);
-            }
-            else {
-                this.trigger('volume', 0);
-            }
-        }
+        this.setMute(!this.muted);
     },
     togglePause: function() {
         if (this.isLoaded()) {

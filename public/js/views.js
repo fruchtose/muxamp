@@ -610,11 +610,9 @@ var YouTubeInterface = Backbone.View.extend({
             	view.clearInterval();
             	view.trigger('pause', view.$el.tubeplayer('data'));
             },
-            volume: 50,
             onPlayerPlaying: function() {
             	view.onload.resolve();
             	view.state = 1;
-                view.setVolume(view.currentVolume);
                 view.setInterval();
                 view.trigger('play');
             },
@@ -661,8 +659,14 @@ var YouTubeInterface = Backbone.View.extend({
 	},
 	load: function(options) {
 		var view = this;
-		var params = _.extend({volume: 50}, view.defaults, options);
+		var params = _.extend({}, view.defaults, options);
+		console.log(params);
 		view.$el.tubeplayer(params);
+		if (_.isNumber(options.volume)) {
+    		view.setVolume(options.volume);
+    	} else {
+    		view.setVolume(view.currentVolume);
+    	}
 		view.onload.promise();
 	},
 	mute: function() {
@@ -707,7 +711,9 @@ var YouTubeInterface = Backbone.View.extend({
 		view.$el.removeAttr('class data-prev-mute-volume');
 		view.muted = false;
 		view.state = -2;
-		(view.currentVolume != null) || (view.currentVolume = 50);
+		if (!_.isNumber(view.currentVolume)) {
+			view.currentVolume = 50;
+		}
 		view.trigger('reset');
 	},
 	seek: function(time) {
@@ -739,8 +745,10 @@ var YouTubeInterface = Backbone.View.extend({
 		var view = this;
 		var volumize = function() {
 			view.$el.tubeplayer('volume', percent);
-			view.currentVolume = view.$el.tubeplayer('volume');
+			view.currentVolume = percent;
 	        view.trigger('volume', view.currentVolume);
+	        console.log(view.currentVolume);
+	        console.trace();
 		};
 		view.onload.done(volumize);
 	},
