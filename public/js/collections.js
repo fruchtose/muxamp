@@ -80,7 +80,7 @@ var TrackPlaylist = TrackList.extend({
 
 		this.on("reset", function(playlist, options) {
             options || (options = {});
-			var currentTrack = 0 || options.currentTrack;
+			var currentTrack = options.currentTrack || 0;
             var autoplay = options.play && this.isLoaded();
             this.totalDuration = _(this.pluck('duration'))
                 .reduce(function(memo, val) {
@@ -90,7 +90,6 @@ var TrackPlaylist = TrackList.extend({
                 this.stop(true);
                 soundManager.reboot();
 		    }
-            this.setCurrentTrack(currentTrack);
             this.trigger("tracks:new", this.models);
             this.sync("create", this);
             this.goToTrack(currentTrack, autoplay);
@@ -229,8 +228,8 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     setCurrentTrack: function(trackNumber) {
-        this.currentTrack = trackNumber;
-        if (this.isLoaded() && trackNumber >= 0 && trackNumber < this.size()) {
+        if (this.size() && trackNumber >= 0 && trackNumber < this.size()) {
+            this.currentTrack = trackNumber;
             this.currentMedia = this.at(trackNumber);
         } else {
             this.currentTrack = 0;
@@ -263,7 +262,7 @@ var TrackPlaylist = TrackList.extend({
         this.trigger('volume', setMute ? 0 : intPercent);
     },
     shuffle: function() {
-        if (!this.size()) {
+        if (!this.isLoaded()) {
             return false;
         }
         // Fisher-Yates shuffle implementation by Cristoph (http://stackoverflow.com/users/48015/christoph),
