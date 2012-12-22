@@ -498,8 +498,6 @@ var SearchResultsView = Backbone.View.extend({
 var TimebarView = Backbone.View.extend({
 	el: $("#timebar-row"),
 	initialize: function() {
-		this.percent = 0;
-		this.time = 0;
 		this.timebar = $('#timebar-inner');
 		this.timeElapsed = $('#time-elapsed');
 		var timebarOuter = $("#timebar-outer");
@@ -527,15 +525,9 @@ var TimebarView = Backbone.View.extend({
         if (updateTime - this.lastUpdate < 333) {
             return;
         }
-        this.percent = percent;
-        this.time = time;
         this.lastUpdate = updateTime;
-        this.render();
-	},
-	render: function() {
-		this.timebar.width(this.percent.toFixed(2) + "%");
-		this.timeElapsed.text(secondsToString(this.time));
-		return this;
+        this.timebar.width(percent.toFixed(2) + "%");
+		this.timeElapsed.text(secondsToString(time));
 	}
 });
 
