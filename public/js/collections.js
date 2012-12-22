@@ -154,7 +154,6 @@ var TrackPlaylist = TrackList.extend({
                 this.sync("create", this);
             }
         }
-        this.sync("create", this);
     },
     nextTrack: function(autostart) {
         var trackInt = parseInt(this.currentTrack), next = (trackInt + 1) % this.size() || 0;
