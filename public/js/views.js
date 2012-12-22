@@ -50,12 +50,12 @@ Backbone.View.prototype.close = function() {
 };
 
 var ModalView = Backbone.View.extend({
-	el: $('#about'),
+	el: $('#about-button'),
 	events: {
-		'click #about-button': 'modal'
+		'click': 'modal'
 	},
 	modal: function() {
-		this.$el.modal({
+		$('#about').modal({
 	        backdrop: true
 	    });
 	}

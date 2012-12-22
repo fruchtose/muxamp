@@ -1,8 +1,11 @@
-var express = require('express'), app = express();
+var express = require('express'), 
+	app = express(),
+	ejs = require('ejs-locals');
 
 app.configure(function() {
 	app.use(express.static(__dirname + '/public/'));
 	app.use(express.bodyParser());
+	app.engine('ejs', ejs);
 	app.set('view engine', 'ejs');
 });
 
@@ -10,7 +13,6 @@ var search = require('./lib/search').search(),
 	mediaRouterBase = require('./lib/router'),
 	mediaRouter = mediaRouterBase.getRouter(),
 	url = require('url'),
-	ejs = require('ejs'),
 	$ = require('./lib/jquery.whenall'),
 	playlist = require('./lib/playlist'),
 	cacher = require('node-dummy-cache'),
