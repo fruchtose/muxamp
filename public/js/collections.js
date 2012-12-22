@@ -8,7 +8,7 @@ var fastMove = function(arr, pos1, pos2) {
     var i, tmp;
     // cast input parameters to integers
     // if positions are different and inside array
-    if (pos1 !== pos2 && 0 <= pos1 && pos1 <= this.length && 0 <= pos2 && pos2 <= this.length) {
+    if (pos1 !== pos2 && 0 <= pos1 && pos1 <= arr.length && 0 <= pos2 && pos2 <= arr.length) {
       // save element from position 1
       tmp = arr[pos1];
       // move element down and shift other elements up
@@ -24,7 +24,7 @@ var fastMove = function(arr, pos1, pos2) {
         }
       }
       // put element from position 1 to destination
-      this[pos2] = tmp;
+      arr[pos2] = tmp;
     }
 };
 
@@ -318,7 +318,7 @@ var TrackPlaylist = TrackList.extend({
     },
     toJSON: function() {
         var playlist = [];
-        this.forEach(function(media) {
+        this.forEach(function(media, index) {
             playlist.push({
                 siteCode: media.get("siteCode"),
                 siteMediaID: media.get("siteMediaID")

@@ -350,7 +350,7 @@ var PlaylistView = Backbone.View.extend({
 	    		return helper;
 	    	},
 	        start: function(event, ui) {
-	            startPos = $(event.target).closest('tr').index();
+	            startPos =ui.item.index();
 	        },
 	        tolerance: 'pointer',
 	        stop: function(event, ui) {
