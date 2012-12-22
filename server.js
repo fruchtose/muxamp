@@ -13,7 +13,7 @@ var search = require('./lib/search').search(),
 	mediaRouterBase = require('./lib/router'),
 	mediaRouter = mediaRouterBase.getRouter(),
 	url = require('url'),
-	$ = require('./lib/jquery.whenall'),
+	Q = require('q'),
 	playlist = require('./lib/playlist'),
 	cacher = require('node-dummy-cache'),
 	playlistFetchCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
@@ -51,7 +51,7 @@ app.get('/playlists/:queryID', function(req, res) {
 				}));
 			}
 		}
-		$.when.apply(null, responses).always(function() {
+		Q.allResolved(responses).then(function() {
 			if (!cached && results.length >= 5) {
 				playlistFetchCache.put(queryID, results);
 			}
@@ -81,7 +81,7 @@ app.post('/playlists/save', function(req, res) {
 		else {
 			savedID = doesExist;
 		}
-		$.whenAll.apply(null, responses).always(function() {
+		Q.allResolved(responses).then(function() {
 			res.json({id: savedID});
 		});
 	}).fail(function() {
