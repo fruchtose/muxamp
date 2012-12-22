@@ -12,6 +12,8 @@
     "generic-pool": "~2.0.2",
     "node-dummy-cache": "~0.2.2",
     "mysql": "~2.0.0-alpha5",
-    "ejs": "~0.8.3"
+    "ejs": "~0.8.3",
+    "underscore": "~1.4.3",
+    "underscore.string": "~2.3.1"
   }
 }
