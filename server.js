@@ -35,7 +35,7 @@ app.get('/search/:site/:page([0-9]+)/:query?', function(req, res) {
 app.get('/playlists/:queryID', function(req, res) {
 	var queryID = req.params.queryID;
 	var exists = playlist.getString(queryID);
-	exists.done(function(doesExist) {
+	exists.then(function(doesExist) {
 		var responses = [], results = [];
 		var playlistString = doesExist;
 		var cached = playlistFetchCache.get(queryID);
@@ -59,19 +59,19 @@ app.get('/playlists/:queryID', function(req, res) {
 		});
 	}).fail(function() {
 		res.json({id: false, results: []});
-	});
+	}).done();
 });
 
 app.post('/playlists/save', function(req, res) {
 	var query = req.body;
 	var qs = playlist.toQueryString(req.body);
 	var existing = playlist.getID(qs);
-	existing.done(function(doesExist) {
+	existing.then(function(doesExist) {
 		var savedID = false;
 		var responses = [], results = [];
 		if (!doesExist && qs.length) {
 			var saveQuery = playlist.save(query);
-			saveQuery.done(function(result) {
+			saveQuery.then(function(result) {
 				savedID = result;
 			}).fail(function(result) {
 				console.log('playlist not inserted', playlist);
@@ -86,7 +86,7 @@ app.post('/playlists/save', function(req, res) {
 		});
 	}).fail(function() {
 		res.json({id: false});
-	});
+	}).done();
 });
 
 app.listen(process.env['app_port'] || 3000);
