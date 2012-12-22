@@ -49,51 +49,55 @@
         		<div class="span12" style="height: 100%;">
 		        	<div id="tabs" class="tabbable tabs-left">
 		        		<ul id="tab-list" class="span4 nav nav-tabs">
-		        			<li><a id="search-tab" href="#tab1" data-toggle="tab">Search Results</a></li>
-		        			<li id="playlist-tab"><a class="active" href="#tab2" data-toggle="tab">Playlist &mdash; <span id="track-count">0</span> item<span id="multiple-tracks">s</span> [<span id="playlist-duration">0:00</span>]</a></li>
+		        			<li>
+		        				<a id="search-tab" href="#search-results-pane" data-toggle="tab">
+		        					Search Results
+		        				</a>
+		        			</li>
+		        			<li id="playlist-tab">
+		        				<a class="active" href="#playlist-pane" data-toggle="tab">
+		        					Playlist &mdash; <span id="track-count">0</span> item<span id="multiple-tracks">s</span> [<span id="playlist-duration">0:00</span>]
+		        				</a>
+		        			</li>
 		        		</ul>
 		        		<div id="tab-content" class="tab-content">
-		        			<div id="tab1" class="tab-pane">
-		        				<div id="search-results-pane">
-			        				<div class="tab-actions">
-			        					<span id="add-all" class="btn"><i class="icon-plus"></i> Add All</span>
-			        					<span id="play-all" class="btn"><i class="icon-music"></i> Play All</span>
-			        					<span id="load-more-search-results" class="btn"><i class="icon-refresh"></i> Load More Results</span>
-			        				</div>
-			        				 <table id="search-results" class="table table-condensed table-striped">
-				                		<thead>
-				                			<tr>
-				                				<th class="action-header"></th>
-				                				<th class="uploader-cell">Uploader</th>
-				                				<th class="title-cell">Title</th>
-				                				<th class="duration-cell">Time</th>
-				                				<th class="link-cell">Link</th>
-				                			</tr>
-				                		</thead>
-				                		<tbody>
-				                		</tbody>
-				                	</table>
-			                	</div>
-	        				 </div>
-		        			<div id="tab2" class="tab-pane active">
-		        				<div id="playlist-pane">
-			        				<div class="tab-actions">
-			        					<span id="clear" class="btn"><i class="icon-trash"></i> Clear</span>
-			        				</div>
-				                	<table id="tracks" class="table table-condensed table-striped">
-				                		<thead>
-				                			<tr>
-				                				<th class="action-header"></th>
-				                				<th class="uploader-cell">Uploader</th>
-				                				<th class="title-cell">Title</th>
-				                				<th class="duration-cell">Time</th>
-				                				<th class="link-cell">Link</th>
-				                			</tr>
-				                		</thead>
-				                		<tbody>
-				                		</tbody>
-				                	</table>
-				                </div>
+	        				<div id="search-results-pane" class="tab-pane">
+		        				<div class="tab-actions">
+		        					<span id="add-all" class="btn"><i class="icon-plus"></i> Add All</span>
+		        					<span id="play-all" class="btn"><i class="icon-music"></i> Play All</span>
+		        					<span id="load-more-search-results" class="btn"><i class="icon-refresh"></i> Load More Results</span>
+		        				</div>
+		        				 <table id="search-results" class="table table-condensed table-striped">
+			                		<thead>
+			                			<tr>
+			                				<th class="action-header"></th>
+			                				<th class="uploader-cell">Uploader</th>
+			                				<th class="title-cell">Title</th>
+			                				<th class="duration-cell">Time</th>
+			                				<th class="link-cell">Link</th>
+			                			</tr>
+			                		</thead>
+			                		<tbody>
+			                		</tbody>
+			                	</table>
+		                	</div>
+		        			<div id="playlist-pane" class="tab-pane active">
+		        				<div class="tab-actions">
+		        					<span id="clear" class="btn"><i class="icon-trash"></i> Clear</span>
+		        				</div>
+			                	<table id="tracks" class="table table-condensed table-striped">
+			                		<thead>
+			                			<tr>
+			                				<th class="action-header"></th>
+			                				<th class="uploader-cell">Uploader</th>
+			                				<th class="title-cell">Title</th>
+			                				<th class="duration-cell">Time</th>
+			                				<th class="link-cell">Link</th>
+			                			</tr>
+			                		</thead>
+			                		<tbody>
+			                		</tbody>
+			                	</table>
 				            </div>
 				        </div>
 					</div>
