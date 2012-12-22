@@ -6,16 +6,15 @@ app.configure(function() {
 	app.set('view engine', 'ejs');
 });
 
-var search = require('./lib/search').search();
-var mediaRouterBase = require('./lib/router');
-var mediaRouter = mediaRouterBase.getRouter();
-var url = require('url');
-var ejs = require('ejs');
-var $ = require('./lib/jquery.whenall');
-var playlist = require('./lib/playlist');
-var fs = require('fs');
-var cacher = require('node-dummy-cache');
-var playlistFetchCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
+var search = require('./lib/search').search(),
+	mediaRouterBase = require('./lib/router'),
+	mediaRouter = mediaRouterBase.getRouter(),
+	url = require('url'),
+	ejs = require('ejs'),
+	$ = require('./lib/jquery.whenall'),
+	playlist = require('./lib/playlist'),
+	cacher = require('node-dummy-cache'),
+	playlistFetchCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
 
 app.get(/^\/([1-9][0-9]*)?$/, function(req, res) {
 	res.render('playlist');
