@@ -36,22 +36,24 @@ app.get('/playlists/:queryID', function(req, res) {
 	var queryID = req.params.queryID;
 	var exists = playlist.getString(queryID);
 	exists.then(function(doesExist) {
-		var responses = [], results = [];
+		var responses = [], results;
 		var playlistString = doesExist;
 		var cached = playlistFetchCache.get(queryID);
 		if (cached) {
 			results = cached;
 		}
 		else {
+			results = new Array(urlParams.length);
 			var urlParams = mediaRouterBase.getURLParams(playlistString, true);
-			var i;
-			for (i in urlParams) {
-				responses.push(mediaRouter.addResource(urlParams[i], function(searchResults) {
-					results = results.concat(searchResults);
-				}));
-			}
+			_.each(urlParams, function(param, index) {
+				var response = mediaRouter.addResource(param, function(searchResults) {
+					results[index] = searchResults;
+				});
+				responses.push(response);
+			});
 		}
 		Q.allResolved(responses).then(function() {
+			results = _.compact(results);
 			if (!cached && results.length >= 5) {
 				playlistFetchCache.put(queryID, results);
 			}
