@@ -47,8 +47,8 @@ app.get('/playlists/:queryID', function(req, res) {
 			var urlParams = mediaRouterBase.getURLParams(playlistString, true);
 			results = new Array(urlParams.length);
 			_.each(urlParams, function(param, index) {
-				var response = mediaRouter.addResource(param, function(searchResults) {
-					results[index] = searchResults;
+				var response = mediaRouter.addResource(param).then(function(searchResults) {
+					results[index] = searchResults.tracks;
 				});
 				responses.push(response);
 			});
