@@ -14,6 +14,7 @@ var search = require('./lib/search').search(),
 	mediaRouter = mediaRouterBase.getRouter(),
 	url = require('url'),
 	Q = require('q'),
+	_ = require('underscore')._,
 	playlist = require('./lib/playlist'),
 	cacher = require('node-dummy-cache'),
 	playlistFetchCache = cacher.create(cacher.ONE_SECOND * 45, cacher.ONE_SECOND * 30);
@@ -43,8 +44,8 @@ app.get('/playlists/:queryID', function(req, res) {
 			results = cached;
 		}
 		else {
-			results = new Array(urlParams.length);
 			var urlParams = mediaRouterBase.getURLParams(playlistString, true);
+			results = new Array(urlParams.length);
 			_.each(urlParams, function(param, index) {
 				var response = mediaRouter.addResource(param, function(searchResults) {
 					results[index] = searchResults;
@@ -53,13 +54,14 @@ app.get('/playlists/:queryID', function(req, res) {
 			});
 		}
 		Q.allResolved(responses).then(function() {
-			results = _.compact(results);
+			results = _.chain(results).flatten().compact().value();
 			if (!cached && results.length >= 5) {
 				playlistFetchCache.put(queryID, results);
 			}
 			res.json({id: queryID, results: results});
 		});
-	}).fail(function() {
+	}).fail(function(error) {
+		error && console.log(error);
 		res.json({id: false, results: []});
 	}).done();
 });
@@ -86,7 +88,8 @@ app.post('/playlists/save', function(req, res) {
 		Q.allResolved(responses).then(function() {
 			res.json({id: savedID});
 		});
-	}).fail(function() {
+	}).fail(function(error) {
+		error && console.log(error);
 		res.json({id: false});
 	}).done();
 });
