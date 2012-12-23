@@ -40,7 +40,6 @@ var TrackPlaylist = TrackList.extend({
 		this.id = false,
         this.muted = false,
 		this.totalDuration = 0;
-		this.settings = {};
 
         this.on("add", function(mediaObjects, playlist, options) {
             options || (options = {});
@@ -92,7 +91,9 @@ var TrackPlaylist = TrackList.extend({
                 soundManager.reboot();
 		    }
             this.trigger("tracks:new", this.models);
-            this.sync("create", this);
+            if (!options.readonly) {
+                this.sync("create", this);
+            }
             this.goToTrack(currentTrack, autoplay);
 		});
 
@@ -102,9 +103,6 @@ var TrackPlaylist = TrackList.extend({
             }
         });
 	},
-    getSetting: function(option) {
-    	return this.settings[option];
-    },
     getVolume: function() {
         return this.currentVolumePercent;
     },
@@ -242,9 +240,6 @@ var TrackPlaylist = TrackList.extend({
             : this.currentVolumePercent;
         this.setVolume(newVolume);
         this.muted = mute;
-    },
-    setSetting: function(option, value) {
-    	this.settings[option] = value;
     },
     setVolume: function(intPercent) {
         intPercent = Math.round(intPercent);
