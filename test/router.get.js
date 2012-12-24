@@ -71,4 +71,16 @@ describe('SoundCloud', function() {
 			done();
 		}).done();
 	});
+	it('should be able to fetch the best remix of Levels from an embedded Flash player', function(done) {
+		router.get('http://p1.soundcloud.com/player.swf?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F46010803&remote_addr=10.20.3.72&referer=').then(function(results) {
+			checkLevelsRemix(results);
+			done();
+		}).done();
+	});
+	it('should be able to fetch the best remix of Levels from a redirected embedded Flash player', function(done) {
+		router.get('http://player.soundcloud.com/player.swf?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F46010803&remote_addr=10.20.3.72&referer=').then(function(results) {
+			checkLevelsRemix(results);
+			done();
+		}).done();
+	});
 });
