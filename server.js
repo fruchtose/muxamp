@@ -62,6 +62,7 @@ app.get('/playlists/:queryID', function(req, res) {
 		});
 	}).fail(function(error) {
 		error && console.log(error);
+		console.trace();
 		res.json({id: false, results: []});
 	}).done();
 });
@@ -71,6 +72,7 @@ app.post('/playlists/save', function(req, res) {
 	var qs = playlist.toQueryString(req.body);
 	var existing = playlist.getID(qs);
 	existing.then(function(doesExist) {
+		try {
 		var savedID = false;
 		var responses = [], results = [];
 		if (!doesExist && qs.length) {
@@ -88,8 +90,14 @@ app.post('/playlists/save', function(req, res) {
 		Q.allResolved(responses).then(function() {
 			res.json({id: savedID});
 		});
+	} catch(e) {
+		console.log(e);
+		console.trace();
+		throw "lol";
+	}
 	}).fail(function(error) {
 		error && console.log(error);
+		console.trace();
 		res.json({id: false});
 	}).done();
 });
