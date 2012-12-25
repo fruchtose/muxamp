@@ -1,6 +1,49 @@
 var search = require('../lib/search').search,
 	_	   = require('underscore')._;
 
+describe('Error catching', function() {
+	it('should stop a search without arguments', function(done) {
+		search().fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+	it('should stop a search with an empty query', function(done) {
+		search('', 'ytv', 0).fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+	it('should stop a search without a site code', function(done) {
+		search('rolling stones', '', 0).fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+	it('should stop a search with a nonexistent site code', function(done) {
+		search('rolling stones', 'lol', 0).fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+	it('should return no results for a URL not covered by Muxamp', function(done) {
+		search('https://github.com/visionmedia/should.js').fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+});
+
 describe('URL search', function() {
 	var checkPSY, checkLevelsRemix;
 	checkPSY = function(results) {
