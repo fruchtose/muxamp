@@ -1,51 +1,45 @@
 var router = require('../lib/router').getRouter();
 
 describe('Error handling', function() {
+	var expectError = function(data) {
+		data.should.have.property('error');
+		data.error.should.be.a('string');
+		data.error.length.should.be.above(0);
+	};
+
 	it('should return an error for an empty string', function(done) {
 		router.get('').fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
+			expectError(results);
 			done();
 		}).done();
 	});
 	it('should return an error for unexpected input', function(done) {
 		router.get(5.2345).fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
+			expectError(results);
 			done();
 		}).done();
 	});
 	it('should return an error for a URL not covered by Muxamp', function(done) {
 		router.get('https://github.com/visionmedia/should.js').fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
+			expectError(results);
 			done();
 		}).done();
 	});
 	it('should not be able to fetch a YouTube user\s profile', function(done) {
 		router.get('http://www.youtube.com/user/officialpsy').fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
+			expectError(results);
 			done();
 		}).done();
 	});
 	it('should not be able to fetch a SoundCloud user profile', function(done) {
 		router.get('https://soundcloud.com/foofighters').fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
+			expectError(results);
 			done();
 		}).done();
 	});
 	it('should not be able to fetch a SoundCloud set', function(done) {
 		router.get('https://soundcloud.com/foofighters/sets/wasting-light').fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
+			expectError(results);
 			done();
 		}).done();
 	});
