@@ -25,9 +25,33 @@ describe('Error handling', function() {
 			done();
 		}).done();
 	});
+	it('should not be able to fetch a YouTube user\s profile', function(done) {
+		router.get('http://www.youtube.com/user/officialpsy').fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+	it('should not be able to fetch a SoundCloud user profile', function(done) {
+		router.get('https://soundcloud.com/foofighters').fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+	it('should not be able to fetch a SoundCloud set', function(done) {
+		router.get('https://soundcloud.com/foofighters/sets/wasting-light').fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
 });
 
-describe('YouTube', function() {
+describe('YouTube access', function() {
 	var checkPSY = function(results) {
 		results.should.have.property('tracks');
 		results.tracks.should.have.length(1);
@@ -68,7 +92,7 @@ describe('YouTube', function() {
 	});
 });
 
-describe('SoundCloud', function() {
+describe('SoundCloud access', function() {
 	var checkLevelsRemix = function(results) {
 		results.should.have.property('tracks');
 		results.tracks.should.have.length(1);
