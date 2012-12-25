@@ -1,7 +1,7 @@
 var search = require('../lib/search').search,
 	_	   = require('underscore')._;
 
-describe('Error catching', function() {
+describe('Error handling', function() {
 	it('should stop a search without arguments', function(done) {
 		search().fail(function(results) {
 			results.should.have.property('error');

@@ -1,5 +1,32 @@
 var router = require('../lib/router').getRouter();
 
+describe('Error handling', function() {
+	it('should return an error for an empty string', function(done) {
+		router.get('').fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+	it('should return an error for unexpected input', function(done) {
+		router.get(5.2345).fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+	it('should return an error for a URL not covered by Muxamp', function(done) {
+		router.get('https://github.com/visionmedia/should.js').fail(function(results) {
+			results.should.have.property('error');
+			results.error.should.be.a('string');
+			results.error.length.should.be.above(0);
+			done();
+		}).done();
+	});
+});
+
 describe('YouTube', function() {
 	var checkPSY = function(results) {
 		results.should.have.property('tracks');
