@@ -1,7 +1,4 @@
-var router = require('../lib/router').getRouter(),
-	_ = require('underscore')._;
-
-_.str = require('underscore.string');
+var router = require('../lib/router').getRouter();
 
 describe('YouTube', function() {
 	var checkPSY = function(results) {
