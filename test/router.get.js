@@ -38,7 +38,9 @@ describe('Error handling', function() {
 		}).done();
 	});
 	it('should not be able to fetch a SoundCloud set', function(done) {
-		router.get('https://soundcloud.com/foofighters/sets/wasting-light').fail(function(results) {
+		router.get('https://soundcloud.com/foofighters/sets/wasting-light').then(function(data) {
+			console.log(data);
+		}).fail(function(results) {
 			expectError(results);
 			done();
 		}).done();
