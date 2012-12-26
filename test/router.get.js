@@ -125,4 +125,15 @@ describe('SoundCloud access', function() {
 			done();
 		}).done();
 	});
+	it('should be able to fetch a track from a download link ', function(done) {
+		// From https://soundcloud.com/cyrilhahn/destinys-child-say-my-name
+		router.get('http://api.soundcloud.com/tracks/49816643/download').then(function(results) {
+			results.should.have.property('tracks');
+			results.tracks.should.have.length(1);
+			var media = results.tracks[0];
+			media.should.have.property('author');
+			media.author.should.eql('Cyril Hahn');
+			done();
+		}).done();
+	});
 });
