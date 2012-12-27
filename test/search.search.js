@@ -1,47 +1,25 @@
-var _	   	  = require('underscore')._.
+var _	   	  = require('underscore')._,
 	search 	  = require('../lib/search').search,
 	testutils = require('../lib/testutils');
 
 describe('Error handling', function() {
 	it('should stop a search without arguments', function(done) {
-		search().fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
-			done();
-		}).done();
+		testutils.expectErrorMessage(search(), done);
 	});
 	it('should stop a search with an empty query', function(done) {
-		search('', 'ytv', 0).fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
-			done();
-		}).done();
+		testutils.expectErrorMessage(search('', 0, 25), done);
 	});
 	it('should stop a search without a site code', function(done) {
-		search('rolling stones', '', 0).fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
-			done();
-		}).done();
+		testutils.expectErrorMessage(search('rolling stones', '', 25), done);
 	});
 	it('should stop a search with a nonexistent site code', function(done) {
-		search('rolling stones', 'lol', 0).fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
-			done();
-		}).done();
+		testutils.expectErrorMessage(search('rolling stones', 'lol', 0), done);
 	});
-	it('should return no results for a URL not covered by Muxamp', function(done) {
-		search('https://github.com/visionmedia/should.js').fail(function(results) {
-			results.should.have.property('error');
-			results.error.should.be.a('string');
-			results.error.length.should.be.above(0);
-			done();
-		}).done();
+	it('should stop a search for a string that is not a URL', function(done) {
+		testutils.expectErrorMessage(search('sup brah'), done);
+	});
+	it('should stop a search for a URL not covered by Muxamp', function(done) {
+		testutils.expectErrorMessage(search('https://github.com/visionmedia/should.js'), done);
 	});
 });
 
@@ -65,23 +43,17 @@ describe('URL search', function() {
 	};
 
 	it('should be able to search for a YouTube video', function(done) {
-		search('http://www.youtube.com/watch?v=9bZkp7q19f0').then(function(results) {
-			checkPSY(results);
-			done();
-		}).done();
+		testutils.expectSuccess(search('http://www.youtube.com/watch?v=9bZkp7q19f0'), checkPSY, done);
 	});
 	it('should be able to search for a SoundCloud track', function(done) {
-		search('http://soundcloud.com/djatat/avicii-levels-remix-full').then(function(results) {
-			checkLevelsRemix(results);
-			done();
-		}).done();
+		testutils.expectSuccess(search('http://soundcloud.com/djatat/avicii-levels-remix-full'), checkLevelsRemix, done);
 	});
 });
 
 describe('SoundCloud search', function() {
 	var page0 = [];
-	it('should have tracks for deadmau5', function(done) {
-		search('deadmau5', 'sct', 0).then(function(data) {
+	it('should have results for deadmau5', function(done) {
+		testutils.expectSuccess(search('katy perry', 'sct', 0), function(data) {
 			data.should.have.property('tracks');
 			// deadmau5 is popular, we should have results
 			var tracks = page0 = data.tracks;
@@ -89,11 +61,10 @@ describe('SoundCloud search', function() {
 			_.each(tracks, function(track) {
 				track.should.have.property('type').eql('audio');
 			});
-			done();
-		}).done();
+		}, done);
 	});
-	it('should have multiple pages of tracks for deadmau5', function(done) {
-		search('deadmau5', 'sct', 1).then(function(data) {
+	it('should have multiple pages of results for deadmau5', function(done) {
+		testutils.expectSuccess(search('katy perry', 'sct', 1), function(data) {
 			data.should.have.property('tracks');
 			// deadmau5 is popular, we should have results
 			var tracks = data.tracks;
@@ -102,22 +73,20 @@ describe('SoundCloud search', function() {
 				page0[index].should.not.eql(track);
 				track.should.have.property('type').eql('audio');
 			});
-			done();
-		}).done();
+		}, done);
 	});
 	it('should not have results for a nonsensical query', function(done) {
-		search('12341234adfadfasdf2344134', 'sct', 0).then(function(data) {
+		testutils.expectSuccess(search('12341234adfadfasdf2344134', 'sct', 0), function(data) {
 			data.should.have.property('tracks');
 			data.tracks.should.have.length(0);
-			done();
-		}).done();
+		}, done);
 	});
 });
 
 describe('YouTube search', function() {
 	var page0 = [];
 	it('should have videos for Katy Perry', function(done) {
-		search('katy perry', 'ytv', 0).then(function(data) {
+		testutils.expectSuccess(search('katy perry', 'ytv', 0), function(data) {
 			data.should.have.property('tracks');
 			// Katy Perry is popular, we should have results
 			var tracks = page0 = data.tracks;
@@ -125,11 +94,10 @@ describe('YouTube search', function() {
 			_.each(tracks, function(track) {
 				track.should.have.property('type').eql('video');
 			});
-			done();
-		}).done();
+		}, done);
 	});
 	it('should have multiple pages of videos for Katy Perry', function(done) {
-		search('katy perry', 'ytv', 1).then(function(data) {
+		testutils.expectSuccess(search('katy perry', 'ytv', 1), function(data) {
 			data.should.have.property('tracks');
 			// Katy Perry is popular, we should have results
 			var tracks = data.tracks;
@@ -138,14 +106,12 @@ describe('YouTube search', function() {
 				page0[index].should.not.eql(track);
 				track.should.have.property('type').eql('video');
 			});
-			done();
-		}).done();
+		}, done);
 	});
 	it('should not have results for a nonsensical query', function(done) {
-		search('12341234adfadfasdf2344134', 'ytv', 0).then(function(data) {
+		testutils.expectSuccess(search('12341234adfadfasdf2344134', 'ytv', 0), function(data) {
 			data.should.have.property('tracks');
 			data.tracks.should.have.length(0);
-			done();
-		}).done();
+		}, done);
 	});
 });
