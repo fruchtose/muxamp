@@ -1,5 +1,6 @@
-var search = require('../lib/search').search,
-	_	   = require('underscore')._;
+var _	   	  = require('underscore')._.
+	search 	  = require('../lib/search').search,
+	testutils = require('../lib/testutils');
 
 describe('Error handling', function() {
 	it('should stop a search without arguments', function(done) {
@@ -78,7 +79,7 @@ describe('URL search', function() {
 });
 
 describe('SoundCloud search', function() {
-	var page0;
+	var page0 = [];
 	it('should have tracks for deadmau5', function(done) {
 		search('deadmau5', 'sct', 0).then(function(data) {
 			data.should.have.property('tracks');
@@ -114,7 +115,7 @@ describe('SoundCloud search', function() {
 });
 
 describe('YouTube search', function() {
-	var page0;
+	var page0 = [];
 	it('should have videos for Katy Perry', function(done) {
 		search('katy perry', 'ytv', 0).then(function(data) {
 			data.should.have.property('tracks');
