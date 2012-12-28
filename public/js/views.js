@@ -37,7 +37,7 @@ var secondsToString = function(duration) {
 };
 
 var getAttribute = function(name, value) {
-	return name + '="' + value + '"';
+	return name + '="' + value.toString().replace(/"/g, '&quot;') + '"';
 };
 
 // With thanks to Christopher Coenraets
