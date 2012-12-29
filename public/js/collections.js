@@ -160,7 +160,7 @@ var TrackPlaylist = TrackList.extend({
     parse: function(response) {
     	var mediaObjects= [];
     	if (response.id) {
-    		var results = response.results;
+    		var results = response.tracks;
 	    	if (results.length) {
 	    		var i;
 	    		for (i in results) {
