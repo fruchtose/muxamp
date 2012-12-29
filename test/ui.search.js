@@ -36,6 +36,9 @@ describe('Frontend search', function() {
 			};
 			testutils.expectSuccess(testCase(), function(browser) {
 				window.$('#search-results tbody tr').size().should.eql(25);
+				window.$('#search-results tbody tr td.title-cell').each(function() {
+					window.$(this).text().length.should.be.above(0);
+				})
 			}, done);
 		});
 	}, setup);
