@@ -53,22 +53,16 @@ describe('Adding tracks from search', function() {
 	testutils.server.testWithServer(3000, function() {
 		it('should give the browser a playlist ID', function(done) {
 			var search = function() {
-				var deferred = Q.defer();
-				browser.visit(baseUrl).then(function() {
-					browser
-						.fill('#search-query', 'MGMT')
-						.pressButton('#search-submit', function() {
-							deferred.resolve(browser);
-						});
-					
-				}, function(error) {
-					throw error;
+				return browser.visit(baseUrl).then(function() {
+					var b = browser.fill('#search-query', 'MGMT');
+					return Q.ninvoke(b, 'pressButton', '#search-submit');
+				}, function(err) {
+					throw err;
 				});
-				return deferred.promise;
 			};
 			var addFirstTrack = function(browser) {
 				var deferred = Q.defer();
-				window.Playlist.on('id', function() {
+				window.Playlist.once('id', function() {
 					deferred.resolve(browser);
 				})
 				window.$('#search-results tr:first-child .search-add-result').click();
