@@ -23,3 +23,28 @@ describe('Browser playlist interaction', function() {
 		});
 	}, setup);
 });
+
+describe('Browser playlist interaction', function() {
+	var baseUrl = 'http://localhost:' + 3000 + '/', setup;
+	var browser, window;
+	setup = {
+		before: function() { browser = new Browser(); window = browser.window; },
+		after: function() { browser.close(); }
+	};
+	testutils.server.testWithServer(3000, function() {
+		it('should be able to play a YouTube video', function(done) {
+			var load = Q.when(browser.visit(baseUrl + 57), function() {
+				window.Playlist.once('play', function() {
+					window.setTimeout(function() {
+						window.Playlist.isPlaying().should.be.ok;
+					}, 600);
+				});
+				window.Playlist.play();
+				return browser;
+			}, testutils.thrower);
+			testutils.expectSuccess(load, function(browser) {
+				window.Playlist.id.should.eql(57);
+			}, done);
+		});
+	}, setup);
+});
