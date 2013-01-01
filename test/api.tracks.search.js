@@ -21,12 +21,13 @@ describe('SoundCloud API track search', function() {
 		var page0;
 		it('should have tracks for deadmau5', function(done) {
 			var search = SoundCloud.search({query: 'deadmau5', page: 0, perPage: 25});
+			var comingTracks = search.get('tracks');
 			Q.all([
 				search.should.be.resolved,
 				search.should.eventually.have.property('tracks'),
-				search.get('tracks').then(function(tracks) {
+				comingTracks.should.eventually.have.length(25),
+				comingTracks.then(function(tracks) {
 					page0 = tracks;
-					tracks.should.have.length(25);
 					_.each(tracks, function(track) {
 						track.should.have.property('type').eql('audio');
 					});
@@ -35,11 +36,12 @@ describe('SoundCloud API track search', function() {
 		});
 		it('should have multiple pages of tracks for deadmau5', function(done) {
 			var search = SoundCloud.search({query: 'deadmau5', page: 1, perPage: 25});
+			var comingTracks = search.get('tracks');
 			Q.all([
 				search.should.be.resolved,
 				search.should.eventually.have.property('tracks'),
-				search.get('tracks').then(function(tracks) {
-					tracks.should.have.length(25);
+				comingTracks.should.eventually.have.length(25),
+				comingTracks.then(function(tracks) {
 					_.each(tracks, function(track, index) {
 						page0[index].should.not.eql(track);
 						track.should.have.property('type').eql('audio');
@@ -52,9 +54,7 @@ describe('SoundCloud API track search', function() {
 			Q.all([
 				search.should.be.resolved,
 				search.should.eventually.have.property('tracks'),
-				search.get('tracks').then(function(tracks) {
-					tracks.should.have.length(0);
-				})
+				search.get('tracks').should.eventually.have.length(0)
 			]).should.notify(done);
 		});
 	});
@@ -76,12 +76,13 @@ describe('YouTube API video search', function() {
 		var page0;
 		it('should have tracks for katy perry', function(done) {
 			var search = YouTube.search({query: 'katy perry', page: 0, perPage: 25});
+			var comingTracks = search.get('tracks');
 			Q.all([
 				search.should.be.resolved,
 				search.should.eventually.have.property('tracks'),
-				search.get('tracks').then(function(tracks) {
+				comingTracks.should.eventually.have.length(25),
+				comingTracks.then(function(tracks) {
 					page0 = tracks;
-					tracks.should.have.length(25);
 					_.each(tracks, function(track) {
 						track.should.have.property('type').eql('video');
 					});
@@ -90,11 +91,12 @@ describe('YouTube API video search', function() {
 		});
 		it('should have multiple pages of tracks for katy perry', function(done) {
 			var search = YouTube.search({query: 'katy perry', page: 1, perPage: 25});
+			var comingTracks = search.get('tracks');
 			Q.all([
 				search.should.be.resolved,
 				search.should.eventually.have.property('tracks'),
-				search.get('tracks').then(function(tracks) {
-					tracks.should.have.length(25);
+				comingTracks.should.eventually.have.length(25),
+				comingTracks.then(function(tracks) {
 					_.each(tracks, function(track, index) {
 						page0[index].should.not.eql(track);
 						track.should.have.property('type').eql('video');
@@ -107,9 +109,7 @@ describe('YouTube API video search', function() {
 			Q.all([
 				search.should.be.resolved,
 				search.should.eventually.have.property('tracks'),
-				search.get('tracks').then(function(tracks) {
-					tracks.should.have.length(0);
-				})
+				search.get('tracks').should.eventually.have.length(0)
 			]).should.notify(done);
 		});
 	});
