@@ -1,3 +1,4 @@
 --require test/support/setup
+--require q
 --slow 2500
 --timeout 10000

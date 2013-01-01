@@ -4,35 +4,34 @@ var testutils = require('../lib/testutils'),
 describe('URL router', function() {
 	describe('error handling', function() {
 		it('should return an error for an empty string', function(done) {
-			testutils.expectErrorMessage(router.get(''), done);
+			router.get('').should.be.rejected.and.notify(done);
 		});
 		it('should return an error for unexpected input', function(done) {
-			testutils.expectErrorMessage(router.get(5.2345), done);
+			router.get(5.2345).should.be.rejected.and.notify(done);
 		});
 		it('should return an error for a URL not covered by Muxamp', function(done) {
-			testutils.expectErrorMessage(router.get('https://github.com/visionmedia/should.js'), done);
+			router.get('https://github.com/visionmedia/should.js').should.be.rejected.and.notify(done);
 		});
 		it('should not be able to fetch a YouTube user\s profile', function(done) {
-			testutils.expectErrorMessage(router.get('http://www.youtube.com/user/officialpsy'), done);
+			router.get('http://www.youtube.com/user/officialpsy').should.be.rejected.and.notify(done);
 		});
 		it('should not be able to fetch a SoundCloud user profile', function(done) {
-			testutils.expectErrorMessage(router.get('https://soundcloud.com/foofighters'), done);
+			router.get('https://soundcloud.com/foofighters').should.be.rejected.and.notify(done);
 		});
 		it('should not be able to fetch a SoundCloud set', function(done) {
-			testutils.expectErrorMessage(router.get('https://soundcloud.com/foofighters/sets/wasting-light'), done);
+			router.get('https://soundcloud.com/foofighters/sets/wasting-light').should.be.rejected.and.notify(done);
 		});
 	});
 
-	var checkPSY = function(results) {
-		results.should.have.property('tracks');
-		results.tracks.should.have.length(1);
-		var media = results.tracks[0];
-		media.should.have.property('author');
-		media.author.should.eql('officialpsy');
-		return results;
-	};
-	var expectPSY = function(deferred, done) {
-		testutils.expectSuccess(deferred, checkPSY, done);
+	var expectPSY = function(promise, done) {
+		var tracks = promise.get('tracks'), media = tracks.get(0), author = media.get('author');
+		return Q.all([
+			promise.should.be.resolved,
+			promise.should.eventually.have.property('tracks'),
+			tracks.should.eventually.have.length(1),
+			media.should.eventually.have.property('author'),
+			author.should.eventually.eql('officialpsy')
+		]).should.notify(done);
 	};
 	var gangnamStyle = 'http://www.youtube.com/watch?v=9bZkp7q19f0';
 
@@ -41,7 +40,7 @@ describe('URL router', function() {
 			expectPSY(router.get(gangnamStyle, ['sct']), done);
 		});
 		it('should interfere when applicable sites are excluded', function(done) {
-			testutils.expectErrorMessage(router.get(gangnamStyle, ['ytv']), done);
+			router.get(gangnamStyle, ['ytv']).should.be.rejected.and.notify(done);
 		});
 	});
 
@@ -64,16 +63,14 @@ describe('URL router', function() {
 	});
 
 	describe('SoundCloud access', function() {
-		var checkLevelsRemix = function(results) {
-			results.should.have.property('tracks');
-			results.tracks.should.have.length(1);
-			var media = results.tracks[0];
-			media.should.have.property('author');
-			media.author.should.eql('@@ (AT-AT)');
-			return results;
-		};
-		var expectLevels = function(deferred, done) {
-			return testutils.expectSuccess(deferred, checkLevelsRemix, done);
+		var expectLevels = function(promise, done) {
+			var tracks = promise.get('tracks'), media = tracks.get(0), author = media.get('author');
+			Q.all([
+				promise.should.eventually.have.property('tracks'),
+				tracks.should.eventually.have.length(1),
+				media.should.eventually.have.property('author'),
+				author.should.eventually.eql('@@ (AT-AT)'),
+			]).should.notify(done);
 		}
 		it('should be able to fetch the best remix of Levels', function(done) {
 			expectLevels(router.get('https://soundcloud.com/djatat/avicii-levels-remix-full'), done);
