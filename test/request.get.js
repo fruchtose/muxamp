@@ -1,5 +1,5 @@
 var request   = require('request'),
-	should    = require('should'),
+	should	  = require('chai').should(),
 	muxamp 	  = require('../lib/server').getApplication(),
 	testutils = require('../lib/testutils');
 

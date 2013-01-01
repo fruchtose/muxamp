@@ -1,3 +1,3 @@
---require should
+--require chai
 --slow 2500
 --timeout 10000
