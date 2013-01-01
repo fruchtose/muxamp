@@ -2,6 +2,15 @@ var testutils = require('../lib/testutils'),
 	router    = require('../lib/router').getRouter();
 
 describe('URL router', function() {
+	var expectAuthor = function(promise, authorName, done) {
+		var tracks = promise.get('tracks'), media = tracks.get(0), author = media.get('author');
+		Q.all([
+			promise.should.eventually.have.property('tracks'),
+			tracks.should.eventually.have.length(1),
+			media.should.eventually.have.property('author'),
+			author.should.eventually.eql(authorName),
+		]).should.notify(done);
+	};
 	describe('error handling', function() {
 		it('should return an error for an empty string', function(done) {
 			router.get('').should.be.rejected.and.notify(done);
@@ -24,14 +33,7 @@ describe('URL router', function() {
 	});
 
 	var expectPSY = function(promise, done) {
-		var tracks = promise.get('tracks'), media = tracks.get(0), author = media.get('author');
-		return Q.all([
-			promise.should.be.resolved,
-			promise.should.eventually.have.property('tracks'),
-			tracks.should.eventually.have.length(1),
-			media.should.eventually.have.property('author'),
-			author.should.eventually.eql('officialpsy')
-		]).should.notify(done);
+		return expectAuthor(promise, 'officialpsy', done);
 	};
 	var gangnamStyle = 'http://www.youtube.com/watch?v=9bZkp7q19f0';
 
@@ -64,13 +66,7 @@ describe('URL router', function() {
 
 	describe('SoundCloud access', function() {
 		var expectLevels = function(promise, done) {
-			var tracks = promise.get('tracks'), media = tracks.get(0), author = media.get('author');
-			Q.all([
-				promise.should.eventually.have.property('tracks'),
-				tracks.should.eventually.have.length(1),
-				media.should.eventually.have.property('author'),
-				author.should.eventually.eql('@@ (AT-AT)'),
-			]).should.notify(done);
+			expectAuthor(promise, '@@ (AT-AT)', done);
 		}
 		it('should be able to fetch the best remix of Levels', function(done) {
 			expectLevels(router.get('https://soundcloud.com/djatat/avicii-levels-remix-full'), done);
@@ -88,15 +84,8 @@ describe('URL router', function() {
 			expectLevels(router.get('http://player.soundcloud.com/player.swf?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F46010803&remote_addr=10.20.3.72&referer='), done);
 		});
 		it('should be able to fetch a track from a download link ', function(done) {
-			var expectDownload = function(results) {
-				results.should.have.property('tracks');
-				results.tracks.should.have.length(1);
-				var media = results.tracks[0];
-				media.should.have.property('author');
-				media.author.should.eql('Cyril Hahn');
-			};
 			// From https://soundcloud.com/cyrilhahn/destinys-child-say-my-name
-			testutils.expectSuccess(router.get('http://api.soundcloud.com/tracks/49816643/download'), expectDownload, done);
+			expectAuthor(router.get('http://api.soundcloud.com/tracks/49816643/download'), 'Cyril Hahn', done);
 		});
 	});
 });
