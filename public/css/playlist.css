@@ -12,7 +12,6 @@ img {
     float: left;
 }
 .table td {
-	line-height: 22px;
 	vertical-align: middle;
 }
 .align-bottom {
@@ -61,7 +60,7 @@ img {
 	position: relative;
 }
 #search-query {
-	width: 159px;
+	width: 155px;
 }
 #site-selector {
 	width: 152px;
@@ -165,9 +164,16 @@ a {
     top: 327px;
     width: 380px;
 }
+#controls {
+	line-height: 20px;
+}
 #controls a.btn {
+	height: 18px;
     padding: 0 6px 0 6px;
     top: 4px;
+}
+#controls a.btn i {
+	margin-top: 0;
 }
 #timebar-row {
 	margin-left: 1px;
@@ -212,7 +218,7 @@ a {
 }
 #volume-amount i {
     cursor: pointer;
-    margin-top: -4px;
+    margin-top: -2px;
     vertical-align: middle;
 }
 #volume-number {
@@ -306,7 +312,7 @@ tr:hover .actions {
 	-moz-border-radius: 11px;
 	border-radius: 11px;
 	height: 18px;
-	padding: 2px 3px 0 3px;
+	padding: 0px 3px 2px 3px;
 	vertical-align: top;
 }
 #track-information {

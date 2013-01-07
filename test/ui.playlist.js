@@ -12,14 +12,14 @@ describe('Browser playlist interaction', function() {
 	};
 	testutils.server.testWithServer(3000, function() {
 		it('should have the expected UI', function(done) {
-			testutils.expectSuccess(browser.visit(baseUrl), function() {
+			browser.visit(baseUrl).then(function() {
 				window.$('#controls a').size().should.eql(5); //Back, play, stop, next, shuffle
-			}, done);
+			}).should.be.fulfilled.and.notify(done);
 		});
 		it('should be able to navigate to a playlist', function(done) {
-			testutils.expectSuccess(browser.visit(baseUrl + 156), function(browser) {
+			browser.visit(baseUrl + 156).then(function() {
 				window.Playlist.id.should.eql(156);
-			}, done);
+			}).should.be.fulfilled.and.notify(done);
 		});
 	}, setup);
 });
@@ -33,9 +33,25 @@ describe('Browser playlist interaction', function() {
 	};
 	testutils.server.testWithServer(3000, function() {
 		it('should be able to play a YouTube video', function(done) {
-			var load = Q.when(browser.visit(baseUrl + 57), function() {
+			var visit = browser.visit(baseUrl + 57);
+			Q.all([
+				visit.should.be.fulfilled,
+				visit.then(function() {
+					var deferred = Q.defer();
+					window.Playlist.once('play', function() {
+						window.setTimeout(function() {
+							window.Playlist.isPlaying().should.be.ok;
+							deferred.resolve();
+						}, 10000);
+					});
+					window.Playlist.play();
+					return deferred.promise;
+				}).should.be.fulfilled
+			]).should.notify(done);
+			/*var load = Q.when(browser.visit(baseUrl + 57), function() {
 				window.Playlist.once('play', function() {
 					window.setTimeout(function() {
+						console.log(window.Playlist.isPlaying());
 						window.Playlist.isPlaying().should.be.ok;
 					}, 600);
 				});
@@ -44,7 +60,7 @@ describe('Browser playlist interaction', function() {
 			}, testutils.thrower);
 			testutils.expectSuccess(load, function(browser) {
 				window.Playlist.id.should.eql(57);
-			}, done);
+			}, done);*/
 		});
 	}, setup);
 });

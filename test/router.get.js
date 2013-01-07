@@ -5,6 +5,7 @@ describe('URL router', function() {
 	var expectAuthor = function(promise, authorName, done) {
 		var tracks = promise.get('tracks'), media = tracks.get(0), author = media.get('author');
 		Q.all([
+			promise.should.be.fulfilled,
 			promise.should.eventually.have.property('tracks'),
 			tracks.should.eventually.have.length(1),
 			media.should.eventually.have.property('author'),

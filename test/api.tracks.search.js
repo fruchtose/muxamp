@@ -23,7 +23,7 @@ describe('SoundCloud API track search', function() {
 			var search = SoundCloud.search({query: 'deadmau5', page: 0, perPage: 25});
 			var comingTracks = search.get('tracks');
 			Q.all([
-				search.should.be.resolved,
+				search.should.be.fulfilled,
 				search.should.eventually.have.property('tracks'),
 				comingTracks.should.eventually.have.length(25),
 				comingTracks.then(function(tracks) {
@@ -38,7 +38,7 @@ describe('SoundCloud API track search', function() {
 			var search = SoundCloud.search({query: 'deadmau5', page: 1, perPage: 25});
 			var comingTracks = search.get('tracks');
 			Q.all([
-				search.should.be.resolved,
+				search.should.be.fulfilled,
 				search.should.eventually.have.property('tracks'),
 				comingTracks.should.eventually.have.length(25),
 				comingTracks.then(function(tracks) {
@@ -52,7 +52,7 @@ describe('SoundCloud API track search', function() {
 		it('should not have results for a nonsensical query', function(done) {
 			var search = SoundCloud.search({query: '12341234adfadfasdf2344134', page: 1, perPage: 25});
 			Q.all([
-				search.should.be.resolved,
+				search.should.be.fulfilled,
 				search.should.eventually.have.property('tracks'),
 				search.get('tracks').should.eventually.have.length(0)
 			]).should.notify(done);
@@ -78,7 +78,7 @@ describe('YouTube API video search', function() {
 			var search = YouTube.search({query: 'katy perry', page: 0, perPage: 25});
 			var comingTracks = search.get('tracks');
 			Q.all([
-				search.should.be.resolved,
+				search.should.be.fulfilled,
 				search.should.eventually.have.property('tracks'),
 				comingTracks.should.eventually.have.length(25),
 				comingTracks.then(function(tracks) {
@@ -93,7 +93,7 @@ describe('YouTube API video search', function() {
 			var search = YouTube.search({query: 'katy perry', page: 1, perPage: 25});
 			var comingTracks = search.get('tracks');
 			Q.all([
-				search.should.be.resolved,
+				search.should.be.fulfilled,
 				search.should.eventually.have.property('tracks'),
 				comingTracks.should.eventually.have.length(25),
 				comingTracks.then(function(tracks) {
@@ -107,7 +107,7 @@ describe('YouTube API video search', function() {
 		it('should not have results for a nonsensical query', function(done) {
 			var search = YouTube.search({query: '12341234adfadfasdf2344134', page: 1, perPage: 25});
 			Q.all([
-				search.should.be.resolved,
+				search.should.be.fulfilled,
 				search.should.eventually.have.property('tracks'),
 				search.get('tracks').should.eventually.have.length(0)
 			]).should.notify(done);
