@@ -66,6 +66,19 @@ var MainView = Backbone.View.extend({
 		this.blockUI = false;
 		this.subviews = [new ControlsView(), new ModalView(), new PlaylistView(),
 			new SearchBarView(), new SearchResultsView(), new TimebarView(), new VolumeView()];
+
+		var showCommunicationError = function(error) {
+			bootbox.alert('Sorry, the server could not be contacted. ' + error);
+		};
+
+		var showServerError = function(error) {
+			bootbox.alert('Sorry, a server error occurred. ' + error);
+		};
+
+		this.listenTo(Playlist, 'error:communication', showCommunicationError);
+		this.listenTo(SearchResults, 'error:communication', showCommunicationError);
+		this.listenTo(Playlist, 'error:server', showServerError);
+		this.listenTo(SearchResults, 'error:server', showServerError);
 	},
 
 	el: "body",
@@ -342,12 +355,17 @@ var PlaylistView = Backbone.View.extend({
 	        axis: 'y',
 	        containment: 'document',
 	        helper: function(event, ui) {
-	    		var children = ui.children();
-	    		var helper = ui.clone();
-	    		helper.children().each(function(index) {
-	    			$(this).width(children.eq(index).width());
-	    		});
-	    		return helper;
+	        	try {
+	        		var children = ui.children();
+		    		var helper = ui.clone();
+		    		helper.children().each(function(index) {
+		    			$(this).width(children.eq(index).width());
+		    		});
+		    		return helper;
+	        	} catch(e) {
+	        		Playlist.trigger('error:communication', 'The server will not be able to send you any data.')
+	        		return {};
+	        	}
 	    	},
 	        start: function(event, ui) {
 	            startPos =ui.item.index();

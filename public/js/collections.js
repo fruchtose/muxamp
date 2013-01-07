@@ -98,9 +98,7 @@ var TrackPlaylist = TrackList.extend({
 		});
 
         this.on('id', function(data) {
-            if (data.id) {
-                this.id = data.id;
-            }
+            this.id = data.id;
         });
 	},
     getVolume: function() {
@@ -158,7 +156,7 @@ var TrackPlaylist = TrackList.extend({
         this.goToTrack(next, autostart);
     },
     parse: function(response) {
-    	var mediaObjects= [];
+    	var mediaObjects = [];
     	if (response.id) {
     		var results = response.tracks;
 	    	if (results.length) {
@@ -169,6 +167,9 @@ var TrackPlaylist = TrackList.extend({
 	    		}
 	    	}
     	}
+        if (response.error) {
+            this.trigger('error:server', error);
+        }
     	return mediaObjects;
     },
     play: function() {
@@ -297,7 +298,13 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     sync: function(method, model, options) {
-        options = options || {timeout: 20000};
+        var self = this;
+        options = options || {
+            error: function() {
+                self.trigger('error:communication', 'Playlist fetching and syncing are inaccessible right now.');
+            },
+            timeout: 20000
+        };
         if (method == 'create') {
             options.url = 'playlists/save';
         } else if (options.id) {
@@ -346,17 +353,23 @@ var TrackPlaylist = TrackList.extend({
 
 var SearchResultsProvider = TrackList.extend({
     nextPage: function() {
+        var self = this;
         this.page++;
         var results = this.fetch({
+            error: self.onerror,
             remove: false,
             update: true
         });
         return results;
     },
     initialize: function() {
+        var self = this;
         this.query = '';
         this.page = 0;
         this.site = '';
+        this.onerror = function() {
+            self.trigger('error:communication', 'Search results are unavailable.');
+        };
         this.on('add', function(models, collection) {
             collection.trigger('results', models);
         });
@@ -365,18 +378,27 @@ var SearchResultsProvider = TrackList.extend({
         });
     },
     parse: function(data) {
-        var tracks = [];
-        var options = {silent: true};
+        var self = this, 
+            tracks = [];
+
+        var options = {
+            silent: true
+        };
         _(data).each(function(result) {
             tracks.push(Track.getMediaObject(result, options));
         });
+        if (data.error) {
+            this.trigger('error:server', error);
+        }
         return tracks;
     },
     search: function(query, site) {
         this.query = query;
         this.page = 0;
         this.site = site;
-        return this.fetch();
+        return this.fetch({
+            error: this.onerror
+        });
     },
     url: function() {
         return '/search/' + this.site + '/' + this.page + '/' + encodeURIComponent(this.query);
