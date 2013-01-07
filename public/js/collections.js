@@ -168,7 +168,7 @@ var TrackPlaylist = TrackList.extend({
 	    	}
     	}
         if (response.error) {
-            this.trigger('error:server', error);
+            this.trigger('error:server', response.error);
         }
     	return mediaObjects;
     },
