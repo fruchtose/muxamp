@@ -348,7 +348,8 @@ var SearchResultsProvider = TrackList.extend({
     nextPage: function() {
         this.page++;
         var results = this.fetch({
-            add: true
+            remove: false,
+            update: true
         });
         return results;
     },
