@@ -24,7 +24,7 @@ describe('Browser playlist interaction', function() {
 	}, setup);
 });
 
-describe('Browser playlist interaction', function() {
+/*describe('Browser playlist interaction', function() {
 	var baseUrl = 'http://localhost:' + 3000 + '/', setup;
 	var browser, window;
 	setup = {
@@ -61,6 +61,6 @@ describe('Browser playlist interaction', function() {
 			testutils.expectSuccess(load, function(browser) {
 				window.Playlist.id.should.eql(57);
 			}, done);*/
-		});
+/*		});
 	}, setup);
-});
+});*/

@@ -21,6 +21,15 @@ describe('Error handling', function() {
 	it('should stop a search for a URL not covered by Muxamp', function(done) {
 		testutils.expectErrorMessage(search('https://github.com/visionmedia/should.js'), done);
 	});
+	it('should filter out unstreamable search results', function(done) {
+		var obamaSearch = search('obama', 'ytv', 0),
+			length = obamaSearch.get('tracks').get('length');
+		Q.all([
+			obamaSearch.should.be.fulfilled,
+			obamaSearch.should.eventually.have.property('tracks'),
+			length.should.eventually.be.below(25)
+		]).should.notify(done);
+	});
 });
 
 describe('URL search', function() {
