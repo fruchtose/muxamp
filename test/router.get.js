@@ -31,9 +31,9 @@ describe('URL router', function() {
 		it('should not be able to fetch a SoundCloud set', function(done) {
 			router.get('https://soundcloud.com/foofighters/sets/wasting-light').should.be.rejected.and.notify(done);
 		});
-		// Search query: obama
+		// Search query: romney
 		it('should return an error for unstreamable media', function(done) {
-			router.get('https://www.youtube.com/watch?v=2SLa-poeHY4').should.be.rejected.and.notify(done);
+			router.get('http://www.youtube.com/watch?v=yTCRwi71_ns').should.be.rejected.and.notify(done);
 		});
 	});
 
