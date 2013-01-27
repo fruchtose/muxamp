@@ -1,6 +1,6 @@
-var config = require('./lib/config');
+var muxamp = require('./lib/server');
 
-var app = require('./lib/server').getApplication(), port = config.get('app_port');
+var app = muxamp.getApplication(), port = muxamp.defaultPort;
 app.listen(port, function() {
 	console.log("Server started, port", port);
 });
