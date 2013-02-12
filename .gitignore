@@ -1,2 +1,4 @@
 .nodester.appconfig
 
+*.sublime-project
+*.sublime-workspace
