@@ -1,4 +1,4 @@
-var _	   	   = require('underscore')._,
+var _	   	   = require('underscore'),
 	Q 		   = require('q'),
 	apis 	   = require('../lib/apis'),
 	SoundCloud = apis.SoundCloud.Tracks,

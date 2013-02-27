@@ -1,4 +1,4 @@
-var _	   	  = require('underscore')._,
+var _	   	  = require('underscore'),
 	search 	  = require('../lib/search').search,
 	testutils = require('../lib/testutils');
 
