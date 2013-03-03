@@ -60,7 +60,7 @@ describe('GET', function() {
 					data.should.have.property('id');
 					data['id'].should.eql(57);
 					data.should.have.property('tracks');
-					data['tracks'].should.have.length(5);
+					data['tracks'].should.have.length(6);
 					done();
 				});
 			});
