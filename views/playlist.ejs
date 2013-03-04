@@ -182,5 +182,16 @@
         <script src="js/views.js" type="text/javascript"></script>
         <script src="js/routes.js" type="text/javascript"></script>
         <script src="js/app.js" type="text/javascript"></script>
+        <% if (reject) { %>
+        	<% script(reject) -%>
+        <% } else { %>
+        	<script type="text/javascript">
+        		function checkBrowser() {return false;}
+        	</script>
+        <% } %>
+        <% for(var i=0; i<js.length; i++) { %>
+        	<% script(js[i]) -%>
+        <% } %>
+        <%-scripts%>
     </body>
 </html>

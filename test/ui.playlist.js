@@ -1,11 +1,43 @@
 var Q 		  = require('q'),
-	Browser   = require('zombie'),
-	testutils = require('../lib/testutils')
+	testutils = require('../lib/testutils'),
+	hooks	  = testutils.browser;
 	muxamp 	  = require('../lib/server').getApplication();
 
 describe('Browser playlist interaction', function() {
-	var baseUrl = 'http://localhost:' + 3000 + '/', setup;
-	var browser, window;
+	var baseUrl = 'http://localhost:3000/';
+	var context = {};
+	before(hooks.before(context));
+
+	beforeEach(hooks.beforeEach(context));
+	afterEach(hooks.afterEach(context));
+
+	it('should open', function(done) {
+		Q.nfcall(context.page.open, baseUrl).done(function() {
+			done();
+		});
+	});
+
+	it('should open with success', function(done) {
+		Q.nfcall(context.page.open, baseUrl).then(function(status) {
+			status.should.eql('success');
+		}).done(function() {
+			done();
+		});
+	});
+
+	it('should have the expected UI', function(done) {
+		Q.nfcall(context.page.open, baseUrl).then(function(status) {
+			return Q.nfcall(context.page.evaluate, function() {
+				return $('#controls a').size();
+			}, function(err, result) {
+				result.should.eql(5);
+				done();
+			});
+		}).done();
+	});
+
+	after(hooks.after(context));
+	/*var browser, window;
 	setup = {
 		before: function() { browser = new Browser(); window = browser.window; },
 		after: function() { browser.close(); }
@@ -21,7 +53,7 @@ describe('Browser playlist interaction', function() {
 				window.Playlist.id.should.eql(156);
 			}).should.be.fulfilled.and.notify(done);
 		});
-	}, setup);
+	}, setup);*/
 });
 
 /*describe('Browser playlist interaction', function() {
