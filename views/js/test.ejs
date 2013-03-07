@@ -1,9 +1,8 @@
-<script type="text/javascript">
-	function checkBrowser() {return false;}
-	mocha.ui('bdd'); 
-	mocha.reporter('html');
-	expect = chai.expect;
-</script>
-<% ['js/q.js', 'js/mocha.js', 'js/chai.js', 'js/chai-as-promised.js'].forEach(function(e) { %>
+<% stylesheet('css/mocha.css') -%>
+
+<% var testLibs = ['js/q.js', 'js/mocha.js', 'js/chai.js', 'js/chai-as-promised.js', 'js/test.setup.js']; %>
+<% var tests = ['js/test.frontend.js']; %>
+<% var testScripts = testLibs.concat(tests); %>
+<% testScripts.forEach(function(e) { %>
 	<% script(e) -%>
 <% }) %>
