@@ -6,4 +6,10 @@ describe('Opening Muxamp', function() {
             done();
         });
 	});
+	it('should initialize the playlist', function() {
+		Playlist.should.not.be.null;
+	});
+	it('should initialize the router', function() {
+		Router.should.not.be.null;
+	});
 });
