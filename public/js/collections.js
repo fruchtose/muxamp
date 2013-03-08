@@ -91,10 +91,15 @@ var TrackPlaylist = TrackList.extend({
                 soundManager.reboot();
 		    }
             this.trigger("tracks:new", this.models);
-            if (!options.readonly) {
-                this.sync("create", this);
-            }
             this.goToTrack(currentTrack, autoplay);
+            var result;
+            if (!options.readonly) {
+                result = this.sync("create", this);
+            } else {
+                result = $.Deferred();
+                result.resolve();
+            }
+            return result.promise();
 		});
 
         this.on('id', function(data) {

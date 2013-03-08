@@ -26,8 +26,6 @@ var PlaylistRouter = Backbone.Router.extend({
 	},
 
 	reset: function() {
-		Playlist.reset();
-		var result = $.Deferred().resolve();
-		return result.promise();
+		return Playlist.reset();
 	}
 });
