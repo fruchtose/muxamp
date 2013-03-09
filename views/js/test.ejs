@@ -1,7 +1,7 @@
 <% stylesheet('css/mocha.css') -%>
 
 <% var testLibs = ['js/q.js', 'js/mocha.js', 'js/chai.js', 'js/chai-as-promised.js', 'js/test.setup.js']; %>
-<% var tests = ['js/test.frontend.js']; %>
+<% var tests = ['js/test.acceptance.js']; %>
 <% var testScripts = testLibs.concat(tests); %>
 <% testScripts.forEach(function(e) { %>
 	<% script(e) -%>
