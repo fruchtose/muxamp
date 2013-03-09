@@ -39,6 +39,33 @@ describe('Routing', function() {
 	})
 });
 
+describe('Playlist', function() {
+	it('should have content for this set of tests', function() {
+		Playlist.size().should.be.above(0);
+	});
+	describe('YouTube capabilities', function() {
+		it('should be able to play a video', function(done) {
+			YouTube.once('play', function() {
+				Playlist.currentMedia.should.not.be.null;
+				Playlist.isPlaying().should.eql(true);
+				Playlist.isPaused().should.eql(false);
+				done();
+			});
+			Playlist.play();
+		});
+		it('should be able to pause a video', function(done) {
+			YouTube.once('pause', function() {
+				Playlist.currentMedia.should.not.be.null;
+				console.log(Playlist.isPlaying(), Playlist.isPaused(), YouTube.state);
+				Playlist.isPlaying().should.eql(true);
+				Playlist.isPaused().should.eql(true);
+				done();
+			});
+			Playlist.togglePause();
+		});
+	});
+});
+
 describe('Search', function() {
 	var testTrack = function(track) {
 		track.should.be.an('object');

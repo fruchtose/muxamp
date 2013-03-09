@@ -648,7 +648,6 @@ var YouTubeInterface = Backbone.View.extend({
 		var view = this;
 		var pause = function() {
 			view.$el.tubeplayer('pause');
-			view.trigger('pause');
 		};
 		view.onload.done(pause);
 	},

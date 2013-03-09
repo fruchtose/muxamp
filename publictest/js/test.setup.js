@@ -1,7 +1,7 @@
 function checkBrowser() {return false;}
 mocha.setup({
 	ignoreLeaks: true,
-	timeout: 4000
+	timeout: 10000
 });
 mocha.ui('bdd'); 
 mocha.reporter('html');
