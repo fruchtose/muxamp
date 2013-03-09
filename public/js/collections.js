@@ -69,7 +69,7 @@ var TrackPlaylist = TrackList.extend({
 
             this.totalDuration -= mediaObject.get('duration');
             if (index == this.currentTrack) {
-                this.goToTrack(Math.min(this.size() - 1, index));
+                this.goToTrack(Math.min(this.size() - 1, index), this.isPlaying());
             }
             if ( ! this.where({siteMediaID: mediaObject.get('siteMediaID')}).length) {
                 // Destroys media if no more instances exist in playlist
@@ -114,10 +114,9 @@ var TrackPlaylist = TrackList.extend({
             this.setCurrentTrack(0);
             return;
         }
-        var wasPlaying = this.isPlaying();
         this.stop(true);
         this.setCurrentTrack(index);
-        if (wasPlaying || autostart) {
+        if (autostart) {
             this.play();
         }
     },

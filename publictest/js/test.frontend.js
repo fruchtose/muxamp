@@ -47,8 +47,9 @@ describe('Playlist', function() {
 		it('should be able to play a video', function(done) {
 			YouTube.once('play', function() {
 				Playlist.currentMedia.should.not.be.null;
-				Playlist.isPlaying().should.eql(true);
-				Playlist.isPaused().should.eql(false);
+				Playlist.currentMedia.get('siteCode').should.eql('ytv');
+				Playlist.isPlaying().should.be.true;
+				Playlist.isPaused().should.be.false;
 				done();
 			});
 			Playlist.play();
@@ -56,14 +57,43 @@ describe('Playlist', function() {
 		it('should be able to pause a video', function(done) {
 			YouTube.once('pause', function() {
 				Playlist.currentMedia.should.not.be.null;
-				console.log(Playlist.isPlaying(), Playlist.isPaused(), YouTube.state);
-				Playlist.isPlaying().should.eql(true);
-				Playlist.isPaused().should.eql(true);
+				Playlist.isPlaying().should.be.true;
+				Playlist.isPaused().should.be.true;
 				done();
 			});
 			Playlist.togglePause();
 		});
 	});
+	describe('SoundCloud capabilities', function() {
+		it('should be able to play a track', function(done) {
+			Playlist.nextTrack(false);
+			Playlist.isPlaying().should.be.false;
+			Playlist.currentMedia.get('siteCode').should.eql('sct');
+			Playlist.once('play', function() {
+				Playlist.currentMedia.should.not.be.null;
+				Playlist.isPlaying().should.be.true;
+				Playlist.isPaused().should.be.false;
+				done();
+			});
+			Playlist.play();
+		});
+		it('should be able to pause a track', function(done) {
+			Playlist.once('pause', function() {
+				Playlist.currentMedia.should.not.be.null;
+				Playlist.isPlaying().should.be.true;
+				Playlist.isPaused().should.be.true;
+				done();
+			});
+			Playlist.togglePause();
+		});
+	});
+	describe('interaction', function() {
+		it('should be able to go forward in the track list', function() {
+			firstTrack = Playlist.currentMedia;
+			Playlist.nextTrack();
+			firstTrack.should.not.eql(Playlist.currentMedia);
+		});
+	})
 });
 
 describe('Search', function() {
