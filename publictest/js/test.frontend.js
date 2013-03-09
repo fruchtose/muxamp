@@ -38,3 +38,47 @@ describe('Routing', function() {
 		}).then(asyncFetchVerifier(153, done));
 	})
 });
+
+describe('Search', function() {
+	var testTrack = function(track) {
+		track.should.be.an('object');
+		track.should.not.be.empty;
+		track.siteMediaID.should.not.be.empty;
+		track.duration.should.be.above(0);
+	};
+	it('should not have results on page open', function() {
+		SearchResults.size().should.eql(0);
+	});
+	it('should be able to search YouTube', function(done) {
+		SearchResults.search('lady gaga', 'ytv').then(function(results) {
+			results.should.be.an('array');
+			results.length.should.be.above(0);
+			testTrack(results[0]);
+			done();
+		});
+	});
+	it('should be able to search SoundCloud', function(done) {
+		SearchResults.search('deadmau5', 'sct').then(function(results) {
+			results.should.be.an('array');
+			results.length.should.be.above(0);
+			testTrack(results[0]);
+			done();
+		});
+	});
+	it('should be able to get a second page of search results', function(done) {
+		SearchResults.nextPage().then(function(results) {
+			results.should.be.an('array');
+			results.length.should.be.above(0);
+			testTrack(results[0]);
+			done();
+		});
+	});
+	it('should be able to retrieve SoundCloud media based on a URL', function(done) {
+		SearchResults.search('https://soundcloud.com/fuckmylife/arm1n_3', 'url').then(function(results) {
+			results.should.be.an('array');
+			results.length.should.be.above(0);
+			testTrack(results[0]);
+			done();
+		});
+	});
+});

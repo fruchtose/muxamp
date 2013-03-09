@@ -1,5 +1,8 @@
 function checkBrowser() {return false;}
-mocha.setup({ignoreLeaks: true});
+mocha.setup({
+	ignoreLeaks: true,
+	timeout: 4000
+});
 mocha.ui('bdd'); 
 mocha.reporter('html');
 var expect = chai.expect;
