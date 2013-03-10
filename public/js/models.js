@@ -118,6 +118,9 @@ var SoundTrack = Track.extend({
     getDuration: function() {
         return this.get("duration");
     },
+    getVolume: function() {
+        return this.get('sound').volume;
+    },
     isMuted: function() {
         return this.get("sound").muted;
     },
@@ -219,6 +222,9 @@ var YouTubeTrack = VideoTrack.extend({
     end: function() {
         this.destruct();
     },
+    getVolume: function() {
+        return YouTube.getVolume();
+    },
     isMuted: function() {
         return YouTube.isMuted();
     },
@@ -241,6 +247,13 @@ var YouTubeTrack = VideoTrack.extend({
                 initialVideo: this.get('siteMediaID')
             })).then(function() {
                 self._stopped = false;
+                self.listenTo(YouTube, 'progress', function(progress) {
+                    triggerEvents(self, 'progress', self, progress);
+                });
+                YouTube.once('end error', function() {
+                    self.stopListening(YouTube, 'progress');
+                    self.end();
+                });
                 triggerEvents(self, 'play', self, args);
             });
         }
@@ -255,8 +268,8 @@ var YouTubeTrack = VideoTrack.extend({
             triggerEvents(self, 'progress', self, {percent: decimalPercent, time: time}, _.rest(args));
         });
     },
-    setMute: function(mute) {
-        var self = this, dfd, event, args = arguments;
+    setMute: function(mute, silent) {
+        var self = this, dfd, event, args = _.rest(arguments, 2);
         if (mute) {
             event = 'mute';
             dfd = YouTube.mute();
@@ -265,6 +278,9 @@ var YouTubeTrack = VideoTrack.extend({
             event = 'unmute';
         }
         dfd.then(function() {
+            if (silent) {
+                return;
+            }
             triggerEvents(self, event, self, args);
         });
     },
@@ -272,9 +288,13 @@ var YouTubeTrack = VideoTrack.extend({
         var muted = this.isMuted(), dfd, self = this, args = arguments;
         dfd = YouTube.setVolume(percent);
         if (percent == 0 && !muted) {
-            dfd = this.setMute(true);
+            dfd.then(function() {
+                return YouTube.setMute(true, true);
+            });
         } else if (percent > 0 && muted) {
-            dfd = this.setMute(false);
+            dfd.then(function() {
+                return YouTube.setMute(false, true);
+            });
         }
         dfd.then(function() {
             triggerEvents(self, 'volume', self, args);
@@ -285,7 +305,6 @@ var YouTubeTrack = VideoTrack.extend({
         YouTube.pause();
         YouTube.seek(0).then(function() {
             self._stopped = true;
-            triggerEvents(self, 'progress', self, {percent: 0, time: 0}, args)
             triggerEvents(self, 'stop', self, args);
         });
     },

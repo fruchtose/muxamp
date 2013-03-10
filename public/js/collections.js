@@ -179,8 +179,8 @@ var TrackPlaylist = TrackList.extend({
     play: function() {
         if (this.isLoaded()) {
             var playlist = this;
-            var progress = function(details) {
-                playlist.trigger('progress', details);
+            var progress = function(media) {
+                media.triggerProgress();
             };
             var media = this.currentMedia;
             if (media.get('type') == 'audio') {
@@ -197,7 +197,7 @@ var TrackPlaylist = TrackList.extend({
                     whileplaying: function() {
                         var position = this.position, seconds = position/1000;
                         var percent = Math.min(100 * (position / this.duration), 100);
-                        progress({percent: percent, time: seconds});
+                        progress(media);
                     }
                 });
             }
@@ -206,14 +206,11 @@ var TrackPlaylist = TrackList.extend({
                     media.play({
                         volume: playlist.isMuted() ? 0 : playlist.getVolume(),
                     });
-                    playlist.listenTo(YouTube, 'progress', progress);
-                    YouTube.once('end error', function() {
-                        playlist.stopListening(YouTube);
+                    media.once('end', function() {
                         playlist.nextTrack(true);
                     }, this);
                 }
             }
-            this.trigger('play', media);
         }
     },
     previousTrack: function(autostart) {
@@ -227,14 +224,23 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     setCurrentTrack: function(trackNumber) {
+        var self = this;
+        if (this.currentMedia) {
+            this.stopListening(this.currentMedia);
+        }
         if (this.size() && trackNumber >= 0 && trackNumber < this.size()) {
             this.currentTrack = trackNumber;
             this.currentMedia = this.at(trackNumber);
+            this.listenTo(this.currentMedia, 'all', function(event, track) {
+                args = _.rest(arguments, 2);
+                self.trigger(event, args);
+            });
         } else {
             this.currentTrack = 0;
             this.currentMedia = null;
         }
-        this.trigger('track', this.currentTrack);
+        this.trigger('track', this.currentMedia, this.currentTrack);
+        
     },
     setMute: function(mute) {
         if (this.isLoaded()) {
@@ -247,17 +253,13 @@ var TrackPlaylist = TrackList.extend({
         this.muted = mute;
     },
     setVolume: function(intPercent) {
-        intPercent = Math.round(intPercent);
-        if (this.isLoaded()) {
-            var media = this.currentMedia;
-            var setMute = intPercent == 0;
-            media.setVolume(intPercent);
-            if (setMute) {
-                intPercent = this.currentVolumePercent;
-            }
+        if (!this.isLoaded()) {
+            return false;
         }
+        intPercent = Math.round(intPercent);
+        var media = this.currentMedia;
+        media.setVolume(intPercent);
         this.currentVolumePercent = intPercent;
-        this.trigger('volume', setMute ? 0 : intPercent);
     },
     shuffle: function() {
         if (!this.isLoaded()) {
@@ -296,9 +298,6 @@ var TrackPlaylist = TrackList.extend({
             } else {
                 this.currentMedia.stop();
             }
-            
-            this.trigger('progress', {percent: 0, time: 0});
-            this.trigger('stop', this.currentMedia);
         }
     },
     sync: function(method, model, options) {

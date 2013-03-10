@@ -350,7 +350,7 @@ var PlaylistView = Backbone.View.extend({
 			this.append(tracks);
 		}
 	},
-	setCurrentTrack: function(trackNumber) {
+	setCurrentTrack: function(track, trackNumber) {
 		$(this.table).find('tr')
 			.removeClass('playing')
 			.eq(trackNumber)
@@ -492,6 +492,9 @@ var TimebarView = Backbone.View.extend({
 	    this.lastUpdate = new Date();
 
 	    Playlist.on('progress', this.onProgress, this);
+	    Playlist.on('stop', function() {
+	    	this.onProgress({percent: 0, time: 0});
+	    }, this)
 	},
 	onProgress: function(details) {
 		var percent = details.percent || 0;
@@ -525,6 +528,9 @@ var VolumeView = Backbone.View.extend({
 	    });
 
 	    Playlist.on('volume', this.updateSymbol, this);
+	    Playlist.on('mute', function() {
+	    	this.updateSymbol(0);
+	    }, this)
 	},
 	toggleMute: function() {
 		Playlist.toggleMute();
@@ -561,8 +567,17 @@ var YouTubeInterface = Backbone.View.extend({
 		};
 		return view.onload.done(callback);
 	},
+	getVolume: function() {
+		return $el.tubeplayer('volume') || 0;
+	},
 	initialize: function() {
 		var view = this;
+		var triggerError = function(view) {
+			view.onload.reject();
+            view.clearInterval();
+            view.stop();
+            view.trigger('error');
+		};
 		this.defaults = {
             showControls: false,
             autoPlay: false,
@@ -600,22 +615,13 @@ var YouTubeInterface = Backbone.View.extend({
                 view.trigger('end');
             },
             onErrorNotEmbeddable: function() {
-            	view.onload.reject();
-                view.clearInterval();
-                view.stop();
-                view.trigger('error');
+            	triggerError(view);
             },
             onErrorNotFound: function() {
-            	view.onload.reject();
-                view.clearInterval();
-                view.stop();
-                view.trigger('error');
+            	triggerError(view);
             },
             onErrorInvalidParameter: function() {
-            	view.onload.reject();
-                view.clearInterval();
-                view.stop();
-                view.trigger('error');
+            	triggerError(view);
             }
         };
 		this.reset();
@@ -657,6 +663,7 @@ var YouTubeInterface = Backbone.View.extend({
 		var view = this;
 		var pause = function() {
 			view.$el.tubeplayer('pause');
+			view.trigger('pause');
 		};
 		return view.onload.done(pause);
 	},
@@ -668,6 +675,8 @@ var YouTubeInterface = Backbone.View.extend({
 			view.$el.tubeplayer('play');
 			if (paused) {
 				view.trigger('resume');
+			} else {
+				view.trigger('play');
 			}
 		};
 		return view.onload.done(play);
