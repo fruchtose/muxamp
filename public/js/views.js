@@ -689,7 +689,7 @@ var YouTubeInterface = Backbone.View.extend({
 		var view = this;
 		var seek = function() {
 			view.$el.tubeplayer('seek', time);
-			view.trigger('seek', time);
+			view.trigger('progress', time);
 		};
 		return view.onload.done(seek);
 	},

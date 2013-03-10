@@ -26,7 +26,7 @@ var Track = Backbone.Model.extend({
         this.trigger('play', this, arguments);
     },
     seek: function() {
-        this.trigger('seek', this, arguments);
+        this.trigger('progress', this, arguments);
     },
     setMute: function(mute) {
         var event = mute ? 'mute' : 'unmute';
@@ -130,8 +130,9 @@ var SoundTrack = Track.extend({
         this.trigger('play', this, arguments);
     },
     seek: function(decimalPercent) {
-        this.get("sound").setPosition(Math.floor(decimalPercent * this.get("sound").duration));
-        this.trigger('seek', this, arguments);
+        var time = Math.floor(decimalPercent * this.get("sound").duration);
+        this.get("sound").setPosition(time);
+        this.trigger.apply(this, ['progress', this, {percent: decimalPercent, time: time}].concat(arguments));
     },
     setMute: function(mute) {
         if (mute) {
@@ -233,10 +234,10 @@ var YouTubeTrack = VideoTrack.extend({
         }
     },
     seek: function(decimalPercent) {
-        var duration = this.get('duration'), self = this;
-        YouTube.seek(Math.floor(decimalPercent * duration)).then(function() {
+        var duration = this.get('duration'), self = this, time = Math.floor(decimalPercent * duration);
+        YouTube.seek(time).then(function() {
             self._stopped = false;
-            self.trigger.apply(self, ['seek', self, decimalPercent].concat(arguments));
+            self.trigger.apply(self, ['progress', self, {percent: decimalPercent, time: time}].concat(arguments));
         });
     },
     setMute: function(mute) {
