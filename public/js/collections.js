@@ -289,8 +289,8 @@ var TrackPlaylist = TrackList.extend({
     },
     stop: function (hard) {
         if (this.isLoaded()) {
-            // Hard stop is used when the current media should not be restarted until 
-            // the next time a player queues it
+            // Hard stop is used when the current media should be 'destroyed' (unload from the client)
+            // until the next time the user loads it in the playlist
             if (hard) {
                 this.currentMedia.end();
             } else {
@@ -335,15 +335,10 @@ var TrackPlaylist = TrackList.extend({
         this.setMute(!this.muted);
     },
     togglePause: function() {
-        if (this.isLoaded()) {
-            var isPaused = this.currentMedia.isPaused();
-            this.currentMedia.togglePause();
-            if (isPaused) {
-                this.trigger('resume');
-            } else {
-                this.trigger('pause');
-            }
+        if (!this.isLoaded()) {
+            return;
         }
+        this.currentMedia.togglePause();
     },
 	url: function(id) {
 		var loc = '/';

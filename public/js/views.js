@@ -552,6 +552,15 @@ var YouTubeInterface = Backbone.View.extend({
 			this.whilePlaying = false;
 		}
 	},
+	getData: function() {
+		var self = this;
+		var callback = function() {
+			data = $el.tubeplayer('data');
+			self.trigger('data', data);
+			return data;
+		};
+		return view.onload.done(callback);
+	},
 	initialize: function() {
 		var view = this;
 		this.defaults = {
@@ -688,8 +697,10 @@ var YouTubeInterface = Backbone.View.extend({
 	seek: function(time) {
 		var view = this;
 		var seek = function() {
+			var data = view.$el.tubeplayer('data');
+			var percent = time / data.duration;
 			view.$el.tubeplayer('seek', time);
-			view.trigger('progress', time);
+			view.trigger('progress', {percent: percent, time: time});
 		};
 		return view.onload.done(seek);
 	},

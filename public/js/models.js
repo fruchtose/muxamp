@@ -45,6 +45,9 @@ var Track = Backbone.Model.extend({
     togglePause: function(playing) {
         var event = playing ? 'pause' : 'resume';
         triggerEvents(this, event, this, _.rest(arguments));
+    },
+    triggerProgress: function() {
+        triggerEvents(this, event, this, {percent: 0, time: 0}, arguments);
     }
 }, {
     getMediaObject: function(mediaData, options) {
@@ -169,6 +172,12 @@ var SoundTrack = Track.extend({
     toggleMute: function() {
         var mute = !this.isMuted();
         this.setMute(mute);
+    },
+
+    triggerProgress: function() {
+        var time = this.get('sound').position;
+        var percent = time / this.get('sound').duration;
+        triggerEvents(this, 'progress', this, {percent: percent, time: time}, arguments);
     }
 });
 
@@ -201,10 +210,10 @@ var YouTubeTrack = VideoTrack.extend({
 		})
 	},
 	destruct: function() {
-        var self = this;
+        var self = this, args = arguments;
         YouTube.reset().then(function() {
             self._stopped = true;
-            triggerEvents(self, 'destruct', self, arguments);
+            triggerEvents(self, 'destruct', self, args);
         });
     },
     end: function() {
@@ -223,7 +232,7 @@ var YouTubeTrack = VideoTrack.extend({
         return this._stopped || ! this.isPlaying();
     },
     play: function(options) {
-        var self = this;
+        var self = this, args = arguments;
         if (this.isPaused()) {
             this.togglePause();
         } else {
@@ -232,19 +241,22 @@ var YouTubeTrack = VideoTrack.extend({
                 initialVideo: this.get('siteMediaID')
             })).then(function() {
                 self._stopped = false;
-                triggerEvents(self, 'play', self, arguments);
+                triggerEvents(self, 'play', self, args);
             });
         }
     },
     seek: function(decimalPercent) {
-        var duration = this.get('duration'), self = this, time = Math.floor(decimalPercent * duration);
+        var duration = this.get('duration'), 
+            self = this, 
+            time = Math.floor(decimalPercent * duration),
+            args = arguments;
         YouTube.seek(time).then(function() {
             self._stopped = false;
-            triggerEvents(self, 'progress', self, {percent: decimalPercent, time: time}, _.rest(arguments));
+            triggerEvents(self, 'progress', self, {percent: decimalPercent, time: time}, _.rest(args));
         });
     },
     setMute: function(mute) {
-        var self = this, dfd, event;
+        var self = this, dfd, event, args = arguments;
         if (mute) {
             event = 'mute';
             dfd = YouTube.mute();
@@ -253,11 +265,11 @@ var YouTubeTrack = VideoTrack.extend({
             event = 'unmute';
         }
         dfd.then(function() {
-            triggerEvents(self, event, self, arguments);
+            triggerEvents(self, event, self, args);
         });
     },
     setVolume: function(percent) {
-        var muted = this.isMuted(), dfd, self = this;
+        var muted = this.isMuted(), dfd, self = this, args = arguments;
         dfd = YouTube.setVolume(percent);
         if (percent == 0 && !muted) {
             dfd = this.setMute(true);
@@ -265,16 +277,16 @@ var YouTubeTrack = VideoTrack.extend({
             dfd = this.setMute(false);
         }
         dfd.then(function() {
-            triggerEvents(self, 'volume', self, arguments);
+            triggerEvents(self, 'volume', self, args);
         });
     },
     stop: function() {
-        var self = this;
+        var self = this, args = arguments;
         YouTube.pause();
         YouTube.seek(0).then(function() {
             self._stopped = true;
-            triggerEvents(self, 'progress', self, {percent: 0, time: 0}, arguments)
-            triggerEvents(self, 'stop', self, arguments);
+            triggerEvents(self, 'progress', self, {percent: 0, time: 0}, args)
+            triggerEvents(self, 'stop', self, args);
         });
     },
     togglePause: function() {
@@ -282,14 +294,23 @@ var YouTubeTrack = VideoTrack.extend({
         var state = YouTube.state;
         var playing = state == 1 || state == 3;
         var dfd = playing ? YouTube.pause() : YouTube.play();
-        var event = playing ? 'pause' : 'resume';
+        var event = playing ? 'pause' : 'resume', args = arguments;
         dfd.then(function() {
             self._stopped = false;
-            triggerEvents(self, event, self, arguments);
+            triggerEvents(self, event, self, args);
         });
     },
     toggleMute: function() {
         var mute = !this.isMuted();
         this.setMute(mute);
+    },
+    triggerProgress: function() {
+        var args = arguments;
+        YouTube.getData().then(function(data) {
+            var time = data.currentTime,
+                duration = data.duration,
+                percent = time / duration;
+            triggerEvents(self, 'progress', self, {percent: percent, time: time}, args);
+        });
     }
 });
