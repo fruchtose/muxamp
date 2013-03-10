@@ -45,7 +45,7 @@ describe('Playlist', function() {
 	});
 	describe('YouTube capabilities', function() {
 		it('should be able to play a video', function(done) {
-			YouTube.once('play', function() {
+			Playlist.once('play', function() {
 				Playlist.currentMedia.should.not.be.null;
 				Playlist.currentMedia.get('siteCode').should.eql('ytv');
 				Playlist.isPlaying().should.be.true;
@@ -55,7 +55,7 @@ describe('Playlist', function() {
 			Playlist.play();
 		});
 		it('should be able to pause a video', function(done) {
-			YouTube.once('pause', function() {
+			Playlist.once('pause', function() {
 				Playlist.currentMedia.should.not.be.null;
 				Playlist.isPlaying().should.be.true;
 				Playlist.isPaused().should.be.true;

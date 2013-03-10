@@ -225,6 +225,9 @@ var YouTubeTrack = VideoTrack.extend({
     getVolume: function() {
         return YouTube.getVolume();
     },
+    isBuffering: function() {
+        return YouTube.state == 3;
+    },
     isMuted: function() {
         return YouTube.isMuted();
     },
@@ -232,7 +235,7 @@ var YouTubeTrack = VideoTrack.extend({
         return YouTube.state == 2;
     },
     isPlaying: function() {
-        return YouTube.state === 1 || YouTube.hasPlayer();
+        return YouTube.state === 1 || YouTube.hasPlayer() || this.isPaused() || this.isBuffering();
     },
     isStopped: function() {
         return this._stopped || ! this.isPlaying();
@@ -311,7 +314,7 @@ var YouTubeTrack = VideoTrack.extend({
     togglePause: function() {
         var self = this;
         var state = YouTube.state;
-        var playing = state == 1 || state == 3;
+        var playing = this.isPlaying();
         var dfd = playing ? YouTube.pause() : YouTube.play();
         var event = playing ? 'pause' : 'resume', args = arguments;
         dfd.then(function() {

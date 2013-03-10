@@ -573,6 +573,8 @@ var YouTubeInterface = Backbone.View.extend({
 	initialize: function() {
 		var view = this;
 		var triggerError = function(view) {
+			var data = view.$el.tubeplayer('data');
+			view.state = data.state;
 			view.onload.reject();
             view.clearInterval();
             view.stop();
@@ -585,7 +587,26 @@ var YouTubeInterface = Backbone.View.extend({
             loadSWFObject: false,
             width: view.$el.width(),
             height: view.$el.height(),
+            onErrorNotEmbeddable: function() {
+            	triggerError(view);
+            },
+            onErrorNotFound: function() {
+            	triggerError(view);
+            },
+            onErrorInvalidParameter: function() {
+            	triggerError(view);
+            },
+            onMute: function() {
+            	view.trigger('mute');
+            },
+            onPause: function() {
+            	view.state = 2;
+            	view.clearInterval();
+            	view.trigger('pause', view.$el.tubeplayer('data'));
+            },
             onStop: function() {
+            	var data = view.$el.tubeplayer('data');
+            	view.state = data.state;
             	view.clearInterval();
             	view.trigger('stop', view.$el.tubeplayer('data'));
             },
@@ -596,11 +617,6 @@ var YouTubeInterface = Backbone.View.extend({
             	view.state = 3;
             	view.clearInterval();
             	view.trigger('buffering', view.$el.tubeplayer('data'));
-            },
-            onPlayerPaused: function() {
-            	view.state = 2;
-            	view.clearInterval();
-            	view.trigger('pause', view.$el.tubeplayer('data'));
             },
             onPlayerPlaying: function() {
             	view.onload.resolve();
@@ -614,14 +630,13 @@ var YouTubeInterface = Backbone.View.extend({
                 view.stop();
                 view.trigger('end');
             },
-            onErrorNotEmbeddable: function() {
-            	triggerError(view);
+            onSeek: function(time) {
+            	var data = view.$el.tubeplayer('data');
+				var percent = time / data.duration;
+            	view.trigger('progress', {percent: percent, time: time});
             },
-            onErrorNotFound: function() {
-            	triggerError(view);
-            },
-            onErrorInvalidParameter: function() {
-            	triggerError(view);
+            onUnMute: function() {
+            	view.trigger('unmute');
             }
         };
 		this.reset();
@@ -655,17 +670,16 @@ var YouTubeInterface = Backbone.View.extend({
 		var view = this;
 		var mute = function() {
 			view.$el.tubeplayer('mute');
-			view.trigger('mute');
 		};
 		return view.onload.done(mute);
 	},
 	pause: function() {
 		var view = this;
-		var pause = function() {
+		console.log(view.onload.state());
+		var callback = function() {
 			view.$el.tubeplayer('pause');
-			view.trigger('pause');
 		};
-		return view.onload.done(pause);
+		return view.onload.done(callback);
 	},
 	play: function() {
 		var view = this;
@@ -675,8 +689,6 @@ var YouTubeInterface = Backbone.View.extend({
 			view.$el.tubeplayer('play');
 			if (paused) {
 				view.trigger('resume');
-			} else {
-				view.trigger('play');
 			}
 		};
 		return view.onload.done(play);
@@ -706,10 +718,7 @@ var YouTubeInterface = Backbone.View.extend({
 	seek: function(time) {
 		var view = this;
 		var seek = function() {
-			var data = view.$el.tubeplayer('data');
-			var percent = time / data.duration;
 			view.$el.tubeplayer('seek', time);
-			view.trigger('progress', {percent: percent, time: time});
 		};
 		return view.onload.done(seek);
 	},
@@ -718,15 +727,12 @@ var YouTubeInterface = Backbone.View.extend({
 			this.clearInterval();
 		}
 		var view = this;
-		window.setInterval(function() {
+		this.whilePlaying = window.setInterval(function() {
             var data = view.$el.tubeplayer('data');
             if (data && data.hasOwnProperty('currentTime') && data.hasOwnProperty('duration')) {
                 var percent =  (data.currentTime / data.duration) * 100;
                 var time = data.currentTime;
-                view.trigger('progress', {
-                	percent: percent,
-                	time: time
-                });
+                view.trigger('progress', {percent: percent, time: time});
             }
         }, 333);
 	},
@@ -751,8 +757,7 @@ var YouTubeInterface = Backbone.View.extend({
 		var view = this;
 		var unmute = function() {
 			view.$el.tubeplayer('unmute');
-			view.trigger('unmute');
 		};
 		return view.onload.done(unmute);
-	},
+	}
 });
