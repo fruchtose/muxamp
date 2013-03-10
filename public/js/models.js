@@ -1,3 +1,7 @@
+var triggerEvents = function(context) {
+    return context.trigger.apply(context, _.chain(arguments).flatten().rest().value() || []);
+};
+
 var Track = Backbone.Model.extend({
     defaults: {
         siteMediaID: "",
@@ -11,38 +15,36 @@ var Track = Backbone.Model.extend({
         type: ""
     },
     destruct: function() {
-        this.trigger('destruct', this, arguments);
+        triggerEvents(this, 'destruct', arguments);
     },
     end: function() {
-        this.trigger('end', this, arguments);
+        triggerEvents(this, 'end', this, arguments);
     },
     mute: function() {
-        this.trigger('mute', this, arguments);
+        triggerEvents(this, 'mute', this, arguments);
     },
     play: function() {
-        this.trigger('play', this, arguments);
+        triggerEvents(this, 'play', this, arguments);
     },
     play: function() {
-        this.trigger('play', this, arguments);
+        triggerEvents(this, 'play', this, arguments);
     },
     seek: function() {
-        this.trigger('progress', this, arguments);
+        triggerEvents(this, 'progress', this, arguments);
     },
     setMute: function(mute) {
         var event = mute ? 'mute' : 'unmute';
-        var args = [event, this, _.rest(arguments)];
-        this.trigger.apply(this, args);
+        triggerEvents(this, event, _.rest(arguments));
     },
     setVolume: function() {
-        this.trigger('setVolume', this, arguments);
+        triggerEvents(this, 'volume', this, arguments);
     },
     stop: function() {
-        this.trigger('stop', this, arguments);
+        triggerEvents(this, 'stop', this, arguments);
     },
     togglePause: function(playing) {
         var event = playing ? 'pause' : 'resume';
-        var args = [event, this, _.rest(arguments)];
-        this.trigger.apply(this, args);
+        triggerEvents(this, event, this, _.rest(arguments));
     }
 }, {
     getMediaObject: function(mediaData, options) {
@@ -104,11 +106,11 @@ var SoundTrack = Track.extend({
 	},
     destruct: function() {
         this.get("sound").destruct();
-        this.trigger('destruct', this, arguments);
+        triggerEvents(this, 'destruct', this, arguments);
     },
     end: function() {
         this.get("sound").stop();
-        this.trigger('end', this, arguments);
+        triggerEvents(this, 'end', this, arguments);
     },
     getDuration: function() {
         return this.get("duration");
@@ -127,45 +129,46 @@ var SoundTrack = Track.extend({
     },
     play: function(options) {
         this.get('soundManager').play(this.get("siteMediaID"), options);
-        this.trigger('play', this, arguments);
+        triggerEvents(this, 'play', this, arguments);
     },
     seek: function(decimalPercent) {
         var time = Math.floor(decimalPercent * this.get("sound").duration);
         this.get("sound").setPosition(time);
-        this.trigger.apply(this, ['progress', this, {percent: decimalPercent, time: time}].concat(arguments));
+        triggerEvents(this, 'progress', this, {percent: decimalPercent, time: time}, _.rest(arguments));
     },
     setMute: function(mute) {
+        var event = mute ? 'mute' : 'unmute';
         if (mute) {
             this.get("sound").mute();
         }
         else {
             this.get("sound").unmute();
         }
-        this.trigger('setMute', this, arguments);
+        triggerEvents(this, event, this, _.rest(arguments));
     },
     
     setVolume: function(intPercent) {
         this.setMute(intPercent == 0);
         this.get("sound").setVolume(intPercent);
-        this.trigger('setVolume', this, arguments);
+        triggerEvents(this, 'volume', this, arguments);
     },
     
     stop: function() {
         this.get("sound").stop();
-        this.trigger('stop', this, arguments);
+        triggerEvents(this, 'stop', this, arguments);
     },
     
     togglePause: function() {
-        var pause = this.isPlaying();
+        var playing = this.isPlaying();
         var sound = this.get("sound");
         sound.togglePause();
-        this.trigger('togglePause', this, arguments);
+        var event = playing ? 'pause' : 'resume';
+        triggerEvents(this, event, this, arguments);
     },
     
     toggleMute: function() {
         var mute = !this.isMuted();
-        this.get("sound").toggleMute();
-        this.trigger.apply(this, ['toggleMute', this, mute].concat(arguments));
+        this.setMute(mute);
     }
 });
 
@@ -201,7 +204,7 @@ var YouTubeTrack = VideoTrack.extend({
         var self = this;
         YouTube.reset().then(function() {
             self._stopped = true;
-            self.trigger('destruct', self, arguments);
+            triggerEvents(self, 'destruct', self, arguments);
         });
     },
     end: function() {
@@ -229,7 +232,7 @@ var YouTubeTrack = VideoTrack.extend({
                 initialVideo: this.get('siteMediaID')
             })).then(function() {
                 self._stopped = false;
-                self.trigger.apply(self, ['play', self, options].concat(arguments));
+                triggerEvents(self, 'play', self, arguments);
             });
         }
     },
@@ -237,14 +240,20 @@ var YouTubeTrack = VideoTrack.extend({
         var duration = this.get('duration'), self = this, time = Math.floor(decimalPercent * duration);
         YouTube.seek(time).then(function() {
             self._stopped = false;
-            self.trigger.apply(self, ['progress', self, {percent: decimalPercent, time: time}].concat(arguments));
+            triggerEvents(self, 'progress', self, {percent: decimalPercent, time: time}, _.rest(arguments));
         });
     },
     setMute: function(mute) {
-        var self = this;
-        var dfd = mute ? YouTube.mute() : YouTube.unmute();
+        var self = this, dfd, event;
+        if (mute) {
+            event = 'mute';
+            dfd = YouTube.mute();
+        } else {
+            dfd = YouTube.unmute();
+            event = 'unmute';
+        }
         dfd.then(function() {
-            self.trigger.apply(self, ['setMute', self, mute].concat(arguments));
+            triggerEvents(self, event, self, arguments);
         });
     },
     setVolume: function(percent) {
@@ -256,7 +265,7 @@ var YouTubeTrack = VideoTrack.extend({
             dfd = this.setMute(false);
         }
         dfd.then(function() {
-            self.trigger.apply(self, ['setVolume', self, percent].concat(arguments));
+            triggerEvents(self, 'volume', self, arguments);
         });
     },
     stop: function() {
@@ -264,7 +273,8 @@ var YouTubeTrack = VideoTrack.extend({
         YouTube.pause();
         YouTube.seek(0).then(function() {
             self._stopped = true;
-            self.trigger('stop', self, arguments);
+            triggerEvents(self, 'progress', self, {percent: 0, time: 0}, arguments)
+            triggerEvents(self, 'stop', self, arguments);
         });
     },
     togglePause: function() {
@@ -272,16 +282,14 @@ var YouTubeTrack = VideoTrack.extend({
         var state = YouTube.state;
         var playing = state == 1 || state == 3;
         var dfd = playing ? YouTube.pause() : YouTube.play();
+        var event = playing ? 'pause' : 'resume';
         dfd.then(function() {
             self._stopped = false;
-            self.trigger.apply(self, ['togglePause', self, playing].concat(arguments));
+            triggerEvents(self, event, self, arguments);
         });
     },
     toggleMute: function() {
-        var muted = this.isMuted();
-        var self = this, dfd = muted ? YouTube.unmute() : YouTube.mute();
-        dfd.then(function() {
-            self.trigger.apply(self, ['toggleMute', self, muted].concat(arguments));
-        });
+        var mute = !this.isMuted();
+        this.setMute(mute);
     }
 });

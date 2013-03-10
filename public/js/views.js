@@ -338,7 +338,7 @@ var PlaylistView = Backbone.View.extend({
 	    Playlist.on('tracks:new', this.reset, this);
 		Playlist.on('tracks', this.append, this);
 		Playlist.on('id', this.updateList, this);
-		Playlist.on('currentTrack', this.setCurrentTrack, this);
+		Playlist.on('track', this.setCurrentTrack, this);
 	},
 	reset: function(tracks) {
 		$(this.table).empty();

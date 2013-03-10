@@ -234,7 +234,7 @@ var TrackPlaylist = TrackList.extend({
             this.currentTrack = 0;
             this.currentMedia = null;
         }
-        this.trigger('currentTrack', this.currentTrack);
+        this.trigger('track', this.currentTrack);
     },
     setMute: function(mute) {
         if (this.isLoaded()) {
