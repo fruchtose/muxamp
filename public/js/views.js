@@ -634,7 +634,7 @@ var YouTubeInterface = Backbone.View.extend({
     	} else {
     		view.setVolume(view.currentVolume);
     	}
-		view.onload.promise();
+		return view.onload.promise();
 	},
 	mute: function() {
 		var view = this;
@@ -642,14 +642,14 @@ var YouTubeInterface = Backbone.View.extend({
 			view.$el.tubeplayer('mute');
 			view.trigger('mute');
 		};
-		view.onload.done(mute);
+		return view.onload.done(mute);
 	},
 	pause: function() {
 		var view = this;
 		var pause = function() {
 			view.$el.tubeplayer('pause');
 		};
-		view.onload.done(pause);
+		return view.onload.done(pause);
 	},
 	play: function() {
 		var view = this;
@@ -661,7 +661,7 @@ var YouTubeInterface = Backbone.View.extend({
 				view.trigger('resume');
 			}
 		};
-		view.onload.done(play);
+		return view.onload.done(play);
 	},
 	reset: function() {
 		var view = this;
@@ -681,6 +681,9 @@ var YouTubeInterface = Backbone.View.extend({
 			view.currentVolume = 50;
 		}
 		view.trigger('reset');
+		var dfd = $.Deferred();
+		dfd.resolve();
+		return dfd.promise();
 	},
 	seek: function(time) {
 		var view = this;
@@ -688,7 +691,7 @@ var YouTubeInterface = Backbone.View.extend({
 			view.$el.tubeplayer('seek', time);
 			view.trigger('seek', time);
 		};
-		view.onload.done(seek);
+		return view.onload.done(seek);
 	},
 	setInterval: function() {
 		if (this.whilePlaying) {
@@ -714,7 +717,7 @@ var YouTubeInterface = Backbone.View.extend({
 			view.currentVolume = percent;
 	        view.trigger('volume', view.currentVolume);
 		};
-		view.onload.done(volumize);
+		return view.onload.done(volumize);
 	},
 	stop: function() {
 		var view = this;
@@ -722,7 +725,7 @@ var YouTubeInterface = Backbone.View.extend({
 			view.$el.tubeplayer('stop');
 			view.trigger('stop');
 		};
-		view.onload.done(stop);
+		return view.onload.done(stop);
 	},
 	unmute: function() {
 		var view = this;
@@ -730,6 +733,6 @@ var YouTubeInterface = Backbone.View.extend({
 			view.$el.tubeplayer('unmute');
 			view.trigger('unmute');
 		};
-		view.onload.done(unmute);
+		return view.onload.done(unmute);
 	},
 });

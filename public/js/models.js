@@ -9,6 +9,40 @@ var Track = Backbone.Model.extend({
         siteName: "",
         mediaName: "",
         type: ""
+    },
+    destruct: function() {
+        this.trigger('destruct', this, arguments);
+    },
+    end: function() {
+        this.trigger('end', this, arguments);
+    },
+    mute: function() {
+        this.trigger('mute', this, arguments);
+    },
+    play: function() {
+        this.trigger('play', this, arguments);
+    },
+    play: function() {
+        this.trigger('play', this, arguments);
+    },
+    seek: function() {
+        this.trigger('seek', this, arguments);
+    },
+    setMute: function(mute) {
+        var event = mute ? 'mute' : 'unmute';
+        var args = [event, this, _.rest(arguments)];
+        this.trigger.apply(this, args);
+    },
+    setVolume: function() {
+        this.trigger('setVolume', this, arguments);
+    },
+    stop: function() {
+        this.trigger('stop', this, arguments);
+    },
+    togglePause: function(playing) {
+        var event = playing ? 'pause' : 'resume';
+        var args = [event, this, _.rest(arguments)];
+        this.trigger.apply(this, args);
     }
 }, {
     getMediaObject: function(mediaData, options) {
@@ -69,10 +103,12 @@ var SoundTrack = Track.extend({
 		});
 	},
     destruct: function() {
-        return this.get("sound").destruct();
+        this.get("sound").destruct();
+        this.trigger('destruct', this, arguments);
     },
     end: function() {
-        return this.get("sound").stop();
+        this.get("sound").stop();
+        this.trigger('end', this, arguments);
     },
     getDuration: function() {
         return this.get("duration");
@@ -86,19 +122,17 @@ var SoundTrack = Track.extend({
     isPlaying: function() {
         return this.get("sound").playState === 1;
     },
-    
     isStopped: function() {
         return this.get("sound").playState === 0;
     },
-    
     play: function(options) {
-        return this.get('soundManager').play(this.get("siteMediaID"), options);
+        this.get('soundManager').play(this.get("siteMediaID"), options);
+        this.trigger('play', this, arguments);
     },
-    
     seek: function(decimalPercent) {
-        return this.get("sound").setPosition(Math.floor(decimalPercent * this.get("sound").duration));
+        this.get("sound").setPosition(Math.floor(decimalPercent * this.get("sound").duration));
+        this.trigger('seek', this, arguments);
     },
-    
     setMute: function(mute) {
         if (mute) {
             this.get("sound").mute();
@@ -106,24 +140,31 @@ var SoundTrack = Track.extend({
         else {
             this.get("sound").unmute();
         }
+        this.trigger('setMute', this, arguments);
     },
     
     setVolume: function(intPercent) {
         this.setMute(intPercent == 0);
         this.get("sound").setVolume(intPercent);
+        this.trigger('setVolume', this, arguments);
     },
     
     stop: function() {
-        return this.get("sound").stop();
+        this.get("sound").stop();
+        this.trigger('stop', this, arguments);
     },
     
     togglePause: function() {
+        var pause = this.isPlaying();
         var sound = this.get("sound");
-        return sound.togglePause();
+        sound.togglePause();
+        this.trigger('togglePause', this, arguments);
     },
     
     toggleMute: function() {
-        return this.get("sound").toggleMute();
+        var mute = !this.isMuted();
+        this.get("sound").toggleMute();
+        this.trigger.apply(this, ['toggleMute', this, mute].concat(arguments));
     }
 });
 
@@ -153,14 +194,17 @@ var YouTubeTrack = VideoTrack.extend({
 		this.set({
 			url: permalink,
 			permalink: permalink,
-			playState: 0,
 		})
 	},
 	destruct: function() {
-        YouTube.reset();
+        var self = this;
+        YouTube.reset().then(function() {
+            self._stopped = true;
+            self.trigger('destruct', self, arguments);
+        });
     },
     end: function() {
-        YouTube.reset();
+        this.destruct();
     },
     isMuted: function() {
         return YouTube.isMuted();
@@ -169,59 +213,74 @@ var YouTubeTrack = VideoTrack.extend({
         return YouTube.state == 2;
     },
     isPlaying: function() {
-        return YouTube.onload.state() == 'resolved' || YouTube.hasPlayer();
+        return YouTube.state === 1 || YouTube.hasPlayer();
     },
     isStopped: function() {
-        return this.get('playState') === 0 || ! this.isPlaying();
+        return this._stopped || ! this.isPlaying();
     },
     play: function(options) {
+        var self = this;
         if (this.isPaused()) {
-            YouTube.play();
+            this.togglePause();
         } else {
             YouTube.reset();
-            YouTube.load(_.extend({autoPlay: true}, options, {initialVideo: this.get('siteMediaID')}));
+            YouTube.load(_.extend({autoPlay: true}, options, {
+                initialVideo: this.get('siteMediaID')
+            })).then(function() {
+                self._stopped = false;
+                self.trigger.apply(self, ['play', self, options].concat(arguments));
+            });
         }
     },
     seek: function(decimalPercent) {
-        var duration = this.get('duration');
-        YouTube.seek(Math.floor(decimalPercent * duration));
+        var duration = this.get('duration'), self = this;
+        YouTube.seek(Math.floor(decimalPercent * duration)).then(function() {
+            self._stopped = false;
+            self.trigger.apply(self, ['seek', self, decimalPercent].concat(arguments));
+        });
     },
     setMute: function(mute) {
-        if (mute) {
-            YouTube.mute();
-        }
-        else {
-            YouTube.unmute();
-        }
+        var self = this;
+        var dfd = mute ? YouTube.mute() : YouTube.unmute();
+        dfd.then(function() {
+            self.trigger.apply(self, ['setMute', self, mute].concat(arguments));
+        });
     },
     setVolume: function(percent) {
-        var muted = this.isMuted();
-        YouTube.setVolume(percent);
+        var muted = this.isMuted(), dfd, self = this;
+        dfd = YouTube.setVolume(percent);
         if (percent == 0 && !muted) {
-            this.setMute(true);
+            dfd = this.setMute(true);
         } else if (percent > 0 && muted) {
-            this.setMute(false);
+            dfd = this.setMute(false);
         }
+        dfd.then(function() {
+            self.trigger.apply(self, ['setVolume', self, percent].concat(arguments));
+        });
     },
     stop: function() {
+        var self = this;
         YouTube.pause();
-        YouTube.seek(0);
+        YouTube.seek(0).then(function() {
+            self._stopped = true;
+            self.trigger('stop', self, arguments);
+        });
     },
     togglePause: function() {
+        var self = this;
         var state = YouTube.state;
         var playing = state == 1 || state == 3;
-        if (playing) {
-            YouTube.pause();
-        } else {
-            YouTube.play();
-        }
+        var dfd = playing ? YouTube.pause() : YouTube.play();
+        dfd.then(function() {
+            self._stopped = false;
+            self.trigger.apply(self, ['togglePause', self, playing].concat(arguments));
+        });
     },
     toggleMute: function() {
-        var muted = YouTube.isMuted();
-        if (muted) {
-            YouTube.unmute();
-        } else {
-            YouTube.mute();
-        }
+        var muted = this.isMuted();
+        var self = this, dfd = muted ? YouTube.unmute() : YouTube.mute();
+        dfd.then(function() {
+            self.trigger.apply(self, ['toggleMute', self, muted].concat(arguments));
+        });
     }
 });
