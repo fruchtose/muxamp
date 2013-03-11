@@ -107,6 +107,9 @@ var TrackPlaylist = TrackList.extend({
         });
 	},
     getVolume: function() {
+        if (!this.isLoaded()) {
+            return 0;
+        }
         return this.currentVolumePercent;
     },
     goToTrack: function(index, autostart) {
@@ -209,7 +212,7 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     previousTrack: function(autostart) {
-        var trackInt = parseInt(this.currentTrack), next = (trackInt - 1 + this.size()) % this.size() || 0 ;
+        var track= this.currentTrack, next = (track - 1 + this.size()) % this.size() || 0 ;
         this.goToTrack(next, autostart);
     },
     seek: function(decimalPercent) {
@@ -234,13 +237,15 @@ var TrackPlaylist = TrackList.extend({
         
     },
     setMute: function(mute) {
+        if (!this.isLoaded()) {
+            return false;
+        }
         if (this.isLoaded()) {
             this.currentMedia.setMute(mute);
         }
-        var newVolume = (mute)
-            ? 0
-            : this.currentVolumePercent;
-        this.setVolume(newVolume);
+        if (!mute && this.currentVolumePercent > 0) {
+            this.setVolume(this.currentVolumePercent);
+        }
         this.muted = mute;
     },
     setVolume: function(intPercent) {
@@ -249,8 +254,8 @@ var TrackPlaylist = TrackList.extend({
         }
         intPercent = Math.round(intPercent);
         var media = this.currentMedia;
-        media.setVolume(intPercent);
         this.currentVolumePercent = intPercent;
+        media.setVolume(intPercent);
     },
     shuffle: function() {
         if (!this.isLoaded()) {
