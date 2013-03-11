@@ -72,10 +72,10 @@ describe('Routing', function() {
 		};
 	};
 	it('should be able to reset the current playlist environment', function(done) {
-		Playlist.once('id', function(id) {
+		Playlist.once('id', function(data) {
 			window.location.should.match(/(\/|\/#)$/);
 			Playlist.size().should.eql(0);
-			(!!id).should.be.false;
+			(!!data.id).should.be.false;
 			done();
 		})
 		Router.reset();
