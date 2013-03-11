@@ -156,20 +156,15 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     nextTrack: function(autostart) {
-        var trackInt = parseInt(this.currentTrack), next = (trackInt + 1) % this.size() || 0;
+        var track = this.currentTrack, next = (track + 1) % this.size() || 0;
         this.goToTrack(next, autostart);
     },
     parse: function(response) {
     	var mediaObjects = [];
     	if (response.id) {
-    		var results = response.tracks;
-	    	if (results.length) {
-	    		var i;
-	    		for (i in results) {
-	    			var mediaObject = Track.getMediaObject(results[i]);
-	    			mediaObject && mediaObjects.push(mediaObject);
-	    		}
-	    	}
+    		mediaObjects = _.chain(response.tracks || []).map(function(item) {
+                return Track.getMediaObject(item);
+            }).compact().value();
     	}
         if (response.error) {
             this.trigger('error:server', response.error);
