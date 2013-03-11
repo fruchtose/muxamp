@@ -15,39 +15,39 @@ var Track = Backbone.Model.extend({
         type: ""
     },
     destruct: function() {
-        triggerEvents(this, 'destruct', arguments);
+        triggerEvents(this, 'destruct', Array.prototype.slice.call(arguments));
     },
     end: function() {
-        triggerEvents(this, 'end', this, arguments);
+        triggerEvents(this, 'end', Array.prototype.slice.call(arguments));
     },
     mute: function() {
-        triggerEvents(this, 'mute', this, arguments);
+        triggerEvents(this, 'mute', Array.prototype.slice.call(arguments));
     },
     play: function() {
-        triggerEvents(this, 'play', this, arguments);
+        triggerEvents(this, 'play', Array.prototype.slice.call(arguments));
     },
     play: function() {
-        triggerEvents(this, 'play', this, arguments);
+        triggerEvents(this, 'play', Array.prototype.slice.call(arguments));
     },
     seek: function() {
-        triggerEvents(this, 'progress', this, arguments);
+        triggerEvents(this, 'progress', Array.prototype.slice.call(arguments));
     },
     setMute: function(mute) {
         var event = mute ? 'mute' : 'unmute';
         triggerEvents(this, event, _.rest(arguments));
     },
     setVolume: function() {
-        triggerEvents(this, 'volume', this, arguments);
+        triggerEvents(this, 'volume', Array.prototype.slice.call(arguments));
     },
     stop: function() {
-        triggerEvents(this, 'stop', this, arguments);
+        triggerEvents(this, 'stop', Array.prototype.slice.call(arguments));
     },
     togglePause: function(playing) {
         var event = playing ? 'pause' : 'resume';
         triggerEvents(this, event, this, _.rest(arguments));
     },
     triggerProgress: function() {
-        triggerEvents(this, event, this, {percent: 0, time: 0}, arguments);
+        triggerEvents(this, event, this, {percent: 0, time: 0}, Array.prototype.slice.call(arguments));
     }
 }, {
     getMediaObject: function(mediaData, options) {
@@ -109,11 +109,11 @@ var SoundTrack = Track.extend({
 	},
     destruct: function() {
         this.get("sound").destruct();
-        triggerEvents(this, 'destruct', this, arguments);
+        triggerEvents(this, 'destruct', Array.prototype.slice.call(arguments));
     },
     end: function() {
         this.get("sound").stop();
-        triggerEvents(this, 'end', this, arguments);
+        triggerEvents(this, 'end', Array.prototype.slice.call(arguments));
     },
     getDuration: function() {
         return this.get("duration");
@@ -135,12 +135,12 @@ var SoundTrack = Track.extend({
     },
     play: function(options) {
         this.get('soundManager').play(this.get("siteMediaID"), options);
-        triggerEvents(this, 'play', this, arguments);
+        triggerEvents(this, 'play', Array.prototype.slice.call(arguments));
     },
     seek: function(decimalPercent) {
         var time = Math.floor(decimalPercent * this.get("sound").duration);
         this.get("sound").setPosition(time);
-        triggerEvents(this, 'progress', this, {percent: decimalPercent, time: time}, _.rest(arguments));
+        triggerEvents(this, 'progress', {percent: decimalPercent, time: time}, _.rest(arguments));
     },
     setMute: function(mute) {
         var event = mute ? 'mute' : 'unmute';
@@ -156,12 +156,12 @@ var SoundTrack = Track.extend({
     setVolume: function(intPercent) {
         this.setMute(intPercent == 0);
         this.get("sound").setVolume(intPercent);
-        triggerEvents(this, 'volume', this, arguments);
+        triggerEvents(this, 'volume', Array.prototype.slice.call(arguments));
     },
     
     stop: function() {
         this.get("sound").stop();
-        triggerEvents(this, 'stop', this, arguments);
+        triggerEvents(this, 'stop', Array.prototype.slice.call(arguments));
     },
     
     togglePause: function() {
@@ -169,7 +169,7 @@ var SoundTrack = Track.extend({
         var sound = this.get("sound");
         sound.togglePause();
         var event = playing ? 'pause' : 'resume';
-        triggerEvents(this, event, this, arguments);
+        triggerEvents(this, event, this, Array.prototype.slice.call(arguments));
     },
     
     toggleMute: function() {
@@ -180,7 +180,7 @@ var SoundTrack = Track.extend({
     triggerProgress: function() {
         var time = this.get('sound').position;
         var percent = time / this.get('sound').duration;
-        triggerEvents(this, 'progress', this, {percent: percent, time: time}, arguments);
+        triggerEvents(this, 'progress', {percent: percent, time: time}, Array.prototype.slice.call(arguments));
     }
 });
 
@@ -213,10 +213,10 @@ var YouTubeTrack = VideoTrack.extend({
 		})
 	},
 	destruct: function() {
-        var self = this, args = arguments;
+        var self = this, args = Array.prototype.slice.call(arguments);
         YouTube.reset().then(function() {
             self._stopped = true;
-            triggerEvents(self, 'destruct', self, args);
+            triggerEvents(self, 'destruct', args);
         });
     },
     end: function() {
@@ -241,7 +241,7 @@ var YouTubeTrack = VideoTrack.extend({
         return this._stopped || ! this.isPlaying();
     },
     play: function(options) {
-        var self = this, args = arguments;
+        var self = this, args = Array.prototype.slice.call(arguments);
         if (this.isPaused()) {
             this.togglePause();
         } else {
@@ -251,13 +251,13 @@ var YouTubeTrack = VideoTrack.extend({
             })).then(function() {
                 self._stopped = false;
                 self.listenTo(YouTube, 'progress', function(progress) {
-                    triggerEvents(self, 'progress', self, progress);
+                    triggerEvents(self, 'progress', progress, args);
                 });
                 YouTube.once('end error', function() {
                     self.stopListening(YouTube, 'progress');
                     self.end();
                 });
-                triggerEvents(self, 'play', self, args);
+                triggerEvents(self, 'play', args);
             });
         }
     },
@@ -265,10 +265,10 @@ var YouTubeTrack = VideoTrack.extend({
         var duration = this.get('duration'), 
             self = this, 
             time = Math.floor(decimalPercent * duration),
-            args = arguments;
+            args = Array.prototype.slice.call(arguments);
         YouTube.seek(time).then(function() {
             self._stopped = false;
-            triggerEvents(self, 'progress', self, {percent: decimalPercent, time: time}, _.rest(args));
+            triggerEvents(self, 'progress', {percent: decimalPercent, time: time}, _.rest(args));
         });
     },
     setMute: function(mute, silent) {
@@ -288,7 +288,7 @@ var YouTubeTrack = VideoTrack.extend({
         });
     },
     setVolume: function(percent) {
-        var muted = this.isMuted(), dfd, self = this, args = arguments;
+        var muted = this.isMuted(), dfd, self = this, args = Array.prototype.slice.call(arguments);
         dfd = YouTube.setVolume(percent);
         if (percent == 0 && !muted) {
             dfd.then(function() {
@@ -300,15 +300,15 @@ var YouTubeTrack = VideoTrack.extend({
             });
         }
         dfd.then(function() {
-            triggerEvents(self, 'volume', self, args);
+            triggerEvents(self, 'volume', args);
         });
     },
     stop: function() {
-        var self = this, args = arguments;
+        var self = this, args = Array.prototype.slice.call(arguments);
         YouTube.pause();
         YouTube.seek(0).then(function() {
             self._stopped = true;
-            triggerEvents(self, 'stop', self, args);
+            triggerEvents(self, 'stop', args);
         });
     },
     togglePause: function() {
@@ -316,7 +316,7 @@ var YouTubeTrack = VideoTrack.extend({
         var state = YouTube.state;
         var playing = this.isPlaying();
         var dfd = playing ? YouTube.pause() : YouTube.play();
-        var event = playing ? 'pause' : 'resume', args = arguments;
+        var event = playing ? 'pause' : 'resume', args = Array.prototype.slice.call(arguments);
         dfd.then(function() {
             self._stopped = false;
             triggerEvents(self, event, self, args);
@@ -327,12 +327,12 @@ var YouTubeTrack = VideoTrack.extend({
         this.setMute(mute);
     },
     triggerProgress: function() {
-        var args = arguments;
+        var args = Array.prototype.slice.call(arguments);
         YouTube.getData().then(function(data) {
             var time = data.currentTime,
                 duration = data.duration,
                 percent = time / duration;
-            triggerEvents(self, 'progress', self, {percent: percent, time: time}, args);
+            triggerEvents(self, 'progress', {percent: percent, time: time}, args);
         });
     }
 });

@@ -231,10 +231,6 @@ var TrackPlaylist = TrackList.extend({
         if (this.size() && trackNumber >= 0 && trackNumber < this.size()) {
             this.currentTrack = trackNumber;
             this.currentMedia = this.at(trackNumber);
-            this.listenTo(this.currentMedia, 'all', function(event, track) {
-                args = _.rest(arguments, 2);
-                self.trigger(event, args);
-            });
         } else {
             this.currentTrack = 0;
             this.currentMedia = null;
