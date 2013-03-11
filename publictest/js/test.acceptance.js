@@ -96,6 +96,43 @@ describe('Playlist', function() {
 	})
 });
 
+describe('Controls', function() {
+	describe('for volume', function() {
+		before(function(done) {
+			Router.load(151).then(function () {
+				done();
+			})
+		});
+		beforeEach(function(done) {
+			Playlist.once('play', function() {
+				done();
+			});
+			Playlist.play();
+			Playlist.setVolume(50);
+		});
+		it('should change the volume of a YouTube track', function(done) {
+			Playlist.once('volume', function() {
+				Playlist.getVolume().should.eql(100);
+				done();
+			});
+			Playlist.getVolume().should.eql(50);
+			Playlist.setVolume(100);
+		});
+		it('should change the volume of a SoundCloud track', function(done) {
+			Playlist.nextTrack(true);
+			Playlist.once('volume', function() {
+				Playlist.getVolume().should.eql(100);
+				done();
+			});
+			Playlist.getVolume().should.eql(50);
+			Playlist.setVolume(100);
+		})
+		afterEach(function() {
+			Playlist.stop();
+		});
+	});
+});
+
 describe('Search', function() {
 	var testTrack = function(track) {
 		track.should.be.an('object');

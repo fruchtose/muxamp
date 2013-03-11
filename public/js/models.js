@@ -232,13 +232,13 @@ var YouTubeTrack = VideoTrack.extend({
         return YouTube.isMuted();
     },
     isPaused: function() {
-        return YouTube.state == 2;
+        return !this._stopped && YouTube.state == 2;
     },
     isPlaying: function() {
-        return YouTube.state === 1 || YouTube.hasPlayer() || this.isPaused() || this.isBuffering();
+        return !this._stopped && YouTube.state === 1 || YouTube.hasPlayer() || this.isPaused() || this.isBuffering();
     },
     isStopped: function() {
-        return this._stopped || ! this.isPlaying();
+        return this._stopped || !this.isPlaying();
     },
     play: function(options) {
         var self = this, args = Array.prototype.slice.call(arguments);
