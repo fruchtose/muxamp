@@ -561,14 +561,14 @@ var YouTubeInterface = Backbone.View.extend({
 	getData: function() {
 		var self = this;
 		var callback = function() {
-			data = $el.tubeplayer('data');
+			data = self.$el.tubeplayer('data');
 			self.trigger('data', data);
 			return data;
 		};
 		return view.onload.done(callback);
 	},
 	getVolume: function() {
-		return $el.tubeplayer('volume') || 0;
+		return this.$el.tubeplayer('volume') || 0;
 	},
 	initialize: function() {
 		var view = this;
@@ -675,7 +675,6 @@ var YouTubeInterface = Backbone.View.extend({
 	},
 	pause: function() {
 		var view = this;
-		console.log(view.onload.state());
 		var callback = function() {
 			view.$el.tubeplayer('pause');
 		};
