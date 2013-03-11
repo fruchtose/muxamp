@@ -110,7 +110,7 @@ var TrackPlaylist = TrackList.extend({
         if (!this.isLoaded()) {
             return 0;
         }
-        return this.currentVolumePercent;
+        return this.isMuted() ? 0 : this.currentVolumePercent;
     },
     goToTrack: function(index, autostart) {
         if (!this.size()) {
@@ -183,7 +183,7 @@ var TrackPlaylist = TrackList.extend({
             var media = this.currentMedia;
             if (media.get('type') == 'audio') {
                 media.play({
-                    volume: (playlist.isMuted() ? 0 : playlist.getVolume()),
+                    volume: playlist.getVolume(),
                     onfinish: function() {
                         playlist.nextTrack(true);
                     },
@@ -202,7 +202,7 @@ var TrackPlaylist = TrackList.extend({
             else if (media.get('type') == 'video') {
                 if (media.get('siteName') == 'YouTube') {
                     media.play({
-                        volume: playlist.isMuted() ? 0 : playlist.getVolume(),
+                        volume: playlist.getVolume()
                     });
                     media.once('end', function() {
                         playlist.nextTrack(true);
@@ -240,13 +240,11 @@ var TrackPlaylist = TrackList.extend({
         if (!this.isLoaded()) {
             return false;
         }
-        if (this.isLoaded()) {
-            this.currentMedia.setMute(mute);
-        }
+        this.muted = mute;
+        this.currentMedia.setMute(mute);
         if (!mute && this.currentVolumePercent > 0) {
             this.setVolume(this.currentVolumePercent);
         }
-        this.muted = mute;
     },
     setVolume: function(intPercent) {
         if (!this.isLoaded()) {

@@ -292,11 +292,11 @@ var YouTubeTrack = VideoTrack.extend({
         dfd = YouTube.setVolume(percent);
         if (percent == 0 && !muted) {
             dfd.then(function() {
-                return YouTube.setMute(true, true);
+                return self.setMute(true, true);
             });
         } else if (percent > 0 && muted) {
             dfd.then(function() {
-                return YouTube.setMute(false, true);
+                return self.setMute(false, true);
             });
         }
         dfd.then(function() {
