@@ -82,78 +82,93 @@ describe('Playlist', function() {
 				Playlist.currentMedia.should.not.be.null;
 				Playlist.isPlaying().should.be.true;
 				Playlist.isPaused().should.be.true;
+				//$('#controls .icon-pause').size().should.eql(1);
 				done();
 			});
 			Playlist.togglePause();
 		});
 	});
-	describe('interaction', function() {
+	describe('navigation', function() {
 		it('should be able to go forward in the track list', function() {
-			firstTrack = Playlist.currentMedia;
+			var firstTrack = Playlist.currentMedia;
 			Playlist.nextTrack();
 			firstTrack.should.not.eql(Playlist.currentMedia);
 		});
-	})
-});
-
-describe('Playlist volume controls', function() {
-	var testMute = function(done) {
-		Playlist.once('mute', function() {
-			Playlist.isMuted().should.be.true;
-			Playlist.getVolume().should.eql(0);
-			Playlist.once('unmute', function() {
-				Playlist.isMuted().should.be.false;
-				Playlist.getVolume().should.eql(50);
+		it('should be able to go backward in the track list', function() {
+			var firstTrack = Playlist.currentMedia;
+			Playlist.previousTrack();
+			firstTrack.should.not.eql(Playlist.currentMedia);
+		});
+		it('should be able to go to an arbitrary track', function() {
+			var index = Playlist.currentTrack;
+			var goTo = (Playlist.size() - 1) % Playlist.size();
+			var firstTrack = Playlist.currentMedia;
+			Playlist.goToTrack(goTo);
+			firstTrack.should.not.eql(Playlist.currentMedia);
+		});
+	});
+	describe('volume controls', function() {
+		var testMute = function(done) {
+			Playlist.once('mute', function() {
+				Playlist.isMuted().should.be.true;
+				Playlist.getVolume().should.eql(0);
+				Playlist.once('unmute', function() {
+					Playlist.isMuted().should.be.false;
+					Playlist.getVolume().should.eql(50);
+					done();
+				});
+				Playlist.toggleMute();
+			});
+			Playlist.getVolume().should.eql(50);
+			Playlist.isMuted().should.be.false;
+			Playlist.toggleMute();
+		};
+		before(function(done) {
+			Router.load(151).then(function () {
+				Playlist.once('track', function() {
+					done();
+				})
+				Playlist.goToTrack(0);
+			})
+		});
+		beforeEach(function(done) {
+			Playlist.once('play', function() {
+				Playlist.once('volume', function() {
+					done();
+				});
+				Playlist.setVolume(50);
+			});
+			Playlist.play();
+		});
+		it('should change the volume of a YouTube track', function(done) {
+			Playlist.once('volume', function() {
+				Playlist.getVolume().should.eql(100);
 				done();
 			});
-			Playlist.toggleMute();
+			Playlist.getVolume().should.eql(50);
+			Playlist.setVolume(100);
 		});
-		Playlist.getVolume().should.eql(50);
-		Playlist.isMuted().should.be.false;
-		Playlist.toggleMute();
-	};
-	before(function(done) {
-		Router.load(151).then(function () {
-			done();
-		})
-	});
-	beforeEach(function(done) {
-		Playlist.once('play', function() {
-			Playlist.once('volume', function() {
-				done();
-			})
-			Playlist.setVolume(50);
-		});
-		Playlist.play();
-	});
-	it('should change the volume of a YouTube track', function(done) {
-		Playlist.once('volume', function() {
-			Playlist.getVolume().should.eql(100);
-			done();
-		});
-		Playlist.getVolume().should.eql(50);
-		Playlist.setVolume(100);
-	});
-	it('should be able to mute and unmute a YouTube track', function(done) {
-		testMute(done);
-	});
-	it('should change the volume of a SoundCloud track', function(done) {
-		Playlist.nextTrack(true);
-		Playlist.once('volume', function() {
-			Playlist.getVolume().should.eql(100);
-			done();
-		});
-		Playlist.getVolume().should.eql(50);
-		Playlist.setVolume(100);
-	});
-	it('should be able to mute and unmute a SoundCloud track', function(done) {
-		Playlist.once('track', function() {
+		it('should be able to mute and unmute a YouTube track', function(done) {
 			testMute(done);
 		});
-		Playlist.nextTrack(true);
-	});
-	afterEach(function() {
-		Playlist.stop();
+		it('should change the volume of a SoundCloud track', function(done) {
+			Playlist.nextTrack(true);
+			Playlist.once('volume', function() {
+				Playlist.getVolume().should.eql(100);
+				done();
+			});
+			Playlist.getVolume().should.eql(50);
+			Playlist.setVolume(100);
+		});
+		it('should be able to mute and unmute a SoundCloud track', function(done) {
+			Playlist.once('track', function() {
+				testMute(done);
+			});
+			Playlist.nextTrack(true);
+		});
+		afterEach(function() {
+			Playlist.stop();
+		});		
 	});
 });
 
