@@ -335,7 +335,7 @@ var TrackPlaylist = TrackList.extend({
     },
 	url: function(id) {
 		var loc = '/';
-        id || (id = this.id);
+        id || (id = this.id || false);
 		if (id) {
 			loc += 'playlists/' + id;
 		}
