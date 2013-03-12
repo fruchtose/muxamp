@@ -74,8 +74,8 @@ describe('YouTube API video search', function() {
 	});
 	describe('functionality', function() {
 		var page0;
-		it('should have tracks for katy perry', function(done) {
-			var search = YouTube.search({query: 'katy perry', page: 0, perPage: 25});
+		it('should have tracks for kate bush', function(done) {
+			var search = YouTube.search({query: 'kate bush', page: 0, perPage: 25});
 			var comingTracks = search.get('tracks');
 			Q.all([
 				search.should.be.fulfilled,
@@ -89,8 +89,8 @@ describe('YouTube API video search', function() {
 				})
 			]).should.notify(done);
 		});
-		it('should have multiple pages of tracks for katy perry', function(done) {
-			var search = YouTube.search({query: 'katy perry', page: 1, perPage: 25});
+		it('should have multiple pages of tracks for kate bush', function(done) {
+			var search = YouTube.search({query: 'kate bush', page: 1, perPage: 25});
 			var comingTracks = search.get('tracks');
 			Q.all([
 				search.should.be.fulfilled,

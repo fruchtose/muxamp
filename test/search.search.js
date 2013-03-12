@@ -97,8 +97,8 @@ describe('SoundCloud search', function() {
 
 describe('YouTube search', function() {
 	var page0 = [];
-	it('should have videos for Katy Perry', function(done) {
-		testutils.expectSuccess(search('katy perry', 'ytv', 0), function(data) {
+	it('should have videos for kate bush', function(done) {
+		testutils.expectSuccess(search('kate bush', 'ytv', 0), function(data) {
 			data.should.have.property('tracks');
 			// Katy Perry is popular, we should have results
 			var tracks = page0 = data.tracks;
@@ -108,8 +108,8 @@ describe('YouTube search', function() {
 			});
 		}, done);
 	});
-	it('should have multiple pages of videos for Katy Perry', function(done) {
-		testutils.expectSuccess(search('katy perry', 'ytv', 1), function(data) {
+	it('should have multiple pages of videos for kate bush', function(done) {
+		testutils.expectSuccess(search('kate bush', 'ytv', 1), function(data) {
 			data.should.have.property('tracks');
 			// Katy Perry is popular, we should have results
 			var tracks = data.tracks;
