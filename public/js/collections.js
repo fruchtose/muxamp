@@ -98,8 +98,9 @@ var TrackPlaylist = TrackList.extend({
             } else {
                 result = $.Deferred();
                 result.resolve();
+                result = result.promise();
             }
-            return result.promise();
+            return result;
 		});
 
         this.on('id', function(data) {
@@ -366,7 +367,7 @@ var SearchResultsProvider = TrackList.extend({
             collection.trigger('results', models);
         });
         this.on('reset', function(collection) {
-            collection.trigger('results:new', collection.models);
+            collection.trigger('results:new', collection);
         });
     },
     parse: function(data) {

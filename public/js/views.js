@@ -455,15 +455,15 @@ var SearchResultsView = Backbone.View.extend({
 			play: true
 		});
 	},
-	reset: function(tracks) {
+	reset: function(collection) {
 		_.chain(this.rows)
 			.reverse()
 			.each(function(row) {
 				row.close();
 			});
 		this.rows = [];
-		if (tracks) {
-			this.append(tracks);
+		if (collection) {
+			this.append(collection.models);
 		}
 	},
 	show: function() {
