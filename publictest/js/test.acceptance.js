@@ -50,6 +50,12 @@
 		});
 	};
 	describe('Opening Muxamp', function() {
+		it('should have the GUI elements for track search', function() {
+			$('#search-query').size().should.eql(1);
+			$('#search-submit').size().should.eql(1);
+			$('#site-selector').size().should.eql(1);
+			$('#search-site-dropdown').find('li').size().should.eql(3);
+		});
 		it('should load SoundCloud', function(done) {
 			soundManager.should.not.be.null;
 			soundManager.onready(function() {
