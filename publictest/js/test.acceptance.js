@@ -1,4 +1,5 @@
 ;(function() {
+	var playlists = [];
 	var testTrack = function(track) {
 		track.should.be.an('object');
 		track.should.not.be.empty;
@@ -30,6 +31,22 @@
 				done();
 			})
 			playlist.add(collection.first());
+		});
+	};
+	var testGUIPlaylistAdding = function(playlist, searchResults, done) {
+		var startLength = playlist.size(), startId = playlist.id;
+		searchResults.once('results:new', function(collection, options) {
+			collection.each(function(model) {
+				testTrackModel(model);
+			});
+			playlist.once('id', function() {
+				Playlist.id.should.be.above(0);
+				Playlist.id.should.not.eql(startId);
+				Playlist.size().should.be.above(startLength);
+				done();
+			})
+			$('#search-tab').click();
+			$('#search-results tr:first-child .search-add-result').click();
 		});
 	};
 	describe('Opening Muxamp', function() {
@@ -89,29 +106,55 @@
 			});
 		});
 	});
-
 	describe('Adding tracks to the playlist', function() {
 		it('should function for YouTube tracks', function(done) {
+			Playlist.once('id', function() {
+				playlists.push(Playlist.id);
+			});
 			testPlaylistAdding(Playlist, SearchResults, done);
 			SearchResults.search('mgmt', 'ytv');
 		});
 		it('should function for SoundCloud tracks', function(done) {
+			Playlist.once('id', function() {
+				playlists.push(Playlist.id);
+			});
 			testPlaylistAdding(Playlist, SearchResults, done);
 			SearchResults.search('bag raiders', 'sct');
 		});
 		describe('through the GUI', function() {
 			it('should function for YouTube tracks', function(done) {
-				testPlaylistAdding(Playlist, SearchResults, done);
+				Playlist.once('id', function() {
+					playlists.push(Playlist.id);
+				});
+				testGUIPlaylistAdding(Playlist, SearchResults, done);
 				$('#search-query').val('flaming lips');
 				$('#site-selector').click();
 				$('#search-site-dropdown ul li:first-child').click();
 				$('#search-submit').click();
 			});
+			it('should be able to add the same YouTube track twice', function(done) {
+				Playlist.once('id', function() {
+					playlists.push(Playlist.id);
+				});
+				testGUIPlaylistAdding(Playlist, SearchResults, done);
+				$('#search-submit').click();
+			});
 			it('should function for SoundCloud tracks', function(done) {
-				testPlaylistAdding(Playlist, SearchResults, done);
+				Playlist.once('id', function() {
+					playlists.push(Playlist.id);
+				});
+				testGUIPlaylistAdding(Playlist, SearchResults, done);
 				$('#search-query').val('flaming lips');
 				$('#site-selector').click();
 				$('#search-site-dropdown ul li:nth-child(2)').click();
+				$('#search-submit').click();
+			});
+			it('should be able to add the same SoundCloud track twice', function(done) {
+				Playlist.once('id', function() {
+					playlists.push(Playlist.id);
+					console.log(playlists);
+				});
+				testGUIPlaylistAdding(Playlist, SearchResults, done);
 				$('#search-submit').click();
 			});
 		});
@@ -140,14 +183,14 @@
 			Router.reset();
 		});
 		it('should be able to fetch a playlist', function(done) {
-			Router.load(150).then(asyncFetchVerifier(150, done));
+			Router.load(playlists[0]).then(asyncFetchVerifier(playlists[0], done));
 		});
 		it('should be able to fetch playlists in sequence', function(done) {
-			Router.load(151).then(function(data) {
-				checkFetch(151, data);
+			Router.load(playlists[1]).then(function(data) {
+				checkFetch(playlists[1], data);
 			}).then(function() {
-				return Router.load(153);
-			}).then(asyncFetchVerifier(153, done));
+				return Router.load(playlists[2]);
+			}).then(asyncFetchVerifier(playlists[2], done));
 		});
 	});
 
@@ -236,7 +279,7 @@
 				Playlist.toggleMute();
 			};
 			before(function(done) {
-				Router.load(151).then(function () {
+				Router.load(playlists[playlists.length - 1]).then(function () {
 					Playlist.once('track', function() {
 						done();
 					})
