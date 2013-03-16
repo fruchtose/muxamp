@@ -5,6 +5,11 @@
 		track.siteMediaID.should.not.be.empty;
 		track.duration.should.be.above(0);
 	};
+	var testSearchResults = function(results) {
+		results.should.be.an('array');
+		results.length.should.be.above(0);
+		testTrack(results[0]);
+	};
 	var testTrackModel = function(track) {
 		track.should.be.an('object');
 		track.should.not.be.empty;
@@ -49,33 +54,37 @@
 		});
 		it('should be able to search YouTube', function(done) {
 			SearchResults.search('lady gaga', 'ytv').then(function(results) {
-				results.should.be.an('array');
-				results.length.should.be.above(0);
-				testTrack(results[0]);
+				testSearchResults(results);
 				done();
 			});
 		});
+		it('should be able to search YouTube multiple times for the same search term', function(done) {
+			SearchResults.search('lady gaga', 'ytv').then(function(results) {
+				testSearchResults(results);
+				done();
+			});
+		})
 		it('should be able to search SoundCloud', function(done) {
 			SearchResults.search('deadmau5', 'sct').then(function(results) {
-				results.should.be.an('array');
-				results.length.should.be.above(0);
-				testTrack(results[0]);
+				testSearchResults(results);
 				done();
 			});
 		});
+		it('should be able to search SoundCloud multiple times for the same search term', function(done) {
+			SearchResults.search('deadmau5', 'sct').then(function(results) {
+				testSearchResults(results);
+				done();
+			});
+		})
 		it('should be able to get a second page of search results', function(done) {
 			SearchResults.nextPage().then(function(results) {
-				results.should.be.an('array');
-				results.length.should.be.above(0);
-				testTrack(results[0]);
+				testSearchResults(results);
 				done();
 			});
 		});
 		it('should be able to retrieve SoundCloud media based on a URL', function(done) {
 			SearchResults.search('https://soundcloud.com/fuckmylife/arm1n_3', 'url').then(function(results) {
-				results.should.be.an('array');
-				results.length.should.be.above(0);
-				testTrack(results[0]);
+				testSearchResults(results);
 				done();
 			});
 		});
@@ -88,7 +97,7 @@
 		});
 		it('should function for SoundCloud tracks', function(done) {
 			testPlaylistAdding(Playlist, SearchResults, done);
-			SearchResults.search('deadmau5', 'sct');
+			SearchResults.search('bag raiders', 'sct');
 		});
 		describe('through the GUI', function() {
 			it('should function for YouTube tracks', function(done) {
