@@ -2,7 +2,7 @@
 
 Muxamp is a web app that lets you play streaming media from YouTube and SoundCloud in your browser and save your platlists for later use.
 
-Muxamp runs on Node.js. The client uses Backbone and jQuery to provide an interactive experience. Persistence is accomplished using MySQL (chosen out of pure laziness).
+Muxamp runs on [Node.js](https://github.com/joyent/node). The client uses [Backbone](https://github.com/documentcloud/backbone) and [jQuery](https://github.com/jquery/jquery) to provide an interactive experience. Persistence is accomplished using [MySQL](http://www.mysql.com/) (chosen out of pure laziness).
 
 ## Features
 
@@ -50,26 +50,30 @@ All namespaces are separated by colons (`:`). For instance the database host is 
 
 ## Testing
 
-Unit and integration tests can be found in `./tests` and are run using `mocha`. To run these tests, execute `make test`.
+Unit and integration tests can be found in `./tests` and are run using [`mocha`](https://github.com/visionmedia/mocha). To run these tests, execute `make test`.
 
 Acceptance tests for the browser are found in `./publictest`. To run these tests, run `NODE_ENV=test npm start`, then open your browser and visit `http://localhost/<Muxamp port>`. A better way of running acceptance tests is currently being explored through PhantomJS.
 
 ## Server Libraries Used
 
-* `underscore`: JavaScript APIs
-* `underscore.string`: String processing API
-* `express`: HTTP server
-* `nconf`: Application configuration
-* `ejs`: View templating
-* `ejs-locals`: Additional templating features
-* `Q`: JavaScript promises library
-* `request`: HTTP requests for Node.js
-* `generic-pool`: MySQL connection pooling
-* `mysql`: MySQL connections for Node.js
-* `node-dummy-cache`: Dumb in-memory cache for playlist and search result data
-* `mocha`: Test runner
-* `chai`: Assertions library
-* `chai-as-promised`: Assertions for promises
+* [`underscore`](https://github.com/documentcloud/underscore): JavaScript APIs
+* [`underscore.string`](https://github.com/epeli/underscore.string): String processing API
+* [`express`](https://github.com/visionmedia/express): HTTP server
+* [`nconf`](https://github.com/flatiron/nconf): Application configuration
+* [`ejs`](https://github.com/visionmedia/ejs): View templating
+* [`ejs-locals`](https://github.com/RandomEtc/ejs-locals): Additional templating features
+* [`Q`](https://github.com/kriskowal/q): JavaScript promises library
+* [`request`](https://github.com/mikeal/request): HTTP requests for Node.js
+* [`generic-pool`](https://github.com/coopernurse/node-pool): MySQL connection pooling
+* [`mysql`](https://github.com/felixge/node-mysql): MySQL connections for Node.js
+* [`node-dummy-cache`](https://github.com/pescuma/node-dummy-cache): Dumb in-memory cache for playlist and search result data
+* [`mocha`](https://github.com/visionmedia/mocha): Test runner
+* [`chai`](https://github.com/chaijs/chai): Assertions library
+* [`chai-as-promised`](https://github.com/domenic/chai-as-promised): Assertions for promises
+
+## Example
+
+Muxamp is currently running at [http://muxamp.com](http://muxamp.com).
 
 ## FAQ
 
@@ -83,7 +87,7 @@ I wanted to learn Backbone, so I chose to use it for this project.
 
 ### Why does Muxamp store all the media it comes across in a database table called `KnownMedia`?
 
-I want Muxamp to be as responsive as possible. Verifying each track at the time of storage would make the server extremely unresponsive when saving a playlist, since the alternative (besides using a cache like Redis) would be to query YouTube, SoundCloud, etc. for every saved track!
+I want Muxamp to be as responsive as possible. Verifying each track at the time of playlist storage would make the server extremely unresponsive when saving a playlist, since the alternative (besides using a cache like Redis) would be to query YouTube, SoundCloud, etc. for every saved track! My solution is to verify each track when executing a search query, and then checking the database to see if it has a track when the playlist is saved.
 
 ### Why does Muxamp store playlists as strings? Why not in a many-many relationship with a Tracks table? Are you #%^@$!* nuts?
 
