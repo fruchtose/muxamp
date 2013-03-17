@@ -24,7 +24,10 @@ Muxamp supports recent versions of Chrome and Firefox. Internet Explorer probabl
 
 ### Installation
 
-`npm install`
+ 1. `npm install`
+
+ 2. `make install`
+    * If your database (specified in configuration) already has the tables that Muxamp needs to create, run `make install force=true` to overwrite these tables.
 
 ### Configuration
 
