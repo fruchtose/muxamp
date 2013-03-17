@@ -1,8 +1,25 @@
 {
   "name": "muxamp",
   "node": "0.8.1",
-  "author": "Robert Fruchtman",
+  "author": "Robert Fruchtman <robert@fruchtose.com>",
+  "description": "An playlist service for YouTube and SoundCloud streaming media",
   "version": "1.1.0-beta1",
+  "bin": {
+    "muxamp": "./bin/muxamp"
+  },
+  "scripts": {
+    "start": "node ./bin/muxamp",
+    "test": "make test"
+  },
+  "main": "./lib/server",
+  "keywords": [
+    "audio",
+    "playlist",
+    "soundcloud",
+    "stream",
+    "video",
+    "youtube"
+  ],
   "dependencies": {
     "express": "~3.1.0",
     "request": "~2.14.0",
@@ -22,5 +39,9 @@
     "zombie": "~1.4.1",
     "chai": "~1.5.0",
     "chai-as-promised": "~3.2.5"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.6.11"
   }
 }

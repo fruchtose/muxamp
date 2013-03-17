@@ -1,5 +1,7 @@
-var muxamp = require('./lib/server'),
-	config = require('./lib/config');
+#!/usr/bin/env node
+
+var muxamp = require('../lib/server'),
+	config = require('../lib/config');
 
 var app = muxamp.getApplication(),
 	port = config.get('muxamp:port');
