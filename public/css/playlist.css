@@ -5,78 +5,78 @@ html {
     overflow-x: hidden;
 }
 body {
-	background-color: #F2F1E9;
+    background-color: #F2F1E9;
 }
 img {
     border: none;
     float: left;
 }
 .table td {
-	vertical-align: middle;
+    vertical-align: middle;
 }
 .align-bottom {
-	vertical-align: bottom;
+    vertical-align: bottom;
 }
 .left-column {
-	float: left;
+    float: left;
 }
 .right-column {
-	float: right;
+    float: right;
 }
 .nav-hover {
-	background-color: #EEE;
+    background-color: #EEE;
 }
 #header {
-	top: 0;
+    top: 0;
 }
 #footer {
-	bottom: 0;
+    bottom: 0;
 }
 #header, #footer {
-	color: #FFF;
-	background-color: #414349;
-	background-image: linear-gradient(bottom, rgb(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
-	background-image: -o-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
-	background-image: -moz-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
-	background-image: -webkit-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
-	background-image: -ms-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
-	display: block;
-	height: 38px;
-	width: 100%;
-	position: fixed;
-	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
-	z-index: 6;
+    color: #FFF;
+    background-color: #414349;
+    background-image: linear-gradient(bottom, rgb(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
+    background-image: -o-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
+    background-image: -moz-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
+    background-image: -webkit-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
+    background-image: -ms-linear-gradient(bottom, rgba(0,0,0, 0.1) 0%, rgba(255,255,255, 0.1) 100%);
+    display: block;
+    height: 38px;
+    width: 100%;
+    position: fixed;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+    z-index: 6;
 }
 #header-container, #footer-container {
-	height: 28px;
-	margin-top: 5px;
+    height: 28px;
+    margin-top: 5px;
 }
 #header-container .row, #footer-container .row {
-	height: 28px;
-	line-height: 28px;
+    height: 28px;
+    line-height: 28px;
 }
 #search-form {
-	margin-top: -1px;
-	position: relative;
+    margin-top: -1px;
+    position: relative;
 }
 #search-query {
-	width: 155px;
+    width: 155px;
 }
 #site-selector {
-	width: 152px;
+    width: 152px;
 }
 a, a:hover {
-	text-decoration: none;
+    text-decoration: none;
 }
 a {
-	color: #877963;
+    color: #877963;
 }
 #header a {
-	color: #F2F1E9;
+    color: #F2F1E9;
     
 }
 #header a:hover, #footer a:hover {
-	color: #DEDCC3;
+    color: #DEDCC3;
 }
 .caret-right {
   border-left: 4px solid #000;
@@ -85,7 +85,7 @@ a {
   border-bottom: 4px solid transparent;
 }
 #about-button {
-	text-align: center;
+    text-align: center;
 }
 .left {
     position: absolute;
@@ -98,57 +98,57 @@ a {
     text-align: right;
 }
 [class*=span].no-margin {
-	margin-left: 0;
+    margin-left: 0;
 }
 #wrapper {
-	background-color: #FFF;
-	bottom: 38px;
-	-webkit-box-shadow: -2px 0px 6px rgba(0, 0, 0, 0.4), 2px 0px 6px rgba(0, 0, 0, 0.4);
-	-moz-box-shadow:    -2px 0px 6px rgba(0, 0, 0, 0.4), 2px 0px 6px rgba(0, 0, 0, 0.4);
-	box-shadow:         -2px 0px 6px rgba(0, 0, 0, 0.4), 2px 0px 6px rgba(0, 0, 0, 0.4);
-	left: 0;
+    background-color: #FFF;
+    bottom: 38px;
+    -webkit-box-shadow: -2px 0px 6px rgba(0, 0, 0, 0.4), 2px 0px 6px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow:    -2px 0px 6px rgba(0, 0, 0, 0.4), 2px 0px 6px rgba(0, 0, 0, 0.4);
+    box-shadow:         -2px 0px 6px rgba(0, 0, 0, 0.4), 2px 0px 6px rgba(0, 0, 0, 0.4);
+    left: 0;
     position: fixed;
     right: 0;
     top: 38px;
 }
 #tabs {
-	height: 100%;
+    height: 100%;
 }
 #tab-list {
-	height: 100%;
-	margin-top: 0;
-	margin-right: 0;
+    height: 100%;
+    margin-top: 0;
+    margin-right: 0;
 }
 #tab-list > li > a {
-	border-left: none;
-	-webkit-border-top-left-radius: 0;
-	-webkit-border-bottom-left-radius: 0;
-	-moz-border-radius-topleft: 0;
-	-moz-border-radius-bottomleft: 0;
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;
-	padding-right: 11px;
-	text-align: right;
+    border-left: none;
+    -webkit-border-top-left-radius: 0;
+    -webkit-border-bottom-left-radius: 0;
+    -moz-border-radius-topleft: 0;
+    -moz-border-radius-bottomleft: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-right: 11px;
+    text-align: right;
 }
 #tab-content {
-	height: 100%;
-	margin-bottom: 38px;
-	overflow-y: scroll;
+    height: 100%;
+    margin-bottom: 38px;
+    overflow-y: scroll;
 }
 #alert-container {
-	bottom: 38px;
-	position: fixed;
+    bottom: 38px;
+    position: fixed;
 }
 #alerts {
-	margin: 12px 11px -6px 12px;
+    margin: 12px 11px -6px 12px;
 }
 #search-site-dropdown {
     display: inline-block;
     vertical-align: middle;
 }
 #search-site-dropdown a {
-	color: #333;
-	text-shadow: none;
+    color: #333;
+    text-shadow: none;
 }
 #track-count-wrapper {
     float: left;
@@ -165,19 +165,19 @@ a {
     width: 380px;
 }
 #controls {
-	line-height: 20px;
+    line-height: 20px;
 }
 #controls a.btn {
-	height: 18px;
+    height: 18px;
     padding: 0 6px 0 6px;
     top: 4px;
 }
 #controls a.btn i {
-	margin-top: 0;
+    margin-top: 0;
 }
 #timebar-row {
-	margin-left: 1px;
-	width: 637px;
+    margin-left: 1px;
+    width: 637px;
 }
 #time-elapsed {
     float: right;
@@ -197,10 +197,10 @@ a {
     cursor: pointer;
 }
 #volume-outer, #timebar-outer {
-	cursor: pointer;
-	border: 0px none #333;
-	height: 20px;
-	margin-top: 4px;
+    cursor: pointer;
+    border: 0px none #333;
+    height: 20px;
+    margin-top: 4px;
 }
 #volume-outer {
     float: left;
@@ -225,104 +225,104 @@ a {
     margin-left: 6px;
 }
 #video-container, #video {
-	height: 200px;
+    height: 200px;
     position: absolute;
     width: 288px;
 }
 #video-container {
-	-webkit-border-top-left-radius: 4px;
-	-webkit-border-bottom-left-radius: 4px;
-	-moz-border-radius-topleft: 4px;
-	-moz-border-radius-bottomleft: 4px;
-	border-top-left-radius: 4px;
-	border-bottom-left-radius: 4px;
-	padding: 8px 5px;
-	top: 76px;
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    padding: 8px 5px;
+    top: 76px;
 }
 #video {
 }
 #side-content {
-	height: 100%;
-	position: relative;
+    height: 100%;
+    position: relative;
 }
 #playlist-controls {
     height: 60px;
 }
 #search-results, #tracks {
 margin-top: 28px;
-	table-layout: fixed;
+    table-layout: fixed;
 }
 #search-results tr {
-	cursor: pointer;
+    cursor: pointer;
 }
 #search-results tbody td, #tracks tbody td {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 #tracks tbody tr {
-	cursor: pointer;
+    cursor: pointer;
 }
 .tab-actions {
-	margin-left: 5px;
-	margin-top: 5px;
-	position: absolute;
-	top: 0;
+    margin-left: 5px;
+    margin-top: 5px;
+    position: absolute;
+    top: 0;
 }
 .actions {
-	display: none;
+    display: none;
     width: 48px;
 }
 .action-cell {
-	height: 22px;
-	width: 48px;
+    height: 22px;
+    width: 48px;
 }
 .action-header {
-	width: 48px;
+    width: 48px;
 }
 .uploader-cell {
-	width: 128px;
+    width: 128px;
 }
 .title-cell {
-	width: 310px;
+    width: 310px;
 }
 .duration-cell {
-	width: 50px;
+    width: 50px;
 }
 .link-cell {
-	width: 30px;
+    width: 30px;
 }
 #playlist-view .actions {
-	width: 22px;
+    width: 22px;
 }
 tr:hover .actions {
-	display: block;
+    display: block;
 }
 .action {
-	margin-left: 4px;
+    margin-left: 4px;
 }
 .action:first-child {
-	margin-left: 0;
+    margin-left: 0;
 }
 #tracks .playing td {
-	background: #3D3;
+    background: #3D3;
 }
 .action {
-	webkit-border-radius: 11px;
-	-moz-border-radius: 11px;
-	border-radius: 11px;
-	height: 18px;
-	padding: 0px 3px 2px 3px;
-	vertical-align: top;
+    webkit-border-radius: 11px;
+    -moz-border-radius: 11px;
+    border-radius: 11px;
+    height: 18px;
+    padding: 0px 3px 2px 3px;
+    vertical-align: top;
 }
 #track-information {
-	bottom: 0;
-	left: 0;
-	line-height: 28px;
-	position: absolute;
+    bottom: 0;
+    left: 0;
+    line-height: 28px;
+    position: absolute;
 }
 #track-information .right-column {
-	padding-right: 12px;
+    padding-right: 12px;
 }
 .modal ol, .modal ul {
     margin: 6px 0 6px 26px;

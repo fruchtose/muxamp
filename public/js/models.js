@@ -81,32 +81,32 @@ var Track = Backbone.Model.extend({
 });
 
 var SoundTrack = Track.extend({
-	defaults: _.extend({}, Track.prototype.defaults, {
-		soundManager: null,
-		duration: 0.0,
-		sound: null,
-		type: "audio"
-	}),
-	initialize: function(options) {
+    defaults: _.extend({}, Track.prototype.defaults, {
+        soundManager: null,
+        duration: 0.0,
+        sound: null,
+        type: "audio"
+    }),
+    initialize: function(options) {
 
         if (options.silent) {
             return;
         }
 
-		var audio = null, sm = (soundManager != undefined && soundManager != null) 
-			? soundManager 
-			: null;
-		if (sm) {
-			audio = sm.createSound({
-				id: this.get("siteMediaID"),
-				url: this.get("url")
-			});
-		}
-		this.set({
-			soundManager: sm,
-			sound: audio
-		});
-	},
+        var audio = null, sm = (soundManager != undefined && soundManager != null) 
+            ? soundManager 
+            : null;
+        if (sm) {
+            audio = sm.createSound({
+                id: this.get("siteMediaID"),
+                url: this.get("url")
+            });
+        }
+        this.set({
+            soundManager: sm,
+            sound: audio
+        });
+    },
     destruct: function() {
         this.get("sound").destruct();
         triggerEvents(this, 'destruct', Array.prototype.slice.call(arguments));
@@ -185,34 +185,34 @@ var SoundTrack = Track.extend({
 });
 
 var SoundCloudTrack = SoundTrack.extend({
-	defaults: _.extend({}, SoundTrack.prototype.defaults, {
-		site: "SoundCloud",
-		siteCode: "sct",
-		icon: "img/soundcloud_orange_white_16.png"
-	})
+    defaults: _.extend({}, SoundTrack.prototype.defaults, {
+        site: "SoundCloud",
+        siteCode: "sct",
+        icon: "img/soundcloud_orange_white_16.png"
+    })
 });
 
 var VideoTrack = Track.extend({
-	defaults: _.extend({}, Track.prototype.defaults, {
-		type: "video"
-	})
+    defaults: _.extend({}, Track.prototype.defaults, {
+        type: "video"
+    })
 });
 
 var YouTubeTrack = VideoTrack.extend({
-	defaults: _.extend({}, VideoTrack.prototype.defaults, {
-		siteName: "YouTube",
-		siteCode: "ytv",
-		icon: "img/youtube.png",
-	}),
-	initialize: function() {
-		var id = this.get('siteMediaID');
-		var permalink = 'http://www.youtube.com/watch?v=' + id;
-		this.set({
-			url: permalink,
-			permalink: permalink,
-		})
-	},
-	destruct: function() {
+    defaults: _.extend({}, VideoTrack.prototype.defaults, {
+        siteName: "YouTube",
+        siteCode: "ytv",
+        icon: "img/youtube.png",
+    }),
+    initialize: function() {
+        var id = this.get('siteMediaID');
+        var permalink = 'http://www.youtube.com/watch?v=' + id;
+        this.set({
+            url: permalink,
+            permalink: permalink,
+        })
+    },
+    destruct: function() {
         var self = this, args = Array.prototype.slice.call(arguments);
         YouTube.reset().then(function() {
             self._stopped = true;

@@ -7,14 +7,14 @@ var YouTube = new YouTubeInterface({el: $("#video")});
 var Playlist = new TrackPlaylist();
 var SearchResults = new SearchResultsProvider();
 $(document).ready(function() {
-	window.Router = new PlaylistRouter();
-	var mainView = new MainView().toggleBlock().render();
-	Playlist.once('id', function() {
-		mainView.toggleBlock().render();
-	});
-	Playlist.on('id', function(data) {
-		var fragment = (data.id) ? data.id.toString() : "";
-		Router.navigate(fragment, {trigger: false});
-	});
-	Backbone.history.start({pushState: true});
+    window.Router = new PlaylistRouter();
+    var mainView = new MainView().toggleBlock().render();
+    Playlist.once('id', function() {
+        mainView.toggleBlock().render();
+    });
+    Playlist.on('id', function(data) {
+        var fragment = (data.id) ? data.id.toString() : "";
+        Router.navigate(fragment, {trigger: false});
+    });
+    Backbone.history.start({pushState: true});
 });

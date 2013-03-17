@@ -29,17 +29,17 @@ var fastMove = function(arr, pos1, pos2) {
 };
 
 var TrackList = Backbone.Collection.extend({
-	model: Track
+    model: Track
 });
 
 var TrackPlaylist = TrackList.extend({
-	initialize: function() {
+    initialize: function() {
         this.currentMedia = null,
-		this.currentTrack =  0,
-		this.currentVolumePercent = 50,
-		this.id = false,
+        this.currentTrack =  0,
+        this.currentVolumePercent = 50,
+        this.id = false,
         this.muted = false,
-		this.totalDuration = 0;
+        this.totalDuration = 0;
 
         this.on("add", function(mediaObjects, playlist, options) {
             options || (options = {});
@@ -78,9 +78,9 @@ var TrackPlaylist = TrackList.extend({
             this.sync("create", this);
         });
 
-		this.on("reset", function(playlist, options) {
+        this.on("reset", function(playlist, options) {
             options || (options = {});
-			var currentTrack = options.currentTrack || 0;
+            var currentTrack = options.currentTrack || 0;
             var autoplay = options.play && this.isLoaded();
             this.totalDuration = _(this.pluck('duration'))
                 .reduce(function(memo, val) {
@@ -89,7 +89,7 @@ var TrackPlaylist = TrackList.extend({
             if (!this.size()) {
                 this.stop(true);
                 soundManager.reboot();
-		    }
+            }
             this.trigger("tracks:new", this.models);
             this.goToTrack(currentTrack, autoplay);
             var result;
@@ -101,12 +101,12 @@ var TrackPlaylist = TrackList.extend({
                 result = result.promise();
             }
             return result;
-		});
+        });
 
         this.on('id', function(data) {
             this.id = data.id;
         });
-	},
+    },
     getVolume: function() {
         if (!this.isLoaded()) {
             return 0;
@@ -152,7 +152,7 @@ var TrackPlaylist = TrackList.extend({
     },
     moveTrack: function(pos1, pos2) {
         if (this.isLoaded() && pos1 != pos2) {
-        	var minIndex = 0;
+            var minIndex = 0;
             if (pos1 >= 0 && pos2 >= 0 && pos1 < this.size() && pos2 < this.size()) {
                 fastMove(this.models, pos1, pos2);
                 this.sync("create", this);
@@ -164,16 +164,16 @@ var TrackPlaylist = TrackList.extend({
         this.goToTrack(next, autostart);
     },
     parse: function(response) {
-    	var mediaObjects = [];
-    	if (response.id) {
-    		mediaObjects = _.chain(response.tracks || []).map(function(item) {
+        var mediaObjects = [];
+        if (response.id) {
+            mediaObjects = _.chain(response.tracks || []).map(function(item) {
                 return Track.getMediaObject(item);
             }).compact().value();
-    	}
+        }
         if (response.error) {
             this.trigger('error:server', response.error);
         }
-    	return mediaObjects;
+        return mediaObjects;
     },
     play: function() {
         if (this.isLoaded()) {
@@ -334,14 +334,14 @@ var TrackPlaylist = TrackList.extend({
         }
         this.currentMedia.togglePause();
     },
-	url: function(id) {
-		var loc = '/';
+    url: function(id) {
+        var loc = '/';
         id || (id = this.id || false);
-		if (id) {
-			loc += 'playlists/' + id;
-		}
-		return loc;
-	}
+        if (id) {
+            loc += 'playlists/' + id;
+        }
+        return loc;
+    }
 });
 
 var SearchResultsProvider = TrackList.extend({
