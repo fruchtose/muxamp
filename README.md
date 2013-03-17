@@ -35,15 +35,15 @@ Muxamp reads its user configuration through `nconf`, capable of taking in enviro
 All namespaces are separated by colons (`:`). For instance the database host is set in `muxamp:db:host`.
 
  * `muxamp`
- 	* `db`
- 		* `read`: Is DB reading enabled (`true` by default, set to `false` for maintenance mode)
- 		* `false`: Is DB writing enabled (`true` by default, set to `false` for maintenance mode)
- 		* `host`: MySQL database host
- 		* `database`: MySQL database name
- 		* `user`: MySQL database user
- 		* `password`: MySQL database password
- 	* `log`: The logging level Muxamp uses (see `express` for logging level formats)
- 	* `port`: The port from which Muxamp serves (defaults to `process.env['app_port']`, then `3000`)
+    * `db`
+        * `read`: Is DB reading enabled (`true` by default, set to `false` for maintenance mode)
+        * `false`: Is DB writing enabled (`true` by default, set to `false` for maintenance mode)
+        * `host`: MySQL database host
+        * `database`: MySQL database name
+        * `user`: MySQL database user
+        * `password`: MySQL database password
+    * `log`: The logging level Muxamp uses (see `express` for logging level formats)
+    * `port`: The port from which Muxamp serves (defaults to `process.env['app_port']`, then `3000`)
 
 ## Testing
 
