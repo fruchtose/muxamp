@@ -5,6 +5,41 @@ var _	   	   = require('underscore'),
 	YouTube    = apis.YouTube.Tracks,
 	testutils  = require('../lib/testutils');
 
+var verifySearch = function(search, trackType, done) {
+	var comingTracks = search.get('tracks');
+	var trackLength = comingTracks.get('length');
+	Q.all([
+		search.should.be.fulfilled,
+		search.should.eventually.have.property('tracks'),
+		trackLength.should.eventually.be.above(0),
+		comingTracks.then(function(tracks) {
+			_.each(tracks, function(track) {
+				track.should.have.property('type').eql(trackType);
+			});
+		})
+	]).should.notify(done);
+};
+
+var verifyMultipageSearch = function(api, query, perPage, trackType, done) {
+	var page1 = api.search({query: query, page: 0, perPage: perPage}),
+		page2 = api.search({query: query, page: 1, perPage: perPage});
+	Q.all([page1, page2]).spread(function(page1Results, page2Results) {
+		var page1Tracks = page1Results.tracks,
+			page2Tracks = page2Results.tracks;
+		page1Tracks.length.should.be.above(0);
+		page2Tracks.length.should.be.above(0);
+		_.each(page1Tracks, function(track, i) {
+			track.should.not.eql(page2Tracks[i]);
+		});
+		return Q.all([
+			page1.should.be.fulfilled,
+			page2.should.be.fulfilled
+		]);
+	}).then(function() {
+		return [].slice.call(arguments);
+	}).should.notify(done);
+};
+
 describe('SoundCloud API track search', function() {
 	describe('error handling', function() {
 		it('should stop a search without arguments', function(done) {
@@ -18,36 +53,12 @@ describe('SoundCloud API track search', function() {
 		});
 	});
 	describe('functionality', function() {
-		var page0;
 		it('should have tracks for deadmau5', function(done) {
 			var search = SoundCloud.search({query: 'deadmau5', page: 0, perPage: 25});
-			var comingTracks = search.get('tracks');
-			Q.all([
-				search.should.be.fulfilled,
-				search.should.eventually.have.property('tracks'),
-				comingTracks.should.eventually.have.length(25),
-				comingTracks.then(function(tracks) {
-					page0 = tracks;
-					_.each(tracks, function(track) {
-						track.should.have.property('type').eql('audio');
-					});
-				})
-			]).should.notify(done);
+			verifySearch(search, 'audio', done);
 		});
 		it('should have multiple pages of tracks for deadmau5', function(done) {
-			var search = SoundCloud.search({query: 'deadmau5', page: 1, perPage: 25});
-			var comingTracks = search.get('tracks');
-			Q.all([
-				search.should.be.fulfilled,
-				search.should.eventually.have.property('tracks'),
-				comingTracks.should.eventually.have.length(25),
-				comingTracks.then(function(tracks) {
-					_.each(tracks, function(track, index) {
-						page0[index].should.not.eql(track);
-						track.should.have.property('type').eql('audio');
-					});
-				})
-			]).should.notify(done);
+			verifyMultipageSearch(SoundCloud, 'deadmau5', 25, 'audio', done);
 		});
 		it('should not have results for a nonsensical query', function(done) {
 			var search = SoundCloud.search({query: '12341234adfadfasdf2344134', page: 1, perPage: 25});
@@ -76,33 +87,10 @@ describe('YouTube API video search', function() {
 		var page0;
 		it('should have tracks for kate bush', function(done) {
 			var search = YouTube.search({query: 'kate bush', page: 0, perPage: 25});
-			var comingTracks = search.get('tracks');
-			Q.all([
-				search.should.be.fulfilled,
-				search.should.eventually.have.property('tracks'),
-				comingTracks.should.eventually.have.length(25),
-				comingTracks.then(function(tracks) {
-					page0 = tracks;
-					_.each(tracks, function(track) {
-						track.should.have.property('type').eql('video');
-					});
-				})
-			]).should.notify(done);
+			verifySearch(search, 'video', done);
 		});
 		it('should have multiple pages of tracks for kate bush', function(done) {
-			var search = YouTube.search({query: 'kate bush', page: 1, perPage: 25});
-			var comingTracks = search.get('tracks');
-			Q.all([
-				search.should.be.fulfilled,
-				search.should.eventually.have.property('tracks'),
-				comingTracks.should.eventually.have.length(25),
-				comingTracks.then(function(tracks) {
-					_.each(tracks, function(track, index) {
-						page0[index].should.not.eql(track);
-						track.should.have.property('type').eql('video');
-					});
-				})
-			]).should.notify(done);
+			verifyMultipageSearch(YouTube, 'kate bush', 25, 'video', done);
 		});
 		it('should not have results for a nonsensical query', function(done) {
 			var search = YouTube.search({query: '12341234adfadfasdf2344134', page: 1, perPage: 25});

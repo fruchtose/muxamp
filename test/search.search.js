@@ -39,6 +39,8 @@ describe('URL search', function() {
 	var checkPSY, checkLevelsRemix;
 	checkPSY = function(results) {
 		results.should.have.property('tracks');
+		should.exist(results.tracks);
+		should.exist(results.tracks.length);
 		results.tracks.should.have.length(1);
 		var media = results.tracks[0];
 		media.should.have.property('author');
@@ -47,6 +49,8 @@ describe('URL search', function() {
 	};
 	checkLevelsRemix = function(results) {
 		results.should.have.property('tracks');
+		should.exist(results.tracks);
+		should.exist(results.tracks.length);
 		results.tracks.should.have.length(1);
 		var media = results.tracks[0];
 		media.should.have.property('author');
@@ -69,7 +73,9 @@ describe('SoundCloud search', function() {
 			data.should.have.property('tracks');
 			// deadmau5 is popular, we should have results
 			var tracks = page0 = data.tracks;
-			tracks.should.have.length(25);
+			should.exist(tracks);
+			should.exist(tracks.length);
+			tracks.length.should.be.above(0);
 			_.each(tracks, function(track) {
 				track.should.have.property('type').eql('audio');
 			});
@@ -80,9 +86,11 @@ describe('SoundCloud search', function() {
 			data.should.have.property('tracks');
 			// deadmau5 is popular, we should have results
 			var tracks = data.tracks;
-			tracks.should.have.length(25);
+			should.exist(tracks);
+			should.exist(tracks.length);
+			tracks.length.should.be.above(0);
 			_.each(tracks, function(track, index) {
-				page0[index].should.not.eql(track);
+				track.should.not.eql(page0[index]);
 				track.should.have.property('type').eql('audio');
 			});
 		}, done);
@@ -102,7 +110,9 @@ describe('YouTube search', function() {
 			data.should.have.property('tracks');
 			// Katy Perry is popular, we should have results
 			var tracks = page0 = data.tracks;
-			tracks.should.have.length(25);
+			should.exist(tracks);
+			should.exist(tracks.length);
+			tracks.length.should.be.above(0);
 			_.each(tracks, function(track) {
 				track.should.have.property('type').eql('video');
 			});
@@ -113,9 +123,11 @@ describe('YouTube search', function() {
 			data.should.have.property('tracks');
 			// Katy Perry is popular, we should have results
 			var tracks = data.tracks;
-			tracks.should.have.length(25);
+			should.exist(tracks);
+			should.exist(tracks.length);
+			tracks.length.should.be.above(0);
 			_.each(tracks, function(track, index) {
-				page0[index].should.not.eql(track);
+				track.should.not.eql(page0[index]);
 				track.should.have.property('type').eql('video');
 			});
 		}, done);
