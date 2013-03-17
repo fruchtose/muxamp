@@ -5,8 +5,8 @@ var PlaylistRouter = Backbone.Router.extend({
             var url = Backbone.history.getFragment();
             if (location != router.lastUrl) {
                 router.lastUrl = url;
-                if (_gaq) {
-                    _gaq.push(['_trackPageview', '/' + url]);
+                if (window._gaq) {
+                    window._gaq.push(['_trackPageview', '/' + url]);
                 }
             }
         });
