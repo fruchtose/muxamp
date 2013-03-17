@@ -9,118 +9,118 @@
         <%-stylesheets%>
         <link rel="icon" type="image/png" href="img/favicon.ico" />
         <script type="text/javascript">
-			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', 'UA-32306209-1']);
-			_gaq.push(['_trackPageview']);
-			
-			(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-			 })();
-		</script>
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-32306209-1']);
+            _gaq.push(['_trackPageview']);
+            
+            (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+             })();
+        </script>
     </head>
     <body>
-    	<div id="header">
-    		<div id="header-container" class="container">
-	    		<div class="row">
-		    		<form id="search-form" class="span5 form-inline form-search" method="post">
-		                <input type="text" id="search-query" class="span2 search-query" />
-		                <input id="search-site" type="hidden" value="ytv" />
-		                <div id="search-site-dropdown" class="btn-group">
-		                    <button type="submit" class="btn" id="search-submit"><i class="icon-search"></i></button>
-		                    <button id="site-selector" class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-		                        YouTube&nbsp;<span class="caret"></span>
-		                    </button>
-		                    <ul class="dropdown-menu">
-		                        <li><a href onclick="return false;">YouTube</a></li>
-		                        <li><a href onclick="return false;">SoundCloud (Tracks)</a></li>
-		                        <li><a href onclick="return false;">URL</a></li>
-		                    </ul>
-		                </div>
-		            </form>
-		            <span class="span1 right-column">
-		                <a id="about-button" href onclick="return false;"><strong>Muxamp</strong></a>
-		            </span>
-	            </div>
+        <div id="header">
+            <div id="header-container" class="container">
+                <div class="row">
+                    <form id="search-form" class="span5 form-inline form-search" method="post">
+                        <input type="text" id="search-query" class="span2 search-query" />
+                        <input id="search-site" type="hidden" value="ytv" />
+                        <div id="search-site-dropdown" class="btn-group">
+                            <button type="submit" class="btn" id="search-submit"><i class="icon-search"></i></button>
+                            <button id="site-selector" class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                YouTube&nbsp;<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href onclick="return false;">YouTube</a></li>
+                                <li><a href onclick="return false;">SoundCloud (Tracks)</a></li>
+                                <li><a href onclick="return false;">URL</a></li>
+                            </ul>
+                        </div>
+                    </form>
+                    <span class="span1 right-column">
+                        <a id="about-button" href onclick="return false;"><strong>Muxamp</strong></a>
+                    </span>
+                </div>
             </div>
-    	</div>
+        </div>
         <div id="wrapper" class="container">
-        	<div class="row" style="height: 100%;">
-        		<div class="span12" style="height: 100%;">
-		        	<div id="tabs" class="tabbable tabs-left">
-		        		<ul id="tab-list" class="span4 nav nav-tabs">
-		        			<li>
-		        				<a id="search-tab" href="#search-results-pane" data-toggle="tab">
-		        					Search Results
-		        				</a>
-		        			</li>
-		        			<li id="playlist-tab">
-		        				<a class="active" href="#playlist-pane" data-toggle="tab">
-		        					Playlist &mdash; <span id="track-count">0</span> item<span id="multiple-tracks">s</span> [<span id="playlist-duration">0:00</span>]
-		        				</a>
-		        			</li>
-		        		</ul>
-		        		<div id="tab-content" class="tab-content">
-	        				<div id="search-results-pane" class="tab-pane">
-		        				<div class="tab-actions">
-		        					<span id="add-all" class="btn"><i class="icon-plus"></i> Add All</span>
-		        					<span id="play-all" class="btn"><i class="icon-music"></i> Play All</span>
-		        					<span id="load-more-search-results" class="btn"><i class="icon-refresh"></i> Load More Results</span>
-		        				</div>
-		        				 <table id="search-results" class="table table-condensed table-striped">
-			                		<thead>
-			                			<tr>
-			                				<th class="action-header"></th>
-			                				<th class="uploader-cell">Uploader</th>
-			                				<th class="title-cell">Title</th>
-			                				<th class="duration-cell">Time</th>
-			                				<th class="link-cell">Link</th>
-			                			</tr>
-			                		</thead>
-			                		<tbody>
-			                		</tbody>
-			                	</table>
-		                	</div>
-		        			<div id="playlist-pane" class="tab-pane active">
-		        				<div class="tab-actions">
-		        					<span id="clear" class="btn"><i class="icon-trash"></i> Clear</span>
-		        				</div>
-			                	<table id="tracks" class="table table-condensed table-striped">
-			                		<thead>
-			                			<tr>
-			                				<th class="action-header"></th>
-			                				<th class="uploader-cell">Uploader</th>
-			                				<th class="title-cell">Title</th>
-			                				<th class="duration-cell">Time</th>
-			                				<th class="link-cell">Link</th>
-			                			</tr>
-			                		</thead>
-			                		<tbody>
-			                		</tbody>
-			                	</table>
-				            </div>
-				        </div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="span4">
-					<div id="video-container">
-		                <div id="video"></div>
-		            </div>
-	            </div>
-			</div>
-			<div class="row">
-				<div id="alert-container" class="span4">
-					<div id="alerts">
-					</div>
-				</div>
-			</div>
+            <div class="row" style="height: 100%;">
+                <div class="span12" style="height: 100%;">
+                    <div id="tabs" class="tabbable tabs-left">
+                        <ul id="tab-list" class="span4 nav nav-tabs">
+                            <li>
+                                <a id="search-tab" href="#search-results-pane" data-toggle="tab">
+                                    Search Results
+                                </a>
+                            </li>
+                            <li id="playlist-tab">
+                                <a class="active" href="#playlist-pane" data-toggle="tab">
+                                    Playlist &mdash; <span id="track-count">0</span> item<span id="multiple-tracks">s</span> [<span id="playlist-duration">0:00</span>]
+                                </a>
+                            </li>
+                        </ul>
+                        <div id="tab-content" class="tab-content">
+                            <div id="search-results-pane" class="tab-pane">
+                                <div class="tab-actions">
+                                    <span id="add-all" class="btn"><i class="icon-plus"></i> Add All</span>
+                                    <span id="play-all" class="btn"><i class="icon-music"></i> Play All</span>
+                                    <span id="load-more-search-results" class="btn"><i class="icon-refresh"></i> Load More Results</span>
+                                </div>
+                                 <table id="search-results" class="table table-condensed table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th class="action-header"></th>
+                                            <th class="uploader-cell">Uploader</th>
+                                            <th class="title-cell">Title</th>
+                                            <th class="duration-cell">Time</th>
+                                            <th class="link-cell">Link</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="playlist-pane" class="tab-pane active">
+                                <div class="tab-actions">
+                                    <span id="clear" class="btn"><i class="icon-trash"></i> Clear</span>
+                                </div>
+                                <table id="tracks" class="table table-condensed table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th class="action-header"></th>
+                                            <th class="uploader-cell">Uploader</th>
+                                            <th class="title-cell">Title</th>
+                                            <th class="duration-cell">Time</th>
+                                            <th class="link-cell">Link</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="span4">
+                    <div id="video-container">
+                        <div id="video"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div id="alert-container" class="span4">
+                    <div id="alerts">
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="footer">
-        	<div id="footer-container" class="container">
-        		<div class="row">
+            <div id="footer-container" class="container">
+                <div class="row">
                     <div id="controls" class="span2 btn-group">
                         <a href onclick="return false;" id="previous" class="btn"><i class="icon-step-backward"></i></a>
                         <a href onclick="return false;" id="play" class="btn"><i class="icon-play"></i></a>
@@ -134,14 +134,14 @@
                         </div>
                         <div id="volume-amount"><i id="volume-symbol" class="icon-volume-up icon-white"></i><span id="volume-number">50</span></div>
                     </div>
-                	<div id="timebar-row" class="span7">
+                    <div id="timebar-row" class="span7">
                         <div id="timebar-outer" class="progress progress-success">
                             <div id="timebar-inner" class="bar"></div>
                         </div>
                         <div id="time-elapsed">0:00</div>
                     </div>
                 </div>
-        	</div>
+            </div>
         </div>
         <div id="about" class="modal hide">
             <div class="modal-header">
