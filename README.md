@@ -67,3 +67,35 @@ Acceptance tests for the browser are found in `./publictest`. To run these tests
 * `mocha`: Test runner
 * `chai`: Assertions library
 * `chai-as-promised`: Assertions for promises
+
+## FAQ
+
+### Your early code is terrible
+
+Sorry. I wrote Muxamp to learn JavaScript and Node.js, and when I started I had little experience with promises, callbacks, etc.
+
+### Why Backbone on the client side? Why not Meteor, Angular, or *<insert real-time JavaScript library here>*?
+
+I wanted to learn Backbone, so I chose to use it for this project.
+
+### Why does Muxamp store all the media it comes across in a database table called `KnownMedia`?
+
+I want Muxamp to be as responsive as possible. Verifying each track at the time of storage would make the server extremely unresponsive when saving a playlist, since the alternative (besides using a cache like Redis) would be to query YouTube, SoundCloud, etc. for every saved track!
+
+### Why does Muxamp store playlists as strings? Why not in a many-many relationship with a Tracks table? Are you #%^@$!* nuts?
+
+I know it's kind of hacky, but it allows for quick dedup lookup of existing playlists. Take the SHA256 hash of the playlist string, search for it in the Playlists table, and don't insert anything if you get a result. Plus, the SHA256 column can be indexed.
+
+### Why not MongoDB?
+
+I considered it, but I chose to go with a DBMS I already knew, since I have no experience to date with MongoDB.
+
+### Are you accepting patch requests?
+
+Absolutely!
+
+## Future Plans
+
+ * Support for more streaming media sources
+ * Compatibility with older browsers
+ * Consider revisions to database architecture

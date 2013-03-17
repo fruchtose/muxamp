@@ -1,0 +1,51 @@
+#!/usr/bin/env node
+
+var fs               = require('fs'),
+    mysql            = require('mysql'),
+    config           = require('../lib/config'),
+    db               = require('../lib/db'),
+    dbConnectionPool = db.getConnectionPool({multipleStatements: true});
+
+var optimist = require('optimist')
+    .usage('Setup a database for Muxamp\n$0')
+    .boolean('f')
+    .alias('f', 'force')
+    .describe('f', 'Overwrite existing database tables');
+
+if (!db.canWrite()) {
+    throw new Error('Unable to setup database. Write access is restricted.');
+}
+
+db.isSetup().done(function(existingTables) {
+    var existsCallback = function(args) {
+        if (existingTables && ! args.f) {
+            throw new Error(
+                'You already have tables called Playlists and KnownMeida in your database. ' +
+                'If you wish to overwrite them, use --force.'
+            );
+        }
+        return true;
+    };
+    argv = optimist.check(existsCallback).argv;
+    var dbname = config.get('muxamp:db:name');
+        script = fs.readFileSync(__dirname + '/../setup/db.sql', 'utf8');
+    setup = 'USE ' + mysql.escapeId(dbname) + ';' + script;
+    console.log('Connecting to database');
+    dbConnectionPool.acquire(function(acquireError, connection) {
+        if (acquireError) {
+            console.log('Error connecting to database database.', acquireError);
+            dbConnectionPool.release(connection);
+            process.exit(1);
+        }
+        connection.query(setup, function(queryError) {
+            dbConnectionPool.release(connection);
+            if (queryError) {
+                console.log('Error setting up database tables.', queryError);
+                process.exit(2);
+            } else {
+                console.log('Database tables created.');
+                process.exit(0);
+            }
+        });
+    });
+});

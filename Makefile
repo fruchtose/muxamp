@@ -1,4 +1,7 @@
 test:
 	@NODE_ENV=test mocha
 
-.PHONY: test
+install:
+	./bin/setup
+
+.PHONY: test install
