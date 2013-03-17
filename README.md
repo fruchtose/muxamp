@@ -28,7 +28,7 @@ Muxamp supports recent versions of Chrome and Firefox. Internet Explorer probabl
 
 ### Configuration
 
-Muxamp reads its user configuration through `nconf`, capable of taking in environment variables or an optional JSON config file located in `./config/<environment>.json`, which by default is not tracked through Git. `environment` can be `development`, `test`, or `production`.
+Muxamp reads its user configuration through `nconf`, capable of taking in environment variables or an optional JSON config file located in `./config/<environment>.json`. `environment` can be `development`, `test`, or `production`. You may also create a JSON file at `./config/all.json` for configuration in any environment. All of these files are optional and are included in `.gitignore` by default.
 
 #### Configuration structure
 

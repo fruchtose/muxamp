@@ -178,8 +178,8 @@ var SoundTrack = Track.extend({
     },
 
     triggerProgress: function() {
-        var time = this.get('sound').position;
-        var percent = time / this.get('sound').duration;
+        var time = this.get('sound').position / 1000;
+        var percent = (time * 100.0) / this.get('duration');
         triggerEvents(this, 'progress', {percent: percent, time: time}, Array.prototype.slice.call(arguments));
     }
 });
@@ -331,7 +331,7 @@ var YouTubeTrack = VideoTrack.extend({
         YouTube.getData().then(function(data) {
             var time = data.currentTime,
                 duration = data.duration,
-                percent = time / duration;
+                percent = (time * 100.0) / duration;
             triggerEvents(self, 'progress', {percent: percent, time: time}, args);
         });
     }

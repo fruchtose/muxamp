@@ -381,7 +381,7 @@ var SearchResultsProvider = TrackList.extend({
             tracks.push(Track.getMediaObject(result, options));
         });
         if (data.error) {
-            this.trigger('error:server', error);
+            this.trigger('error:server', data.error);
         }
         return tracks;
     },
