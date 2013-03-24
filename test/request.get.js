@@ -11,7 +11,7 @@ describe('GET', function() {
             describe('error handling', function() {
                 it('should return an error for no query', function(done) {
                     request({url: baseUrl + 'search/ytv/0/'}, function(err, response, body) {
-                        response.statusCode.should.eql(200);
+                        response.statusCode.should.eql(400);
                         JSON.parse(body).should.have.property('error');
                         done();
                     });
@@ -53,9 +53,11 @@ describe('GET', function() {
                     });
                 });
             });
-            it('should return search results as JSON', function(done) {
+            it('should return playlists as JSON', function(done) {
                 var lastPlaylist = 0;
                 playlist.count().then(function(count) {
+                    should.exist(count);
+                    count.should.be.above(0);
                     lastPlaylist = count;
                     return playlist.getPlaylist(lastPlaylist);
                 }).done(function(tracks) {
