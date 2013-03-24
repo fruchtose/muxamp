@@ -380,8 +380,8 @@ var SearchResultsView = Backbone.View.extend({
             return track.clone();
         });
         Playlist.add(tracks, {
-            start: Playlist.size(),
-            batch: tracks.length,
+            at: Playlist.size(),
+            batch: tracks.length
         });
     },
     append: function(searchResults) {
@@ -450,7 +450,7 @@ var SearchResultsView = Backbone.View.extend({
             return track.clone();
         });
         Playlist.add(tracks, {
-            start: Playlist.size(),
+            at: Playlist.size(),
             batch: tracks.length,
             play: true
         });

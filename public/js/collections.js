@@ -41,25 +41,21 @@ var TrackPlaylist = TrackList.extend({
         this.muted = false,
         this.totalDuration = 0;
 
-        this.on("add", function(mediaObjects, playlist, options) {
+        this.on("add", function(track, playlist, options) {
+            var length = this.models.length;
             options || (options = {});
-            mediaObjects = _.isArray(mediaObjects) ? mediaObjects : [mediaObjects];
-            var index = options.index, playNext = false;
-            if (options.play) {
-                playNext = (options.index == null) 
-                    ? this.indexOf(mediaObjects[0])
-                    : options.index;
-            }
-            this.totalDuration += _(mediaObjects)
-                .reduce(function(memo, val) {
-                    return memo + val.get('duration');
-                }, 0);
-            this.trigger("tracks", mediaObjects, options);
+            this.totalDuration += track.get('duration');
+            this.trigger("tracks", [track], options);
+            var batch = options.batch, at = options.at, play = options.play, index = this.indexOf(track);
             // Syncs when we reach end of a batch add (or no batch was specified)
-            if (!options.batch || index - options.batch + 1 == options.start) {
-                this.sync("create", this);
-                if (playNext !== false) {
-                    this.goToTrack(playNext, true);
+            if (!(_.isFinite(batch) && _.isFinite(at)) || index + 1 == at + batch) {
+                this.sync('create', this);
+                if (options.play) {
+                    var playAt = _.isFinite(at) ? at : index;
+                    this.goToTrack(playAt, true);
+                }
+                if (!this.currentMedia) {
+                    this.setCurrentTrack(0);
                 }
             }
         });
@@ -131,7 +127,7 @@ var TrackPlaylist = TrackList.extend({
         return this.isLoaded() && this.currentTrack - 1 >= 0;
     },
     isLoaded: function() {
-        return this.size() && this.currentMedia;
+        return !!this.currentMedia;
     },
     isMuted: function() {
         return this.muted;
