@@ -50,12 +50,10 @@ var TrackPlaylist = TrackList.extend({
             // Syncs when we reach end of a batch add (or no batch was specified)
             if (!(_.isFinite(batch) && _.isFinite(at)) || index + 1 == at + batch) {
                 this.sync('create', this);
+                this.refreshCurrentTrack();
                 if (options.play) {
                     var playAt = _.isFinite(at) ? at : index;
                     this.goToTrack(playAt, true);
-                }
-                if (!this.currentMedia) {
-                    this.setCurrentTrack(0);
                 }
             }
         });
@@ -70,6 +68,9 @@ var TrackPlaylist = TrackList.extend({
             if ( ! this.where({siteMediaID: mediaObject.get('siteMediaID')}).length) {
                 // Destroys media if no more instances exist in playlist
                 mediaObject.destruct();
+            }
+            if (!this.size()) {
+                this.refreshCurrentTrack();
             }
             this.sync("create", this);
         });
@@ -87,7 +88,7 @@ var TrackPlaylist = TrackList.extend({
                 soundManager.reboot();
             }
             this.trigger("tracks:new", this.models);
-            this.goToTrack(currentTrack, autoplay);
+            this.refreshCurrentTrack();
             var result;
             if (!options.readonly) {
                 result = this.sync("create", this);
@@ -110,8 +111,7 @@ var TrackPlaylist = TrackList.extend({
         return this.isMuted() ? 0 : this.currentVolumePercent;
     },
     goToTrack: function(index, autostart) {
-        if (!this.size()) {
-            this.setCurrentTrack(0);
+        if (!this.isLoaded()) {
             return;
         }
         this.stop(true);
@@ -212,6 +212,11 @@ var TrackPlaylist = TrackList.extend({
         var track= this.currentTrack, next = (track - 1 + this.size()) % this.size() || 0 ;
         this.goToTrack(next, autostart);
     },
+    refreshCurrentTrack: function() {
+        if ((this.size() && !this.currentMedia) || !this.size()) {
+            this.setCurrentTrack(0);
+        }
+    },
     seek: function(decimalPercent) {
         if (this.isLoaded()) {
             var track = this.currentMedia;
@@ -219,10 +224,6 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     setCurrentTrack: function(trackNumber) {
-        var self = this;
-        if (this.currentMedia) {
-            this.stopListening(this.currentMedia);
-        }
         if (this.size() && trackNumber >= 0 && trackNumber < this.size()) {
             this.currentTrack = trackNumber;
             this.currentMedia = this.at(trackNumber);
