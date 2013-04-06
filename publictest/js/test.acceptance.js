@@ -135,7 +135,7 @@
                 testGUIPlaylistAdding(Playlist, SearchResults, done);
                 $('#search-query').val('flaming lips');
                 $('#site-selector').click();
-                $('#search-site-dropdown ul li:first-child').click();
+                $('#site-selector').click().parent().find('ul li:first-child').find('a').click();
                 $('#search-submit').click();
             });
             it('should be able to add the same YouTube track twice', function(done) {
@@ -151,8 +151,7 @@
                 });
                 testGUIPlaylistAdding(Playlist, SearchResults, done);
                 $('#search-query').val('flaming lips');
-                $('#site-selector').click();
-                $('#search-site-dropdown ul li:nth-child(2)').click();
+                $('#site-selector').click().parent().find('ul li:nth-child(2)').find('a').click();
                 $('#search-submit').click();
             });
             it('should be able to add the same SoundCloud track twice', function(done) {

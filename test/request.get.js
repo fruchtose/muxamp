@@ -32,7 +32,7 @@ describe('GET', function() {
         describe('error handling', function() {
             it('should return no ID for a playlist with an impossible ID', function(done) {
                 request({url: baseUrl + 'playlists/0'}, function(err, response, body) {
-                    response.statusCode.should.eql(200);
+                    response.statusCode.should.eql(404);
                     should.not.exist(err);
                     var data = JSON.parse(body);
                     data.should.have.property('id');
@@ -44,7 +44,7 @@ describe('GET', function() {
             });
             it('should return no ID for a nonexistent playlist', function(done) {
                 request({url: baseUrl + 'playlists/9999999999999999999'}, function(err, response, body) {
-                    response.statusCode.should.eql(200);
+                    response.statusCode.should.eql(404);
                     should.not.exist(err);
                     var data = JSON.parse(body);
                     data.should.have.property('id');
