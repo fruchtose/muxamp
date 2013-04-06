@@ -303,18 +303,23 @@
             it('should change the volume of a YouTube track', function(done) {
                 Playlist.once('volume', function() {
                     Playlist.getVolume().should.eql(100);
+                    Playlist.currentMedia.get('siteCode').should.eql('ytv');
                     done();
                 });
                 Playlist.getVolume().should.eql(50);
                 Playlist.setVolume(100);
             });
             it('should be able to mute and unmute a YouTube track', function(done) {
-                testMute(done);
+                testMute(function() {
+                    Playlist.currentMedia.get('siteCode').should.eql('ytv');
+                    done();
+                });
             });
             it('should change the volume of a SoundCloud track', function(done) {
                 Playlist.nextTrack(true);
                 Playlist.once('volume', function() {
                     Playlist.getVolume().should.eql(100);
+                    Playlist.currentMedia.get('siteCode').should.eql('sct');
                     done();
                 });
                 Playlist.getVolume().should.eql(50);
@@ -322,6 +327,7 @@
             });
             it('should be able to mute and unmute a SoundCloud track', function(done) {
                 Playlist.once('track', function() {
+                    Playlist.currentMedia.get('siteCode').should.eql('ytv');
                     testMute(done);
                 });
                 Playlist.nextTrack(true);
