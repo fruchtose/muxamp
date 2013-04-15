@@ -302,6 +302,7 @@ var TrackPlaylist = TrackList.extend({
         };
         if (method == 'create') {
             options.url = 'playlists/save';
+            options.update = true;
         } else if (options.id) {
             options.url = model.url(options.id);
         }
