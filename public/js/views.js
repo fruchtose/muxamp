@@ -40,15 +40,6 @@ var getAttribute = function(name, value) {
     return name + '="' + value.toString().replace(/"/g, '&quot;') + '"';
 };
 
-// With thanks to Christopher Coenraets
-Backbone.View.prototype.close = function() {
-    if (this.beforeClose) {
-        this.beforeClose();
-    }
-    this.remove();
-    this.off();
-};
-
 var ModalView = Backbone.View.extend({
     el: $('#about-button'),
     events: {
@@ -201,7 +192,7 @@ var PlaylistTrackView = TrackView.extend({
     },
     removeFromPlaylist: function() {
         Playlist.remove(this.model);
-        this.close();
+        this.remove();
     }
 });
 
@@ -343,7 +334,7 @@ var PlaylistView = Backbone.View.extend({
     reset: function(tracks) {
         $(this.table).empty();
         _(this.rows).each(function(row) {
-                row.close();
+                row.remove();
             });
         this.rows = [];
         if (tracks) {
@@ -459,7 +450,7 @@ var SearchResultsView = Backbone.View.extend({
         _.chain(this.rows)
             .reverse()
             .each(function(row) {
-                row.close();
+                row.remove();
             });
         this.rows = [];
         if (collection) {
