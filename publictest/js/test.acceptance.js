@@ -182,6 +182,7 @@
             Playlist.once('id', function(data) {
                 window.location.href.should.match(/(\/|\/#)$/);
                 Playlist.size().should.eql(0);
+                Playlist.currentTrack.should.eql(0);
                 (!!data.id).should.be.false;
                 done();
             })
@@ -228,8 +229,8 @@
             it('should be able to play a track', function(done) {
                 Playlist.nextTrack(false);
                 Playlist.isPlaying().should.be.false;
-                Playlist.currentMedia.get('siteCode').should.eql('sct');
                 Playlist.once('play', function() {
+                    Playlist.currentMedia.get('siteCode').should.eql('sct');
                     Playlist.currentMedia.should.not.be.null;
                     Playlist.isPlaying().should.be.true;
                     Playlist.isPaused().should.be.false;
@@ -239,6 +240,7 @@
             });
             it('should be able to pause a track', function(done) {
                 Playlist.once('pause', function() {
+                    Playlist.currentMedia.get('siteCode').should.eql('sct');
                     Playlist.currentMedia.should.not.be.null;
                     Playlist.isPlaying().should.be.true;
                     Playlist.isPaused().should.be.true;
