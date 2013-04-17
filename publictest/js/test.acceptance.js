@@ -207,8 +207,8 @@
         describe('YouTube capabilities', function() {
             it('should be able to play a video', function(done) {
                 Playlist.once('play', function() {
-                    Playlist.currentMedia.should.not.be.null;
-                    Playlist.currentMedia.get('siteCode').should.eql('ytv');
+                    Playlist.currentMedia().should.not.be.null;
+                    Playlist.currentMedia().get('siteCode').should.eql('ytv');
                     Playlist.isPlaying().should.be.true;
                     Playlist.isPaused().should.be.false;
                     done();
@@ -217,7 +217,7 @@
             });
             it('should be able to pause a video', function(done) {
                 Playlist.once('pause', function() {
-                    Playlist.currentMedia.should.not.be.null;
+                    Playlist.currentMedia().should.not.be.null;
                     Playlist.isPlaying().should.be.true;
                     Playlist.isPaused().should.be.true;
                     done();
@@ -230,8 +230,8 @@
                 Playlist.nextTrack(false);
                 Playlist.isPlaying().should.be.false;
                 Playlist.once('play', function() {
-                    Playlist.currentMedia.get('siteCode').should.eql('sct');
-                    Playlist.currentMedia.should.not.be.null;
+                    Playlist.currentMedia().get('siteCode').should.eql('sct');
+                    Playlist.currentMedia().should.not.be.null;
                     Playlist.isPlaying().should.be.true;
                     Playlist.isPaused().should.be.false;
                     done();
@@ -240,8 +240,8 @@
             });
             it('should be able to pause a track', function(done) {
                 Playlist.once('pause', function() {
-                    Playlist.currentMedia.get('siteCode').should.eql('sct');
-                    Playlist.currentMedia.should.not.be.null;
+                    Playlist.currentMedia().get('siteCode').should.eql('sct');
+                    Playlist.currentMedia().should.not.be.null;
                     Playlist.isPlaying().should.be.true;
                     Playlist.isPaused().should.be.true;
                     //$('#controls .icon-pause').size().should.eql(1);
@@ -252,21 +252,21 @@
         });
         describe('navigation', function() {
             it('should be able to go forward in the track list', function() {
-                var firstTrack = Playlist.currentMedia;
+                var firstTrack = Playlist.currentMedia();
                 Playlist.nextTrack();
-                firstTrack.should.not.eql(Playlist.currentMedia);
+                firstTrack.should.not.eql(Playlist.currentMedia());
             });
             it('should be able to go backward in the track list', function() {
-                var firstTrack = Playlist.currentMedia;
+                var firstTrack = Playlist.currentMedia();
                 Playlist.previousTrack();
-                firstTrack.should.not.eql(Playlist.currentMedia);
+                firstTrack.should.not.eql(Playlist.currentMedia());
             });
             it('should be able to go to an arbitrary track', function() {
                 var index = Playlist.currentTrack;
                 var goTo = (Playlist.size() - 1) % Playlist.size();
-                var firstTrack = Playlist.currentMedia;
+                var firstTrack = Playlist.currentMedia();
                 Playlist.goToTrack(goTo);
-                firstTrack.should.not.eql(Playlist.currentMedia);
+                firstTrack.should.not.eql(Playlist.currentMedia());
             });
         });
         describe('volume controls', function() {
@@ -305,7 +305,7 @@
             it('should change the volume of a YouTube track', function(done) {
                 Playlist.once('volume', function() {
                     Playlist.getVolume().should.eql(100);
-                    Playlist.currentMedia.get('siteCode').should.eql('ytv');
+                    Playlist.currentMedia().get('siteCode').should.eql('ytv');
                     done();
                 });
                 Playlist.getVolume().should.eql(50);
@@ -313,7 +313,7 @@
             });
             it('should be able to mute and unmute a YouTube track', function(done) {
                 testMute(function() {
-                    Playlist.currentMedia.get('siteCode').should.eql('ytv');
+                    Playlist.currentMedia().get('siteCode').should.eql('ytv');
                     done();
                 });
             });
@@ -321,18 +321,15 @@
                 Playlist.nextTrack(true);
                 Playlist.once('volume', function() {
                     Playlist.getVolume().should.eql(100);
-                    Playlist.currentMedia.get('siteCode').should.eql('sct');
+                    Playlist.currentMedia().get('siteCode').should.eql('sct');
                     done();
                 });
                 Playlist.getVolume().should.eql(50);
                 Playlist.setVolume(100);
             });
             it('should be able to mute and unmute a SoundCloud track', function(done) {
-                Playlist.once('track', function() {
-                    Playlist.currentMedia.get('siteCode').should.eql('ytv');
-                    testMute(done);
-                });
-                Playlist.nextTrack(true);
+                Playlist.currentMedia().get('siteCode').should.eql('sct');
+                testMute(done);
             });
             afterEach(function() {
                 Playlist.stop();

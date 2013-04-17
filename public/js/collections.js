@@ -34,7 +34,6 @@ var TrackList = Backbone.Collection.extend({
 
 var TrackPlaylist = TrackList.extend({
     initialize: function() {
-        this.currentMedia = null,
         this.currentTrack =  0,
         this.currentVolumePercent = 50,
         this.id = false,
@@ -104,6 +103,9 @@ var TrackPlaylist = TrackList.extend({
             this.id = data.id;
         });
     },
+    currentMedia: function() {
+        return this.at(this.currentTrack);
+    },
     getVolume: function() {
         if (!this.isLoaded()) {
             return 0;
@@ -127,7 +129,7 @@ var TrackPlaylist = TrackList.extend({
         return this.isLoaded() && this.currentTrack - 1 >= 0;
     },
     isLoaded: function() {
-        return !!this.currentMedia;
+        return !!this.currentMedia();
     },
     isMuted: function() {
         return this.muted;
@@ -135,14 +137,14 @@ var TrackPlaylist = TrackList.extend({
     isPaused: function() {
         var status = false;
         if (this.isLoaded()) {
-            status = this.currentMedia.isPaused();
+            status = this.currentMedia().isPaused();
         }
         return status;
     },
     isPlaying: function() {
         var status = false;
         if (this.isLoaded()) {
-            status = this.currentMedia.isPlaying() || this.currentMedia.isPaused();
+            status = this.currentMedia().isPlaying() || this.currentMedia().isPaused();
         }
         return status;
     },
@@ -177,7 +179,7 @@ var TrackPlaylist = TrackList.extend({
             var progress = function(media) {
                 media.triggerProgress();
             };
-            var media = this.currentMedia;
+            var media = this.currentMedia();
             if (media.get('type') == 'audio') {
                 media.play({
                     volume: playlist.getVolume(),
@@ -213,25 +215,23 @@ var TrackPlaylist = TrackList.extend({
         this.goToTrack(next, autostart);
     },
     refreshCurrentTrack: function() {
-        if ((this.size() && !this.currentMedia) || !this.size()) {
+        if ((this.size() && !this.currentMedia()) || !this.size()) {
             this.setCurrentTrack(0);
         }
     },
     seek: function(decimalPercent) {
         if (this.isLoaded()) {
-            var track = this.currentMedia;
+            var track = this.currentMedia();
             track.seek(decimalPercent);
         }
     },
     setCurrentTrack: function(trackNumber) {
         if (this.size() && trackNumber >= 0 && trackNumber < this.size()) {
             this.currentTrack = trackNumber;
-            this.currentMedia = this.at(trackNumber);
         } else {
             this.currentTrack = 0;
-            this.currentMedia = null;
         }
-        this.trigger('track', this.currentMedia, this.currentTrack);
+        this.trigger('track', this.currentMedia(), this.currentTrack);
         
     },
     setMute: function(mute) {
@@ -239,7 +239,7 @@ var TrackPlaylist = TrackList.extend({
             return false;
         }
         this.muted = mute;
-        this.currentMedia.setMute(mute);
+        this.currentMedia().setMute(mute);
         if (!mute && this.currentVolumePercent > 0) {
             this.setVolume(this.currentVolumePercent);
         }
@@ -249,7 +249,7 @@ var TrackPlaylist = TrackList.extend({
             return false;
         }
         intPercent = Math.round(intPercent);
-        var media = this.currentMedia;
+        var media = this.currentMedia();
         this.currentVolumePercent = intPercent;
         media.setVolume(intPercent);
     },
@@ -258,7 +258,7 @@ var TrackPlaylist = TrackList.extend({
             return false;
         }
         // Fisher-Yates shuffle implementation by Cristoph (http://stackoverflow.com/users/48015/christoph),
-        var currentSiteMediaID = this.currentMedia.get('siteMediaID');
+        var currentSiteMediaID = this.currentMedia().get('siteMediaID');
         var newCurrentTrack = this.currentTrack, arrayShuffle = function(array) {
             var tmp, current, top = array.length;
 
@@ -286,9 +286,9 @@ var TrackPlaylist = TrackList.extend({
             // Hard stop is used when the current media should be 'destroyed' (unload from the client)
             // until the next time the user loads it in the playlist
             if (hard) {
-                this.currentMedia.end();
+                this.currentMedia().end();
             } else {
-                this.currentMedia.stop();
+                this.currentMedia().stop();
             }
         }
     },
@@ -330,7 +330,7 @@ var TrackPlaylist = TrackList.extend({
         if (!this.isLoaded()) {
             return;
         }
-        this.currentMedia.togglePause();
+        this.currentMedia().togglePause();
     },
     url: function(id) {
         var loc = '/';
