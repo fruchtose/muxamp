@@ -68,9 +68,7 @@ var TrackPlaylist = TrackList.extend({
                 // Destroys media if no more instances exist in playlist
                 mediaObject.destruct();
             }
-            if (!this.size()) {
-                this.refreshCurrentTrack();
-            }
+            this.refreshCurrentTrack();
             this.sync("create", this);
         });
 

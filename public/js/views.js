@@ -367,7 +367,7 @@ var PlaylistView = Backbone.View.extend({
 
 var SearchResultsView = Backbone.View.extend({
     addAll: function() {
-        var tracks = SearchResults.toArray().map(function(track) {
+        var tracks = SearchResults.map(function(track) {
             return track.clone();
         });
         Playlist.add(tracks, {
@@ -437,7 +437,7 @@ var SearchResultsView = Backbone.View.extend({
         SearchResults.nextPage();
     },
     playAll: function() {
-        var tracks = SearchResults.toArray().map(function(track) {
+        var tracks = SearchResults.map(function(track) {
             return track.clone();
         });
         Playlist.add(tracks, {

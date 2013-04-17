@@ -1,5 +1,6 @@
 var triggerEvents = function(context) {
-    return context.trigger.apply(context, _.chain(arguments).flatten().rest().value() || []);
+    args = _.chain(arguments).flatten().rest().value() || [];
+    return context.trigger.apply(context, args);
 };
 
 var Track = Backbone.Model.extend({
