@@ -1,16 +1,19 @@
 ;(function() {
     var playlists = [];
+    // Tests track data received by the client
     var testTrack = function(track) {
         track.should.be.an('object');
         track.should.not.be.empty;
         track.siteMediaID.should.not.be.empty;
         track.duration.should.be.above(0);
     };
+    // Tests search results for content
     var testSearchResults = function(results) {
         results.should.be.an('array');
         results.length.should.be.above(0);
         testTrack(results[0]);
     };
+    // Tests that a track model exists
     var testTrackModel = function(track) {
         track.should.be.an('object');
         track.should.not.be.empty;
@@ -20,6 +23,7 @@
     };
     var testPlaylistAdding = function(playlist, searchResults, done) {
         var startLength = playlist.size(), startId = playlist.id;
+        var prevTracks = _.clone(playlist.models);
         searchResults.once('results:new', function(collection, options) {
             collection.each(function(model) {
                 testTrackModel(model);
@@ -28,11 +32,20 @@
                 Playlist.id.should.be.above(0);
                 Playlist.id.should.not.eql(startId);
                 Playlist.size().should.be.above(startLength);
+                // Ensures that the playlist has all the previous tracks
+                // before adding the new one
+                _(prevTracks).each(function(track) {
+                    playlist.indexOf(track).should.be.above(-1);
+                });
                 done();
             })
-            playlist.add(collection.first());
+            // Adds a random track in search results
+            var count = collection.size(),
+                rand = parseInt(Math.random() * count);
+            playlist.add(collection.at(rand).clone());
         });
     };
+    // Tests the ability to add a track through the GUI
     var testGUIPlaylistAdding = function(playlist, searchResults, done) {
         var startLength = playlist.size(), startId = playlist.id;
         searchResults.once('results:new', function(collection, options) {
@@ -45,6 +58,7 @@
                 Playlist.size().should.be.above(startLength);
                 done();
             })
+            // Adds the first track in the search results
             $('#search-tab').click();
             $('#search-results tr:first-child .search-add-result').click();
         });
@@ -166,12 +180,14 @@
     });
 
     describe('Routing', function() {
+        // Ensures that fetched data has a track array and ID
         var checkFetch = function(id, data) {
             data.should.be.an('object');
             data.id.should.eql(id);
             data.tracks.should.be.an('array');
             data.tracks.length.should.be.above(0);
         };
+        // Verifies fetch results asynchronously
         var asyncFetchVerifier = function(id, done) {
             return function(data) {
                 checkFetch(id, data);
