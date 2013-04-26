@@ -282,7 +282,11 @@
                 var goTo = (Playlist.size() - 1) % Playlist.size();
                 var firstTrack = Playlist.currentMedia();
                 Playlist.goToTrack(goTo);
-                firstTrack.should.not.eql(Playlist.currentMedia());
+                if (index != goTo) {
+                    firstTrack.should.not.eql(Playlist.currentMedia());
+                } else {
+                    firstTrack.should.eql(Playlist.currentMedia());
+                }
             });
         });
         describe('volume controls', function() {
@@ -350,6 +354,33 @@
             afterEach(function() {
                 Playlist.stop();
             });     
+        });
+        describe('temporal navigation', function() {
+            it('should allow seeking', function(done) {
+                percent = Math.random() * 101;
+                Playlist.play();
+                Playlist.once('progress', function(state) {
+                    parseInt(percent).should.eql(parseInt(state.percent));
+                    Playlist.stop();
+                    done();
+                });
+                Playlist.seek(percent);
+            });
+        });
+        describe('shuffle', function() {
+            it('should produce a playlist with a different ID (probably)', function(done) {
+                var tracks = Playlist.models, originalId = Playlist.id;
+                Playlist.on('id', function() {
+                    if (Playlist.models != tracks) {
+                        originalId.should.not.eql(Playlist.id);
+                        Playlist.models.length.should.eql(tracks.length);
+                    } else {
+                        originalId.should.eql(Playlist.id);
+                    }
+                    done();
+                });
+                Playlist.shuffle();
+            });
         });
     });
 })();
