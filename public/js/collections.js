@@ -182,6 +182,7 @@ var TrackPlaylist = TrackList.extend({
                 media.play({
                     volume: playlist.getVolume(),
                     onfinish: function() {
+                        media.trigger('end');
                         playlist.nextTrack(true);
                     },
                     onload: function(success) {
@@ -224,6 +225,9 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     setCurrentTrack: function(trackNumber) {
+        if (this.currentMedia()) {
+            this.stopListening(this.currentMedia(), 'end');
+        }
         if (this.size() && trackNumber >= 0 && trackNumber < this.size()) {
             this.currentTrack = trackNumber;
         } else {

@@ -244,7 +244,6 @@
         describe('SoundCloud capabilities', function() {
             it('should be able to play a track', function(done) {
                 Playlist.nextTrack(false);
-                Playlist.isPlaying().should.be.false;
                 Playlist.once('play', function() {
                     Playlist.currentMedia().get('siteCode').should.eql('sct');
                     Playlist.currentMedia().should.not.be.null;
@@ -287,6 +286,17 @@
                 } else {
                     firstTrack.should.eql(Playlist.currentMedia());
                 }
+            });
+            describe('when the current track is playing', function() {
+                it('should play the next track when the next track is called', function(done) {
+                    Playlist.once('play', function() {
+                        Playlist.once('track', function() {
+                            done();
+                        })
+                        Playlist.nextTrack(true);
+                    });
+                    Playlist.play();
+                });
             });
         });
         describe('volume controls', function() {
@@ -357,7 +367,7 @@
         });
         describe('temporal navigation', function() {
             it('should allow seeking', function(done) {
-                percent = Math.random() * 101;
+                percent = Math.random();
                 Playlist.play();
                 Playlist.once('progress', function(state) {
                     parseInt(percent).should.eql(parseInt(state.percent));

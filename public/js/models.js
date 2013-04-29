@@ -222,7 +222,7 @@ var YouTubeTrack = VideoTrack.extend({
     },
     end: function() {
         var self = this, args = Array.prototype.slice.call(arguments);;
-        this.destruct().then(function() {
+        return this.destruct().then(function() {
             triggerEvents(self, 'end', args);
         });
     },

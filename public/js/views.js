@@ -116,7 +116,7 @@ var ControlsView = Backbone.View.extend({
         Playlist.on('pause stop', showPlay, this);
     },
     nextTrack: function() {
-        Playlist.nextTrack(Playlist.isPlaying());
+        Playlist.nextTrack(true);
     },
     play: function() {
         var playing = Playlist.isPlaying(), paused = Playlist.isPaused();
@@ -128,7 +128,7 @@ var ControlsView = Backbone.View.extend({
         }
     },
     previousTrack: function() {
-        Playlist.previousTrack(Playlist.isPlaying());
+        Playlist.previousTrack(true);
     },
     setPlayButton: function(playing) {
         if (playing) {
