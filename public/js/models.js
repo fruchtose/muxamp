@@ -215,13 +215,16 @@ var YouTubeTrack = VideoTrack.extend({
     },
     destruct: function() {
         var self = this, args = Array.prototype.slice.call(arguments);
-        YouTube.reset().then(function() {
+        return YouTube.reset().then(function() {
             self._stopped = true;
             triggerEvents(self, 'destruct', args);
         });
     },
     end: function() {
-        this.destruct();
+        var self = this, args = Array.prototype.slice.call(arguments);;
+        this.destruct().then(function() {
+            triggerEvents(self, 'end', args);
+        });
     },
     getVolume: function() {
         return YouTube.getVolume();

@@ -483,7 +483,7 @@ var TimebarView = Backbone.View.extend({
         this.lastUpdate = new Date();
 
         Playlist.on('progress', this.onProgress, this);
-        Playlist.on('stop', function() {
+        Playlist.on('end stop', function() {
             this.onProgress({percent: 0, time: 0});
         }, this)
     },
