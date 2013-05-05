@@ -34,7 +34,7 @@ var TrackList = Backbone.Collection.extend({
 
 var TrackPlaylist = TrackList.extend({
     initialize: function() {
-        this.currentTrack =  0,
+        this.currentTrack =  -1,
         this.currentVolumePercent = 50,
         this.id = false,
         this.muted = false,
@@ -102,7 +102,7 @@ var TrackPlaylist = TrackList.extend({
         });
     },
     currentMedia: function() {
-        return this.at(this.currentTrack);
+        return this.currentTrack >= 0 ? this.at(this.currentTrack) : null;
     },
     getVolume: function() {
         if (!this.isLoaded()) {
@@ -214,8 +214,14 @@ var TrackPlaylist = TrackList.extend({
         this.goToTrack(next, autostart);
     },
     refreshCurrentTrack: function() {
-        if ((this.size() && !this.currentMedia()) || !this.size()) {
-            this.setCurrentTrack(0);
+        if (this.size()) {
+            if (this.currentMedia()) {
+                this.setCurrentTrack(this.currentTrack);
+            } else {
+                this.setCurrentTrack(0);
+            }
+        } else {
+            this.setCurrentTrack(-1);
         }
     },
     seek: function(decimalPercent) {
@@ -225,13 +231,13 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     setCurrentTrack: function(trackNumber) {
-        if (this.currentMedia()) {
+        if (this.currentMedia() && this.currentTrack != trackNumber) {
             this.stopListening(this.currentMedia(), 'end');
         }
         if (this.size() && trackNumber >= 0 && trackNumber < this.size()) {
             this.currentTrack = trackNumber;
         } else {
-            this.currentTrack = 0;
+            this.currentTrack = -1;
         }
         this.trigger('track', this.currentMedia(), this.currentTrack);
         

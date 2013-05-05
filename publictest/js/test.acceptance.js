@@ -191,6 +191,7 @@
         var asyncFetchVerifier = function(id, done) {
             return function(data) {
                 checkFetch(id, data);
+                (id > 0) && $('tr.playing').size().should.eql(1);
                 done();
             };
         };
@@ -198,7 +199,7 @@
             Playlist.once('id', function(data) {
                 window.location.href.should.match(/(\/|\/#)$/);
                 Playlist.size().should.eql(0);
-                Playlist.currentTrack.should.eql(0);
+                Playlist.currentTrack.should.eql(-1);
                 (!!data.id).should.be.false;
                 done();
             })
