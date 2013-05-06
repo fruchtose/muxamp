@@ -28,6 +28,13 @@ describe('POST', function() {
                     done();
                 });
             });
+            it('when a track is passed in the request body', function(done) {
+                var tracks = [{siteCode: 'ytv', siteMediaID: 'sOnqjkJTMaA'}];
+                request.post(getParameters(tracks), function(err, response, body) {
+                    response.statusCode.should.eql(200);
+                    done();
+                });
+            });
         });
         describe('should return an error message', function() {
             it('when something other than array is passed in the request body', function(done) {
