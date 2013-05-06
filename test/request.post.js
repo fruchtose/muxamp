@@ -7,12 +7,13 @@ var request   = require('request'),
 describe('POST', function() {
     var baseUrl = 'http://localhost:' + 3000 + '/playlists/save';
     function getParameters(body) {
+        var str = JSON.stringify(body);
         return {
             url: baseUrl,
-            body: JSON.stringify(body),
+            body: str,
             headers: {
                 'Content-Type': 'application/json', 
-                'Content-Length': body.length
+                'Content-Length': str.length
             }
         };
     }
@@ -22,7 +23,7 @@ describe('POST', function() {
     describe('playlist saving endpoint', function() {
         describe('should be okay', function() {
             it('when no tracks are passed in the request body', function(done) {
-                request.post({url: baseUrl}, function(err, response, body) {
+                request.post(getParameters({}), function(err, response, body) {
                     response.statusCode.should.eql(205);
                     done();
                 });
@@ -31,6 +32,13 @@ describe('POST', function() {
         describe('should return an error message', function() {
             it('when something other than array is passed in the request body', function(done) {
                 var options = getParameters({problemo: true});
+                request.post(options, function(err, response, body) {
+                    response.statusCode.should.eql(400);
+                    done();
+                });
+            });
+            it('when the request body contains an array of something other than tracks', function(done) {
+                var options = getParameters([1, "a"]);
                 request.post(options, function(err, response, body) {
                     response.statusCode.should.eql(400);
                     done();
