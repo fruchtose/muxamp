@@ -28,11 +28,14 @@ describe('POST', function() {
                     done();
                 });
             });
-            it('when a track is passed in the request body', function(done) {
-                var tracks = [{siteCode: 'ytv', siteMediaID: 'sOnqjkJTMaA'}];
-                request.post(getParameters(tracks), function(err, response, body) {
-                    response.statusCode.should.eql(200);
-                    done();
+            describe('when the request body contains', function() {
+                beforeEach(testutils.db.cleanAndPopulate(10));
+                it('one track', function(done) {
+                    var tracks = [{siteCode: 'ytv', siteMediaID: 'sOnqjkJTMaA'}];
+                    request.post(getParameters(tracks), function(err, response, body) {
+                        response.statusCode.should.eql(200);
+                        done();
+                    });
                 });
             });
         });

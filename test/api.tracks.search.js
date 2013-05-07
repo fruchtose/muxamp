@@ -41,6 +41,8 @@ var verifyMultipageSearch = function(api, query, perPage, trackType, done) {
 };
 
 describe('SoundCloud API track search', function() {
+    before(testutils.db.clean());
+
     describe('error handling', function() {
         it('should stop a search without arguments', function(done) {
             SoundCloud.search().should.be.rejected.and.notify(done);
@@ -72,6 +74,8 @@ describe('SoundCloud API track search', function() {
 });
 
 describe('YouTube API video search', function() {
+    before(testutils.db.clean());
+    
     describe('error handling', function() {
         it('should stop a search without arguments', function(done) {
             YouTube.search().should.be.rejected.and.notify(done);

@@ -29,6 +29,8 @@ describe('GET', function() {
         });
     });
     describe('playlist endpoint', function() {
+        before(testutils.db.cleanAndPopulate(10));
+
         describe('error handling', function() {
             it('should return no ID for a playlist with an impossible ID', function(done) {
                 request({url: baseUrl + 'playlists/0'}, function(err, response, body) {
