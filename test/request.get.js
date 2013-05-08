@@ -1,5 +1,6 @@
 var request   = require('request'),
     should    = require('chai').should(),
+    _         = require('underscore'),
     muxamp    = require('../lib/server').getApplication(),
     testutils = require('../lib/testutils'),
     playlist  = require('../lib/playlist');
@@ -9,6 +10,33 @@ describe('GET', function() {
     context = {};
     before(testutils.hooks.server.before(context));
 
+    describe('user endpoint', function() {
+        before(testutils.db.cleanAndPopulate(10));
+        
+        describe('should return an error', function() {
+            it('for an invalid playlist number', function(done) {
+                request({url: baseUrl + '0'}, function(err, response, body) {
+                    response.statusCode.should.eql(404);
+                    done();
+                });
+            });
+        });
+        describe('should return HTML', function() {
+            it('without a playlist number', function(done) {
+                request({url: baseUrl}, function(err, response, body) {
+                    response.statusCode.should.eql(200);
+                    done();
+                });
+            });
+            it('for a valid playlist number', function(done) {
+                var number = _.random(1, 10);
+                request({url: baseUrl + number.toString()}, function(err, response, body) {
+                    response.statusCode.should.eql(200);
+                    done();
+                });
+            });
+        });
+    });
     describe('search endpoint', function() {
         describe('error handling', function() {
             describe('should return an error', function(done) {
