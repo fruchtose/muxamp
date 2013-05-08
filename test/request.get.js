@@ -11,11 +11,32 @@ describe('GET', function() {
 
     describe('search endpoint', function() {
         describe('error handling', function() {
-            it('should return an error for no query', function(done) {
-                request({url: baseUrl + 'search/ytv/0/'}, function(err, response, body) {
-                    response.statusCode.should.eql(400);
-                    JSON.parse(body).should.have.property('error');
-                    done();
+            describe('should return an error', function(done) {
+                it('when no parameters are passed in the request', function(done) {
+                    request({url: baseUrl + 'search'}, function(err, response, body) {
+                        response.statusCode.should.eql(404);
+                        done();
+                    });
+                });
+                it('when no query is passed in the request', function(done) {
+                    request({url: baseUrl + 'search/ytv/0/'}, function(err, response, body) {
+                        response.statusCode.should.eql(400);
+                        JSON.parse(body).should.have.property('error');
+                        done();
+                    });
+                });
+                it('when an invalid page number is passed in the request', function(done) {
+                    request({url: baseUrl + 'search/ytv/-1/deadmau5'}, function(err, response, body) {
+                        response.statusCode.should.eql(404);
+                        done();
+                    });
+                });
+                it('when an invalid search code is passed in the request', function(done) {
+                    request({url: baseUrl + 'search/---/0/deadmau5'}, function(err, response, body) {
+                        response.statusCode.should.eql(400);
+                        JSON.parse(body).should.have.property('error');
+                        done();
+                    });
                 });
             });
         });
