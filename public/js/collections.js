@@ -366,8 +366,16 @@ var SearchResultsProvider = TrackList.extend({
         this.query = '';
         this.page = 0;
         this.site = '';
-        this.onerror = function() {
-            self.trigger('error:communication', 'Search results are unavailable.');
+        this.onerror = function(model, xhr) {
+            if (xhr.status == 400) {
+                var message = xhr.responseText;
+                try {
+                    message = JSON.parse(message).error;
+                } catch(e) {}
+                self.trigger('error:server', message);
+            } else {
+                self.trigger('error:communication', 'Search results are unavailable.');
+            }
         };
         this.on('add', function(models, collection) {
             collection.trigger('results', models);
