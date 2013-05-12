@@ -749,5 +749,8 @@ var YouTubeInterface = Backbone.View.extend({
             view.$el.tubeplayer('unmute');
         };
         return view.onload.done(unmute);
+    },
+    videoId: function() {
+        return this.$el.tubeplayer('videoId');
     }
 });

@@ -229,17 +229,21 @@ var YouTubeTrack = VideoTrack.extend({
     getVolume: function() {
         return YouTube.getVolume();
     },
+    idInPlayer: function() {
+        return YouTube.videoId() == this.get('siteMediaID');
+    },
     isBuffering: function() {
-        return YouTube.state == 3;
+        return this.idInPlayer() && YouTube.state == 3;
     },
     isMuted: function() {
-        return YouTube.isMuted();
+        return this.idInPlayer() && YouTube.isMuted();
     },
     isPaused: function() {
-        return !this._stopped && YouTube.state == 2;
+        return this.idInPlayer() && !this._stopped && YouTube.state == 2;
     },
     isPlaying: function() {
-        return !this._stopped && YouTube.state === 1 || YouTube.hasPlayer() || this.isPaused() || this.isBuffering();
+        return this.idInPlayer() && !this._stopped && 
+            (YouTube.hasPlayer() || YouTube.state === 1 || this.isPaused() || this.isBuffering());
     },
     isStopped: function() {
         return this._stopped || !this.isPlaying();

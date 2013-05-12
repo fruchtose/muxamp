@@ -63,6 +63,17 @@
             $('#search-results tr:first-child .search-add-result').click();
         });
     };
+    // Tests if only the current playlist track is playing
+    var backgroundTracksNotPlaying = function(playlist) {
+        var current = playlist.currentMedia();
+        return playlist.every(function(track) {
+            if (current == track) {
+                return true;
+            }
+
+            return !track.isPlaying();
+        });
+    };
     describe('Opening Muxamp', function() {
         it('should have the GUI elements for track search', function() {
             $('#search-query').size().should.eql(1);
@@ -171,7 +182,6 @@
             it('should be able to add the same SoundCloud track twice', function(done) {
                 Playlist.once('id', function() {
                     playlists.push(Playlist.id);
-                    console.log(playlists);
                 });
                 testGUIPlaylistAdding(Playlist, SearchResults, done);
                 $('#search-submit').click();
@@ -291,12 +301,30 @@
             describe('when the current track is playing', function() {
                 it('should play the next track when the next track is called', function(done) {
                     Playlist.once('play', function() {
-                        Playlist.once('track', function() {
+                        Playlist.once('play', function() {
+                            backgroundTracksNotPlaying(Playlist).should.eql(true);
                             done();
                         })
                         Playlist.nextTrack(true);
                     });
                     Playlist.play();
+                });
+                it ('should be able to switch to an arbitrary track', function(done) {
+                    var index = Playlist.currentTrack,
+                        current = Playlist.currentMedia(),
+                        next = index - 1 >= 0 ? index - 1 : index + 1;
+                    Playlist.once('play', function() {
+                        backgroundTracksNotPlaying(Playlist).should.eql(true);
+                        if (index == next) {
+                            Playlist.currentMedia().isPlaying().should.eql(true);
+                            Playlist.currentMedia().should.eql(current);
+                        } else {
+                            Playlist.currentMedia().should.not.eql(current);
+                            Playlist.currentMedia().isPlaying().should.eql(true);
+                        }
+                        done();
+                    });
+                    Playlist.goToTrack(next, true);
                 });
             });
         });

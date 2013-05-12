@@ -114,6 +114,9 @@ var TrackPlaylist = TrackList.extend({
         if (!this.isLoaded()) {
             return;
         }
+        if (this.currentMedia() && this.currentTrack != index) {
+            this.stopListening(this.currentMedia(), 'end');
+        }
         this.stop(true);
         this.setCurrentTrack(index);
         if (autostart) {
@@ -202,7 +205,8 @@ var TrackPlaylist = TrackList.extend({
                     media.play({
                         volume: playlist.getVolume()
                     });
-                    media.once('end', function() {
+                    this.listenTo(media, 'end', function() {
+                        playlist.stopListening(media, 'end');
                         playlist.nextTrack(true);
                     }, this);
                 }
@@ -231,13 +235,14 @@ var TrackPlaylist = TrackList.extend({
         }
     },
     setCurrentTrack: function(trackNumber) {
-        if (this.currentMedia() && this.currentTrack != trackNumber) {
-            this.stopListening(this.currentMedia(), 'end');
-        }
         if (this.size() && trackNumber >= 0 && trackNumber < this.size()) {
             this.currentTrack = trackNumber;
         } else {
-            this.currentTrack = -1;
+            if (trackNumber > this.size()) {
+                this.currentTrack = this.size() - 1;
+            } else {
+                this.currentTrack = this.isEmpty() ? -1 : 0;
+            }
         }
         this.trigger('track', this.currentMedia(), this.currentTrack);
         
