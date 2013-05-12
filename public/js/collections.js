@@ -57,19 +57,43 @@ var TrackPlaylist = TrackList.extend({
             }
         });
 
-        this.on("remove", function(mediaObject, playlist, options) {
-            var index = options.index;
+        this.on("remove", function(media, playlist, options) {
+            _.isArray(media) || (media = [media]);
+            var index = options.index,
+                numberRemoved = media.length,
+                lastRemoved = index + numberRemoved - 1,
+                self = this,
+                isPlaying = this.isPlaying();
 
-            this.totalDuration -= mediaObject.get('duration');
-            if (index == this.currentTrack) {
-                this.goToTrack(Math.min(this.size() - 1, index), this.isPlaying());
+            this.totalDuration -= _(media).reduce(function(sum, track) {
+                return sum + track.get('duration');
+            }, 0);
+            // If the current track was removed, tries to find suitable place to move track marker
+            var nextTrack = this.currentTrack;
+            if (this.currentTrack > lastRemoved) {
+                nextTrack = this.currentTrack - numberRemoved;
             }
-            if ( ! this.where({siteMediaID: mediaObject.get('siteMediaID')}).length) {
-                // Destroys media if no more instances exist in playlist
-                mediaObject.destruct();
-            }
+            this.goToTrack(nextTrack, isPlaying);
             this.refreshCurrentTrack();
             this.sync("create", this);
+
+            var abandonedIds = _.chain(media)
+                .pluck('siteMediaID')
+                .uniq()
+                .reject(function(id) {
+                    return self.where({siteMediaID: id}).length;
+                })
+                .map(function(id) {
+                    return [id, true];
+                })
+                .object()
+                .value();
+            var markedForDeletion = _.chain(media)
+                .filter(function(track) {
+                    return abandonedIds[track.get('siteMediaID')];
+                })
+                .invoke('destruct')
+                .value();
         });
 
         this.on("reset", function(playlist, options) {
@@ -219,11 +243,7 @@ var TrackPlaylist = TrackList.extend({
     },
     refreshCurrentTrack: function() {
         if (this.size()) {
-            if (this.currentMedia()) {
-                this.setCurrentTrack(this.currentTrack);
-            } else {
-                this.setCurrentTrack(0);
-            }
+            this.setCurrentTrack(this.currentTrack);
         } else {
             this.setCurrentTrack(-1);
         }
@@ -238,7 +258,7 @@ var TrackPlaylist = TrackList.extend({
         if (this.size() && trackNumber >= 0 && trackNumber < this.size()) {
             this.currentTrack = trackNumber;
         } else {
-            if (trackNumber > this.size()) {
+            if (trackNumber >= this.size()) {
                 this.currentTrack = this.size() - 1;
             } else {
                 this.currentTrack = this.isEmpty() ? -1 : 0;

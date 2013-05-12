@@ -328,6 +328,97 @@
                 });
             });
         });
+        describe('Removing tracks from the playlist', function() {
+            beforeEach(function(done) {
+                Router.load(playlists[playlists.length - 1]).then(function () {
+                    done();
+                });
+            });
+            it('should work when a track after than the current track is removed', function(done) {
+                Playlist.once('track', function() {
+                    var current = Playlist.currentTrack,
+                        toRemove = _.random(current + 1, Playlist.size() - 1),
+                        removed = Playlist.at(toRemove);
+                    Playlist.once('remove', function() {
+                        should.exist(Playlist.currentMedia());
+                        Playlist.currentTrack.should.eql(current);
+                        Playlist.currentMedia().should.eql(Playlist.at(current));
+                        Playlist.indexOf(removed).should.eql(-1);
+                        done();
+                    });
+                    Playlist.remove(Playlist.at(toRemove));
+                });
+                should.exist(Playlist.currentMedia());
+                Playlist.goToTrack(0);
+            });
+            describe('should work when the current track is removed', function(done) {
+                it('at the beginning of the playlist', function(done) {
+                    Playlist.once('track', function() {
+                        var current = Playlist.currentTrack,
+                            removed = Playlist.at(current);
+                        Playlist.once('track', function() {
+                            should.exist(Playlist.currentMedia());
+                            Playlist.currentTrack.should.eql(current);
+                            Playlist.currentMedia().should.not.eql(removed);
+                            Playlist.indexOf(removed).should.eql(-1);
+                            done();
+                        });
+                        Playlist.remove(Playlist.at(current));
+                    });
+                    should.exist(Playlist.currentMedia());
+                    Playlist.goToTrack(0);
+                });
+                it('in the middle of in the playlist', function(done) {
+                    var current = _.random(1, Playlist.size() - 2),
+                        removed = Playlist.at(current);
+                    Playlist.once('track', function() {
+                        Playlist.once('track', function() {
+                            should.exist(Playlist.currentMedia());
+                            Playlist.currentTrack.should.eql(current);
+                            Playlist.currentMedia().should.not.eql(removed);
+                            Playlist.indexOf(removed).should.eql(-1);
+                            done();
+                        });
+                        Playlist.remove(Playlist.at(current));
+                    });
+                    should.exist(Playlist.currentMedia());
+                    Playlist.goToTrack(current);
+                });
+                it('at the end of the playlist', function(done) {
+                    var current = Playlist.size() - 1,
+                        removed = Playlist.at(current);
+                    Playlist.once('track', function() {
+                        Playlist.once('track', function() {
+                            should.exist(Playlist.currentMedia());
+                            Playlist.currentTrack.should.eql(current - 1);
+                            Playlist.currentMedia().should.eql(Playlist.last());
+                            Playlist.indexOf(removed).should.eql(-1);
+                            done();
+                        });
+                        Playlist.remove(Playlist.at(current));
+                    });
+                    should.exist(Playlist.currentMedia());
+                    Playlist.goToTrack(current);
+                });
+            });
+            it('should work when a track before the current track is removed', function(done) {
+                var last = Playlist.size() - 1
+                    currentMedia = Playlist.at(last),
+                    toRemove = _.random(0, last - 1),
+                    removed = Playlist.at(toRemove);
+                Playlist.once('track', function() {
+                    Playlist.once('track', function() {
+                        should.exist(Playlist.currentMedia());
+                        Playlist.currentTrack.should.eql(last - 1);
+                        Playlist.currentMedia().attributes.should.eql(currentMedia.attributes);
+                        Playlist.indexOf(removed).should.eql(-1);
+                        done();
+                    });
+                    Playlist.remove(Playlist.at(toRemove));
+                });
+                Playlist.goToTrack(last);
+            });
+        });
         describe('volume controls', function() {
             var testMute = function(done) {
                 Playlist.once('mute', function() {
@@ -350,7 +441,7 @@
                         done();
                     })
                     Playlist.goToTrack(0);
-                })
+                });
             });
             beforeEach(function(done) {
                 Playlist.once('play', function() {

@@ -191,8 +191,8 @@ var PlaylistTrackView = TrackView.extend({
         Playlist.goToTrack(index, true);
     },
     removeFromPlaylist: function() {
-        Playlist.remove(this.model);
         this.remove();
+        Playlist.remove(this.model);
     }
 });
 
