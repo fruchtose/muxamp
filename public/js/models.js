@@ -110,10 +110,12 @@ var SoundTrack = Track.extend({
     },
     destruct: function() {
         this.get("sound").destruct();
+        triggerEvents(this, 'progress', {percent: 0, time: 0}, Array.prototype.slice.call(arguments));
         triggerEvents(this, 'destruct', Array.prototype.slice.call(arguments));
     },
     end: function() {
         this.get("sound").stop();
+        triggerEvents(this, 'progress', {percent: 0, time: 0}, Array.prototype.slice.call(arguments));
         triggerEvents(this, 'end', Array.prototype.slice.call(arguments));
     },
     getDuration: function() {
@@ -217,6 +219,7 @@ var YouTubeTrack = VideoTrack.extend({
         var self = this, args = Array.prototype.slice.call(arguments);
         return YouTube.reset().then(function() {
             self._stopped = true;
+            triggerEvents(self, 'progress', {percent: 0, time: 0}, Array.prototype.slice.call(arguments));
             triggerEvents(self, 'destruct', args);
         });
     },

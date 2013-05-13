@@ -61,40 +61,31 @@ var TrackPlaylist = TrackList.extend({
             _.isArray(media) || (media = [media]);
             var index = options.index,
                 numberRemoved = media.length,
-                lastRemoved = index + numberRemoved - 1,
-                self = this,
-                isPlaying = this.isPlaying();
+                lastRemoved = index + numberRemoved - 1;
+            
+            var self = this, isPlaying;
 
             this.totalDuration -= _(media).reduce(function(sum, track) {
                 return sum + track.get('duration');
             }, 0);
+            _(media).find(function(track, i) {
+                if (self.currentTrack == index + i) {
+                    isPlaying = track.isPlaying() || isPlaying;
+                    track.end();
+                    return true;
+                }
+            });
             // If the current track was removed, tries to find suitable place to move track marker
             var nextTrack = this.currentTrack;
-            if (this.currentTrack > lastRemoved) {
+            if (this.currentTrack >= lastRemoved) {
                 nextTrack = this.currentTrack - numberRemoved;
             }
-            this.goToTrack(nextTrack, isPlaying);
             this.refreshCurrentTrack();
+            if (isPlaying) {
+                this.play();
+            }
             this.sync("create", this);
-
-            var abandonedIds = _.chain(media)
-                .pluck('siteMediaID')
-                .uniq()
-                .reject(function(id) {
-                    return self.where({siteMediaID: id}).length;
-                })
-                .map(function(id) {
-                    return [id, true];
-                })
-                .object()
-                .value();
-            var markedForDeletion = _.chain(media)
-                .filter(function(track) {
-                    return abandonedIds[track.get('siteMediaID')];
-                })
-                .invoke('destruct')
-                .value();
-        });
+        }, this);
 
         this.on("reset", function(playlist, options) {
             options || (options = {});
