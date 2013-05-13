@@ -476,7 +476,7 @@ var TimebarView = Backbone.View.extend({
             max: timebarOuter.width() * precison,
             slide: function(event, ui) {
                 var fraction = ui.value / timebarOuter.slider("option", "max");
-                Playlist.seek(fraction.toFixed(4));
+                Playlist.seek(parseFloat(fraction.toFixed(4)));
             }
         });
 
