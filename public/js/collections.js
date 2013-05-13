@@ -71,6 +71,7 @@ var TrackPlaylist = TrackList.extend({
             _(media).find(function(track, i) {
                 if (self.currentTrack == index + i) {
                     isPlaying = track.isPlaying() || isPlaying;
+                    self.stopListening(track, 'end');
                     track.end();
                     return true;
                 }
