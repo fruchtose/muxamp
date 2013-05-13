@@ -234,6 +234,16 @@ var TrackPlaylist = TrackList.extend({
         this.goToTrack(next, autostart);
     },
     refreshCurrentTrack: function() {
+        var current = this.currentMedia();
+        var playing = (current ? (current.isPlaying() && current) : null) || this.find(function(track) {
+            return track.isPlaying();
+        });
+
+        if (playing) {
+            this.setCurrentTrack(this.indexOf(playing));
+            return;
+        }
+
         if (this.size()) {
             this.setCurrentTrack(this.currentTrack);
         } else {
