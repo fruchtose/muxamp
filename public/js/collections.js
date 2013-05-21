@@ -383,8 +383,7 @@ var SearchResultsProvider = TrackList.extend({
         this.page++;
         var results = this.fetch({
             error: self.onerror,
-            remove: false,
-            update: true
+            remove: false
         });
         return results;
     },
@@ -431,7 +430,8 @@ var SearchResultsProvider = TrackList.extend({
         this.page = 0;
         this.site = site;
         return this.fetch({
-            error: this.onerror
+            error: this.onerror,
+            reset: true
         });
     },
     url: function() {

@@ -21,7 +21,8 @@ var PlaylistRouter = Backbone.Router.extend({
         var router = this;
         return Playlist.fetch({
             id: playlistID,
-            readonly: true
+            readonly: true,
+            reset: true
         });
     },
 
