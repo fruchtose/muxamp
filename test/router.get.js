@@ -93,4 +93,16 @@ describe('URL router', function() {
             expectAuthor(router.get('http://api.soundcloud.com/tracks/49816643/download'), 'Cyril Hahn', done);
         });
     });
+
+    describe('Jamendo access', function() {
+        var expectGWB = function(promise, done) {
+            expectAuthor(promise, 'Great White Buffalo', done);
+        };
+        it('should be able to fetch a track from Great White Buffalo', function(done) {
+            expectGWB(router.get('http://www.jamendo.com/en/track/1031200/likely-story'), done);
+        });
+        it('should be able to fetch a track from Great White Buffalo with some URL params gone', function(done) {
+            expectGWB(router.get('http://www.jamendo.com/track/1031200'), done);
+        });
+    });
 });

@@ -79,7 +79,7 @@
             $('#search-query').size().should.eql(1);
             $('#search-submit').size().should.eql(1);
             $('#site-selector').size().should.eql(1);
-            $('#search-site-dropdown').find('li').size().should.eql(3);
+            $('#search-site-dropdown').find('li').size().should.eql(4);
         });
         it('should load SoundCloud', function(done) {
             soundManager.should.not.be.null;
@@ -136,6 +136,18 @@
                 done();
             });
         });
+        it('should be able to search Jamendo', function(done) {
+            SearchResults.search('rock', 'jmt').then(function(results) {
+                testSearchResults(results);
+                done();
+            });
+        });
+        it('should be able to retrieve Jamendo media based on a URL', function(done) {
+            SearchResults.search('http://www.jamendo.com/en/track/1031200/likely-story', 'url').then(function(results) {
+                testSearchResults(results);
+                done();
+            });
+        });
     });
     describe('Adding tracks to the playlist', function() {
         it('should function for YouTube tracks', function(done) {
@@ -151,6 +163,13 @@
             });
             testPlaylistAdding(Playlist, SearchResults, done);
             SearchResults.search('bag raiders', 'sct');
+        });
+        it('should function for Jamendo tracks', function(done) {
+            Playlist.once('id', function() {
+                playlists.push(Playlist.id);
+            });
+            testPlaylistAdding(Playlist, SearchResults, done);
+            SearchResults.search('guitar', 'jmt');
         });
         describe('through the GUI', function() {
             it('should function for YouTube tracks', function(done) {
@@ -267,6 +286,30 @@
             it('should be able to pause a track', function(done) {
                 Playlist.once('pause', function() {
                     Playlist.currentMedia().get('siteCode').should.eql('sct');
+                    Playlist.currentMedia().should.not.be.null;
+                    Playlist.isPlaying().should.be.true;
+                    Playlist.isPaused().should.be.true;
+                    //$('#controls .icon-pause').size().should.eql(1);
+                    done();
+                });
+                Playlist.togglePause();
+            });
+        });
+        describe('Jamendo capabilities', function() {
+            it('should be able to play a track', function(done) {
+                Playlist.nextTrack(false);
+                Playlist.once('play', function() {
+                    Playlist.currentMedia().get('siteCode').should.eql('jmt');
+                    Playlist.currentMedia().should.not.be.null;
+                    Playlist.isPlaying().should.be.true;
+                    Playlist.isPaused().should.be.false;
+                    done();
+                });
+                Playlist.play();
+            });
+            it('should be able to pause a track', function(done) {
+                Playlist.once('pause', function() {
+                    Playlist.currentMedia().get('siteCode').should.eql('jmt');
                     Playlist.currentMedia().should.not.be.null;
                     Playlist.isPlaying().should.be.true;
                     Playlist.isPaused().should.be.true;

@@ -240,8 +240,11 @@ var SearchBarView = Backbone.View.extend({
             case "YouTube":
                 siteCode = "ytv";
                 break;
-            case "SoundCloud (Tracks)":
+            case "SoundCloud":
                 siteCode = "sct";
+                break;
+            case "Jamendo":
+                siteCode = 'jmt';
                 break;
             case "URL":
                 siteCode = "url";

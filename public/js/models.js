@@ -67,6 +67,17 @@ var Track = Backbone.Model.extend({
                         soundManager: soundManager
                     }, options);
                     break;
+                case 'jmt':
+                    mediaObject = new JamendoTrack({
+                        siteMediaID: mediaData.siteMediaID,
+                        url: mediaData.url,
+                        permalink: mediaData.permalink,
+                        uploader: mediaData.author,
+                        mediaName: mediaData.mediaName,
+                        duration: mediaData.duration,
+                        soundManager: soundManager
+                    }, options);
+                    break;
                 case 'ytv':
                     mediaObject = new YouTubeTrack({
                         siteMediaID: mediaData.siteMediaID,
@@ -185,6 +196,16 @@ var SoundTrack = Track.extend({
         var percent = (time * 100.0) / this.get('duration');
         triggerEvents(this, 'progress', {percent: percent, time: time}, Array.prototype.slice.call(arguments));
     }
+});
+
+var JamendoTrack = SoundTrack.extend({
+    defaults: _.extend({}, SoundTrack.prototype.defaults, {
+        site: 'Jamendo',
+        siteCode: 'jmt',
+        // Icon by Oliver Schultz, used under Creative Commons SA NC
+        //http://www.iconfinder.com/iconsets/humano2#readme
+        icon: 'img/jamendo_16.png'
+    })
 });
 
 var SoundCloudTrack = SoundTrack.extend({
