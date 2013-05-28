@@ -9,6 +9,9 @@ var expect = chai.expect;
 var should = chai.should();
 var assert = chai.assert;
 $(document).ready(function() {
+    if (window.location.search  != '?test') {
+        return;
+    }
     $('#video-container').css('top', '120px');
     $('#tab-list').append('<li id="test-tab"><a href="#mocha" data-toggle="tab">Tests</a></li>');
     $('.tab-content').find('.active').removeClass('active');

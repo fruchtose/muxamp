@@ -53,7 +53,7 @@ All namespaces are separated by colons (`:`). For instance the database host is 
 
 Unit and integration tests can be found in `./tests` and are run using [`mocha`](https://github.com/visionmedia/mocha). To run these tests, execute `make test`.
 
-Acceptance tests for the browser are found in `./publictest`. To run these tests, run `NODE_ENV=test npm start`, then open your browser and visit `http://localhost/<Muxamp port>`. A better way of running acceptance tests is currently being explored through PhantomJS.
+Acceptance tests for the browser are found in `./publictest`. To run these tests, run `NODE_ENV=test npm start`, then open your browser and visit `http://localhost/<Muxamp port>?test` (e.g. `http://localhost:3000?test`). A better way of running acceptance tests is currently being explored through PhantomJS.
 
 ## Server Libraries Used
 
