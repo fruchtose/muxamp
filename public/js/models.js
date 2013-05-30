@@ -55,38 +55,24 @@ var Track = Backbone.Model.extend({
         var mediaObject = null;
         options || (options = {});
         if (mediaData) {
+            var proto,
+                params = _(mediaData).pick('siteMediaID', 'url', 'permalink', 'mediaName', 'duration');
+            
+            params.uploader = mediaData.author;
             switch (mediaData.siteCode) {
                 case 'sct':
-                    mediaObject = new SoundCloudTrack({
-                        siteMediaID: mediaData.siteMediaID,
-                        url: mediaData.url,
-                        permalink: mediaData.permalink,
-                        uploader: mediaData.author,
-                        mediaName: mediaData.mediaName,
-                        duration: mediaData.duration,
-                        soundManager: soundManager
-                    }, options);
+                    proto = SoundCloudTrack;
+                    params.soundManager = soundManager;
                     break;
                 case 'jmt':
-                    mediaObject = new JamendoTrack({
-                        siteMediaID: mediaData.siteMediaID,
-                        url: mediaData.url,
-                        permalink: mediaData.permalink,
-                        uploader: mediaData.author,
-                        mediaName: mediaData.mediaName,
-                        duration: mediaData.duration,
-                        soundManager: soundManager
-                    }, options);
+                    proto = JamendoTrack;
+                    params.soundManager = soundManager;
                     break;
                 case 'ytv':
-                    mediaObject = new YouTubeTrack({
-                        siteMediaID: mediaData.siteMediaID,
-                        uploader: mediaData.author,
-                        mediaName: mediaData.mediaName,
-                        duration: mediaData.duration,
-                    }, options);
+                    proto = YouTubeTrack;
                     break;
             }
+            mediaObject = new proto(params, options);
         }
         return mediaObject;
     }
