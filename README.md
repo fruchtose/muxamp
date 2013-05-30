@@ -48,6 +48,11 @@ All namespaces are separated by colons (`:`). For instance the database host is 
         * `allowDirectSave`: Normally, tracks can only be saved in a playlist if there is a record of it in the `KnownMedia` table. If `allowDirectSave` is enabled, tracks can be verified at the point of saving the playlist, without going through search first. This is disabled by default, as verifying a track requires a call to the required API, followed by a DB write to record the verification. DB writes are batched per playlist. Turn this option on only if you want to enable playlist saving without going through a search interface.
     * `log`: The logging level Muxamp uses (see `express` for logging level formats)
     * `port`: The port from which Muxamp serves (defaults to `process.env['app_port']`, then `3000`)
+    * `apis`
+        * `jamendo`
+            * `clientId`: Client ID registered with [Jamendo](https://devportal.jamendo.com/) to use their API
+        * `soundcloud`
+            * `clientId`: Client ID registered with [SoundCloud](http://developers.soundcloud.com/) to use their API
 
 ## Testing
 
