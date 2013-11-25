@@ -49,6 +49,8 @@ All namespaces are separated by colons (`:`). For instance the database host is 
     * `log`: The logging level Muxamp uses (see `express` for logging level formats)
     * `port`: The port from which Muxamp serves (defaults to `process.env['app_port']`, then `3000`)
     * `apis`
+        * `youtube`
+            * `serverKey`: Server key provided by Google for use with [the YouTube Data API (v3)](https://developers.google.com/youtube/v3/)
         * `jamendo`
             * `clientId`: Client ID registered with [Jamendo](https://devportal.jamendo.com/) to use their API
         * `soundcloud`
