@@ -30,7 +30,12 @@ describe('POST', function() {
                 });
             });
             describe('when the request body contains', function() {
-                beforeEach(testutils.db.cleanAndPopulate(10));
+                beforeEach(function() {
+                    config.set('muxamp:db:allowDirectSave', true);
+                });
+                afterEach(function() {
+                    config.set('muxamp:db:allowDirectSave', false);
+                });
                 it('one track', function(done) {
                     var tracks = [{siteCode: 'ytv', siteMediaID: 'sOnqjkJTMaA'}];
                     request.post(getParameters(tracks), function(err, response, body) {

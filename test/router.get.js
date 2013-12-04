@@ -31,9 +31,8 @@ describe('URL router', function() {
         it('should not be able to fetch a SoundCloud set', function(done) {
             router.get('https://soundcloud.com/foofighters/sets/wasting-light').should.be.rejected.and.notify(done);
         });
-        // Search query: romney
         it('should return an error for unstreamable media', function(done) {
-            router.get('http://www.youtube.com/watch?v=yTCRwi71_ns').should.be.rejected.and.notify(done);
+            router.get('http://api.soundcloud.com/tracks/49816643/download').should.be.rejected.and.notify(done);
         });
     });
 
@@ -87,10 +86,6 @@ describe('URL router', function() {
         });
         it('should be able to fetch the best remix of Levels from a redirected embedded Flash player', function(done) {
             expectLevels(router.get('http://player.soundcloud.com/player.swf?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F46010803&remote_addr=10.20.3.72&referer='), done);
-        });
-        it('should be able to fetch a track from a download link ', function(done) {
-            // From https://soundcloud.com/cyrilhahn/destinys-child-say-my-name
-            expectAuthor(router.get('http://api.soundcloud.com/tracks/49816643/download'), 'Cyril Hahn', done);
         });
     });
 
