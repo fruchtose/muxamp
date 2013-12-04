@@ -1,4 +1,5 @@
-var request   = require('request'),
+var config    = require('../lib/config'),
+    request   = require('request'),
     should    = require('chai').should(),
     _         = require('underscore'),
     muxamp    = require('../lib/server').getApplication(),
@@ -6,7 +7,7 @@ var request   = require('request'),
     playlist  = require('../lib/playlist');
 
 describe('GET', function() {
-    var baseUrl = 'http://localhost:' + 3000 + '/';
+    var baseUrl = 'http://localhost:' + config.get('muxamp:port') + '/';
     context = {};
     before(testutils.hooks.server.before(context));
 
