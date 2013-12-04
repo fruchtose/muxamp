@@ -131,7 +131,7 @@
             });
         });
         it('should be able to retrieve SoundCloud media based on a URL', function(done) {
-            SearchResults.search('https://soundcloud.com/fuckmylife/arm1n_3', 'url').then(function(results) {
+            SearchResults.search('https://soundcloud.com/fuckmylife/777-1', 'url').then(function(results) {
                 testSearchResults(results);
                 done();
             });
