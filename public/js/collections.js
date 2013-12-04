@@ -181,7 +181,9 @@ var TrackPlaylist = TrackList.extend({
     parse: function(response) {
         var mediaObjects = [];
         if (response.id) {
-            mediaObjects = _.chain(response.tracks || []).map(function(item) {
+            mediaObjects = _.chain(response.tracks || []).reject(function(item) {
+                return item.exception;
+            }).map(function(item) {
                 return Track.getMediaObject(item);
             }).compact().value();
         }
