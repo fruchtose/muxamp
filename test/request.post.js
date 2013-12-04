@@ -1,11 +1,12 @@
-var request   = require('request'),
+var config    = require('../lib/config'),
+    request   = require('request'),
     should    = require('chai').should(),
     muxamp    = require('../lib/server').getApplication(),
     testutils = require('../lib/testutils'),
     playlist  = require('../lib/playlist');
 
 describe('POST', function() {
-    var baseUrl = 'http://localhost:' + 3000 + '/playlists/save';
+    var baseUrl = 'http://localhost:' + config.get('muxamp:port') + '/playlists/save';
     function getParameters(body) {
         var str = JSON.stringify(body);
         return {
