@@ -94,7 +94,7 @@ describe('GET', function() {
                     done();
                 });
             });
-            it('should return no ID for a nonexistent playlist', function(done) {
+            it('should reply with a 404 for a nonexistent playlist', function(done) {
                 request({url: baseUrl + 'playlists/9999999999999999999'}, function(err, response, body) {
                     response.statusCode.should.eql(404);
                     should.not.exist(err);
@@ -109,20 +109,15 @@ describe('GET', function() {
         });
         it('should return playlists as JSON', function(done) {
             var lastPlaylist = 0;
-            playlist.count().then(function(count) {
-                should.exist(count);
-                count.should.be.above(0);
-                lastPlaylist = count;
-                return playlist.getPlaylist(lastPlaylist);
-            }).done(function(tracks) {
-                request({url: baseUrl + 'playlists/' + lastPlaylist}, function(err, response, body) {
+            playlist.last().done(function(id) {
+                request({url: baseUrl + 'playlists/' + id}, function(err, response, body) {
                     response.statusCode.should.eql(200);
                     should.not.exist(err);
                     var data = JSON.parse(body);
                     data.should.have.property('id');
-                    data['id'].should.eql(lastPlaylist);
+                    data['id'].should.eql(id);
                     data.should.have.property('tracks');
-                    data['tracks'].should.have.length(tracks.length);
+                    (data['tracks'].length || 0).should.be.above(0);
                     done();
                 });
             });
